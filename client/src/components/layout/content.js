@@ -1,21 +1,20 @@
 ﻿import React from 'react';
+import { Container, Row, Col } from 'react-bootstrap';
 import { Header } from './header'
 import { Footer } from './footer'
 import { Outlet } from 'react-router-dom';
 
 const Content = () => {
     return (
-        <div className="container">
-            <div className="row">
-                <div className="col-lg-12"> {/* centers content */}
-                    <Header />
-                    <main>
-                        <Outlet />
-                    </main>
-                    <Footer />
-                </div>
-            </div>
-        </div>
+        <Container className="my-4">
+            <Header />
+            <Row as="main">
+                <Col>
+                    <Outlet />
+                </Col>
+            </Row>
+            <Footer />
+        </Container>
     );
 }
 
