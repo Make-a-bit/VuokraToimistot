@@ -1,0 +1,96 @@
+#####################
+# General
+#####################
+*.log
+*.tmp
+*.bak
+*.swp
+*.DS_Store
+Thumbs.db
+
+#####################
+# Node.js / React
+#####################
+node_modules/
+build/
+dist/
+.npm/
+.env
+.env.*.local
+coverage/
+.vite/
+.next/
+out/
+
+# React specific
+*.local
+*.env.local
+*.env.development.local
+*.env.test.local
+*.env.production.local
+
+# NPM logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+#####################
+# Visual Studio
+#####################
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+#####################
+# Build outputs
+#####################
+bin/
+obj/
+[Bb]uild/
+[Ll]ogs/
+TestResults/
+Generated/
+*.dll
+*.exe
+*.app
+*.pdb
+*.cache
+*.dbmdl
+*.mdb
+
+#####################
+# ASP.NET Core
+#####################
+project.lock.json
+project.fragment.lock.json
+artifacts/
+wwwroot/dist/
+wwwroot/node_modules/
+
+#####################
+# Rider / JetBrains
+#####################
+.idea/
+*.sln.iml
+
+#####################
+# Misc
+#####################
+*.vspscc
+*.vssscc
+_ReSharper*/
+*.ncrunch*
+*.dotCover
+*.g.dart
+*.orig
+*.rej
+
+#####################
+# Windows
+#####################
+ehthumbs.db
+Icon?
+Desktop.ini
