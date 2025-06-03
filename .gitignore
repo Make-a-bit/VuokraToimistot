@@ -11,11 +11,11 @@ Thumbs.db
 #####################
 # Node.js / React
 #####################
-node_modules/
-build/
-dist/
+client/node_modules/
+client/build/
+client/dist/
 .npm/
-.env
+client/.env*
 .env.*.local
 coverage/
 .vite/
@@ -38,6 +38,7 @@ pnpm-debug.log*
 #####################
 # Visual Studio
 #####################
+Server/.vs/
 .vs/
 *.user
 *.suo
@@ -47,8 +48,8 @@ pnpm-debug.log*
 #####################
 # Build outputs
 #####################
-bin/
-obj/
+Server/bin/
+Server/obj/
 [Bb]uild/
 [Ll]ogs/
 TestResults/
