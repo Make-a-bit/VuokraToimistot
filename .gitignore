@@ -11,7 +11,7 @@ Thumbs.db
 #####################
 # Node.js / React
 #####################
-node_modules/
+client/node_modules/
 build/
 dist/
 .npm/
@@ -39,6 +39,7 @@ pnpm-debug.log*
 # Visual Studio
 #####################
 .vs/
+Server/.vs
 *.user
 *.suo
 *.userosscache
@@ -47,8 +48,8 @@ pnpm-debug.log*
 #####################
 # Build outputs
 #####################
-bin/
-obj/
+Server/bin/
+Server/obj/
 [Bb]uild/
 [Ll]ogs/
 TestResults/
