@@ -1,5 +1,4 @@
 ﻿using API.Controllers;
-using API.Entitys;
 using Microsoft.Data.SqlClient;
 using System.Diagnostics;
 

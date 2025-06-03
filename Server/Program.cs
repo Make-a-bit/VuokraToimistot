@@ -1,4 +1,3 @@
-using API.Entitys;
 using API.Services;
 
 namespace API
