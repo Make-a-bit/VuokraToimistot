@@ -6,7 +6,7 @@ import { Outlet } from 'react-router-dom';
 
 const Content = () => {
     return (
-        <Container className="my-4">
+        <Container className="my-4" fluid={"xl"}>
             <Header />
             <Row as="main">
                 <Col>
