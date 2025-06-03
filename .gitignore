@@ -12,10 +12,15 @@ Thumbs.db
 # Node.js / React
 #####################
 client/node_modules/
+<<<<<<< HEAD
 build/
 dist/
+=======
+client/build/
+client/dist/
+>>>>>>> 3123b1afeac439074883600ce62a19ab55f534e5
 .npm/
-.env
+client/.env*
 .env.*.local
 coverage/
 .vite/
@@ -38,6 +43,7 @@ pnpm-debug.log*
 #####################
 # Visual Studio
 #####################
+Server/.vs/
 .vs/
 Server/.vs
 *.user
