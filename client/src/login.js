@@ -5,12 +5,14 @@ import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 
+const mainURI = "https://localhost:5140";
+
 const Login = () => {
     const [userName, setUserName] = useState("");
     const [userPassword, setUserPassword] = useState("");
 
     const btnLoginPressed = async () => {
-        const URI = "http://localhost:5140/login/auth";
+        const URI = mainURI + "/login/auth";
         try {
             const options = {
                 method: "POST",
