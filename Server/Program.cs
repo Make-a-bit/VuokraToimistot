@@ -1,3 +1,4 @@
+using API.Repositories;
 using API.Services;
 
 namespace API
@@ -11,13 +12,21 @@ namespace API
             // Add services to the container.
             builder.Services.AddControllers();
 
+            var corsPolicyName = "AllowFrontend";
+
             builder.Services.AddCors(options =>
             {
-                options.AddDefaultPolicy(policy =>
+                options.AddPolicy(name: corsPolicyName, policy =>
                 {
-                    policy.WithOrigins("http://localhost:3000")
+                    policy.WithOrigins(
+                        "http://localhost:3000",     
+                        "http://localhost:3001",     
+                        "https://localhost:3000",    
+                        "https://localhost:3001",    
+                        "https://localhost:7017",    
+                        "http://localhost:5140"      
+                    )
                     .AllowAnyHeader()
-                    .AllowAnyOrigin()
                     .AllowAnyMethod();
                 });
             });
@@ -28,16 +37,18 @@ namespace API
             builder.Services.AddSingleton<DBManager>();
 
             // Register extended instances (per request)
-            builder.Services.AddScoped<UserAccessManager>();
             builder.Services.AddScoped<CustomerAdd>();
+            builder.Services.AddScoped<CustomerRepository>();
+            builder.Services.AddScoped<UserAccessManager>();
 
 
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
             app.UseHttpsRedirection();
-            app.UseAuthorization();
+            app.UseCors(corsPolicyName);
 
+            app.UseAuthorization();
             app.MapControllers();
             app.Run();
         }

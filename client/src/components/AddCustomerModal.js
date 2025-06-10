@@ -3,7 +3,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 
-const mainURI = "https://localhost:5140";
+const mainURI = "https://localhost:7017";
 
 const AddCustomer = ({ show, onHide, onCustomerAdded }) => {
     const [formData, setFormData] = useState({ name: "", email: "", phone: "", address: "", postalCode: "", city: "", country: "" })
