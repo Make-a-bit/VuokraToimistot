@@ -1,4 +1,3 @@
-using API.Entitys;
 using API.Services;
 
 namespace API
@@ -25,11 +24,12 @@ namespace API
 
             builder.Services.AddEndpointsApiExplorer();
 
-            // Register DBManager as a Singleton (shared instance)
+            // Register Singleton services (shared instances)
             builder.Services.AddSingleton<DBManager>();
 
-            // Register classes as extended instance (per request)
+            // Register extended instances (per request)
             builder.Services.AddScoped<UserAccessManager>();
+            builder.Services.AddScoped<CustomerAdd>();
 
 
             var app = builder.Build();

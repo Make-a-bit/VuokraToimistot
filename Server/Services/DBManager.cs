@@ -1,6 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 
-namespace API.Entitys
+namespace API.Services
 {
     /// <summary>
     /// Class for managing the connection to the database.
