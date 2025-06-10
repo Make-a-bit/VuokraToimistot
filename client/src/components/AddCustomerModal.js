@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+﻿import React, { useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
@@ -6,7 +6,14 @@ import Modal from "react-bootstrap/Modal";
 const mainURI = "https://localhost:7017";
 
 const AddCustomer = ({ show, onHide, onCustomerAdded }) => {
+    const initialFormData = { name: "", email: "", phone: "", address: "", postalCode: "", city: "", country: "" };
     const [formData, setFormData] = useState({ name: "", email: "", phone: "", address: "", postalCode: "", city: "", country: "" })
+
+    useEffect(() => {
+        if (!show) {
+            setFormData(initialFormData);
+        }
+    }, [show]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -21,7 +28,7 @@ const AddCustomer = ({ show, onHide, onCustomerAdded }) => {
             onCustomerAdded();
             onHide();
         } else {
-            // Error message? 
+            console.log("Error while adding a new customer");
         }
     };
 
@@ -46,7 +53,7 @@ const AddCustomer = ({ show, onHide, onCustomerAdded }) => {
                     <Form.Group>
                         <Form.Label>Sähköposti</Form.Label>
                         <Form.Control
-                            type="text"
+                            type="email"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             required
