@@ -1,4 +1,5 @@
 ﻿using API.Entities;
+using API.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -7,15 +8,21 @@ namespace API.Controllers
 
     public class CustomerController : Controller
     {
+        private readonly CustomerAdd _customerAdd;
+
+        public CustomerController(CustomerAdd customerAdd)
+        {
+            _customerAdd = customerAdd;
+        }
+
         [HttpPost]
         public async Task<ActionResult> CreateCustomer([FromBody] Customer customer)
         {
-            if (customer == null)
-            {
-                return BadRequest();
-            }
+            var success = await _customerAdd.AddCustomer(customer);
 
-            return Ok();
+            if (success) return Ok();
+
+            else return BadRequest();
         }
     }
 }
