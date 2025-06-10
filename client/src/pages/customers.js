@@ -6,10 +6,16 @@ import { AddCustomer } from "../components/AddCustomerModal";
 const mainURI = "https://localhost:7017";
 
 const CustomerListPage = () => {
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+
     const [showAddCustomer, setShowAddCustomer] = useState(false);
     const [customers, setCustomers] = useState([]);
 
     const fetchCustomers = async () => {
+        setLoading(true);
+        setError("");
+
         try {
             const response = await fetch(mainURI + "/customer", {
                 method: "GET",
@@ -24,8 +30,19 @@ const CustomerListPage = () => {
             setCustomers(data)
         } catch (error) {
             console.error("Failed to fetch customers:", error);
+            setError("Asiakkaiden hakeminen epäonnistui.")
+        } finally {
+            setLoading(false);
         }
     };
+
+    const editCustomer = () => {
+
+    }
+
+    const deleteCustomer = () => {
+
+    }
 
     useEffect(() => {
         fetchCustomers();
@@ -40,7 +57,10 @@ const CustomerListPage = () => {
                 onCustomerAdded={() => fetchCustomers()}
             />
 
-            <Table responsive striped bordered hover>
+            {loading && <p>Ladataan asiakkaita...</p>}
+            {error && <p style={{ color: "red" }}>{error}</p>}
+
+            <Table responsive striped bordered hover size="sm">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -51,8 +71,11 @@ const CustomerListPage = () => {
                         <th>Postinumero</th>
                         <th>Postitoimipaikka</th>
                         <th>Maa</th>
+                        <th>Muokkaa</th>
+                        <th>Poista</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     {customers.map((customer) => (
                         <tr key={customer.id}>
@@ -61,9 +84,11 @@ const CustomerListPage = () => {
                             <td>{customer.email}</td>
                             <td>{customer.phone}</td>
                             <td>{customer.address}</td>
-                            <td>{customer.postalcode}</td>
+                            <td>{customer.postalCode}</td>
                             <td>{customer.city}</td>
                             <td>{customer.country}</td>
+                            <td><Button variant="secondary" onClick={() => editCustomer(customer.id)}>Muokkaa</Button></td>
+                            <td><Button variant="danger" onClick={() => deleteCustomer(customer.id)}>Poista</Button></td>
                         </tr>
                     )) }
                 </tbody>
