@@ -4,7 +4,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 
-const mainURI = "https://localhost:7017";
+const mainURI = "https://localhost:7017/customer";
 
 const AddCustomer = ({ show, onHide, onCustomerAdded }) => {
     const nameInputRef = useRef(null);
@@ -13,6 +13,7 @@ const AddCustomer = ({ show, onHide, onCustomerAdded }) => {
     const [formData, setFormData] = useState({ name: "", email: "", phone: "", address: "", postalCode: "", city: "", country: "" })
     const [inputValidity, setInputValidity] = useState(false);
     const [error, setError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
     
     useEffect(() => {
         if (show) {
@@ -52,22 +53,30 @@ const AddCustomer = ({ show, onHide, onCustomerAdded }) => {
 
         if (!isValid) {
             setInputValidity(true);
+            setErrorMessage("Täytä kaikki kentät!")
             return;
         }
 
         // Proceed for sending data to server
-        const response = await fetch(mainURI + "/customer", {
-            method: "POST",
-            headers: { "Content-type": "application/json" },
-            body: JSON.stringify(formData),
-        });
+        try {
+            const response = await fetch(mainURI, {
+                method: "POST",
+                headers: { "Content-type": "application/json" },
+                body: JSON.stringify(formData),
+            });
 
-        if (response.ok) {
-            onCustomerAdded();
-            onHide();
-        } else {
+            if (response.ok) {
+                onCustomerAdded();
+                onHide();
+            } else {
+                setError(true);
+                setErrorMessage("Virhe asiakkaan lisäämisessä");
+                console.log("Error while adding a new customer");
+            }
+        } catch (err) {
             setError(true);
-            console.log("Error while adding a new customer");
+            setErrorMessage("Verkkovirhe. Tarkista internet yhteys.")
+            console.log("Network error while adding a customer:", err)
         }
     };
 
@@ -77,8 +86,8 @@ const AddCustomer = ({ show, onHide, onCustomerAdded }) => {
                 <Modal.Title>Lisää uusi asiakas</Modal.Title>
             </Modal.Header>
 
-            { inputValidity && <Alert variant={"danger"}>Täytä kaikki kentät!</Alert> }
-            { error && <Alert variant={"danger"}>Virhe asiakkaan lisäämisessä</Alert> }
+            {inputValidity && <Alert variant={"danger"}>{errorMessage}</Alert>}
+            {error && <Alert variant={"danger"}>{errorMessage}</Alert>}
 
             <Modal.Body>
                 <Form onSubmit={handleSubmit}>

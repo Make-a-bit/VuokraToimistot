@@ -9,11 +9,13 @@ const Header = () => {
 
     const navLinks = [
         { path: "/", label: "Etusivu" },
+        { path: "/customers/", label: "Asiakkaat" },
+        { path: "/offices/", label: "Toimistot" },
         {
-            label: "Asiakkaat",
+            label: "Muut",
             dropdown: [
-                { path: "/customers/new", label: "Lisää uusi" },
-                { path: "/customers/", label: "Kaikki asiakkaat" }
+                { path: "/muu/1", label: "Muuta 1" },
+                { path: "muu/2", label: "Muuta 2" }
             ]
         },
     ]

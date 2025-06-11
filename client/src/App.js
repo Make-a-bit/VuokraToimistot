@@ -3,7 +3,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Content } from './components/layout/content';
 import { Home } from './pages/home'
 import { ErrorPage } from './pages/errorpage';
-import { CustomerListPage } from "../src/pages/customers";
+import Customers from "../src/pages/customers";
+import Offices from "../src/pages/offices";
 
 
 const App = () => {
@@ -12,7 +13,8 @@ const App = () => {
             <Routes>
                 <Route path="/" element={<Content />}>
                     <Route index element={<Home />} />
-                    <Route path="/customers/" element={<CustomerListPage />} />
+                    <Route path="/customers/" element={<Customers />} />
+                    <Route path="/offices/" element={<Offices /> } />
                     <Route path="*" element={<ErrorPage />} />
                 </Route>
             </Routes>

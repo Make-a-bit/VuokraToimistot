@@ -8,7 +8,7 @@ import Table from "react-bootstrap/Table";
 
 const mainURI = "https://localhost:7017/customer";
 
-const CustomerListPage = () => {
+const Customers = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const errorState = error !== "";
@@ -71,7 +71,6 @@ const CustomerListPage = () => {
     }
 
     const btnSaveEdits = async () => {
-
         const requiredFields = ['name', 'email', 'phone', 'address', 'postalCode', 'city', 'country'];
         const isValid = requiredFields.every(
             key => String(selectedCustomer[key] || "").trim() !== ""
@@ -82,7 +81,7 @@ const CustomerListPage = () => {
             return;
         }
 
-        const response = await fetch(`${mainURI}/customer/update`, {
+        const response = await fetch(`${mainURI}/update`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(selectedCustomer),
@@ -236,4 +235,4 @@ const CustomerListPage = () => {
     )
 }
 
-export { CustomerListPage }
+export default Customers;
