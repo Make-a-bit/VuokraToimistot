@@ -1,4 +1,5 @@
-﻿import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect, useRef } from "react";
+import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
@@ -6,8 +7,20 @@ import Modal from "react-bootstrap/Modal";
 const mainURI = "https://localhost:7017";
 
 const AddCustomer = ({ show, onHide, onCustomerAdded }) => {
+    const nameInputRef = useRef(null);
     const initialFormData = { name: "", email: "", phone: "", address: "", postalCode: "", city: "", country: "" };
+
     const [formData, setFormData] = useState({ name: "", email: "", phone: "", address: "", postalCode: "", city: "", country: "" })
+    const [inputValidity, setInputValidity] = useState(false);
+    const [error, setError] = useState(false);
+    
+    useEffect(() => {
+        if (show) {
+            setTimeout(() => {
+                nameInputRef.current?.focus();
+            }, 1);
+        }
+    }, [show]);
 
     useEffect(() => {
         if (!show) {
@@ -15,9 +28,34 @@ const AddCustomer = ({ show, onHide, onCustomerAdded }) => {
         }
     }, [show]);
 
+    useEffect(() => {
+        if (inputValidity) {
+            setTimeout(() => {
+                setInputValidity(false)
+            }, 2000);
+        }
+    }, [inputValidity]);
+
+    useEffect(() => {
+        if (error) {
+            setTimeout(() => {
+                setError(false);
+            }, 2000);
+        }
+    }, [error]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        // Check for empty fields
+        const isValid = Object.values(formData).every(value => value.trim() !== "");
+
+        if (!isValid) {
+            setInputValidity(true);
+            return;
+        }
+
+        // Proceed for sending data to server
         const response = await fetch(mainURI + "/customer", {
             method: "POST",
             headers: { "Content-type": "application/json" },
@@ -28,6 +66,7 @@ const AddCustomer = ({ show, onHide, onCustomerAdded }) => {
             onCustomerAdded();
             onHide();
         } else {
+            setError(true);
             console.log("Error while adding a new customer");
         }
     };
@@ -38,12 +77,16 @@ const AddCustomer = ({ show, onHide, onCustomerAdded }) => {
                 <Modal.Title>Lisää uusi asiakas</Modal.Title>
             </Modal.Header>
 
+            { inputValidity && <Alert variant={"danger"}>Täytä kaikki kentät!</Alert> }
+            { error && <Alert variant={"danger"}>Virhe asiakkaan lisäämisessä</Alert> }
+
             <Modal.Body>
                 <Form onSubmit={handleSubmit}>
                     <Form.Group>
                         <Form.Label>Nimi</Form.Label>
                         <Form.Control
                             type="text"
+                            ref={nameInputRef}
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             required

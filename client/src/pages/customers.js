@@ -1,13 +1,15 @@
 ﻿import React, { useState, useEffect } from "react";
+import { AddCustomer } from "../components/AddCustomerModal";
+import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Table from "react-bootstrap/Table";
-import { AddCustomer } from "../components/AddCustomerModal";
 
 const mainURI = "https://localhost:7017";
 
 const CustomerListPage = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const errorState = error !== "";
 
     const [showAddCustomer, setShowAddCustomer] = useState(false);
     const [customers, setCustomers] = useState([]);
@@ -29,7 +31,7 @@ const CustomerListPage = () => {
             const data = await response.json();
             setCustomers(data)
         } catch (error) {
-            console.error("Failed to fetch customers:", error);
+            console.log("Failed to fetch customers:", error);
             setError("Asiakkaiden hakeminen epäonnistui.")
         } finally {
             setLoading(false);
@@ -57,8 +59,8 @@ const CustomerListPage = () => {
                 onCustomerAdded={() => fetchCustomers()}
             />
 
-            {loading && <p>Ladataan asiakkaita...</p>}
-            {error && <p style={{ color: "red" }}>{error}</p>}
+            { loading && <Alert variant={"info"}>Ladataan asiakkaita...</Alert> }
+            { errorState && <Alert variant={"danger"}>{error}</Alert> }
 
             <Table responsive striped bordered hover size="sm">
                 <thead>
