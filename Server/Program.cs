@@ -38,7 +38,9 @@ namespace API
 
             // Register extended instances (per request)
             builder.Services.AddScoped<CustomerAdd>();
+            builder.Services.AddScoped<CustomerDelete>();
             builder.Services.AddScoped<CustomerRepository>();
+            builder.Services.AddScoped<CustomerUpdate>();
             builder.Services.AddScoped<UserAccessManager>();
 
 
