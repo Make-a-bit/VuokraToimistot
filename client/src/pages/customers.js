@@ -8,10 +8,9 @@ import Table from "react-bootstrap/Table";
 
 const mainURI = "https://localhost:7017/customer";
 
-const CustomerListPage = () => {
+const Customers = () => {
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
-    const errorState = error !== "";
+    const [errorMessage, setErrorMessage] = useState("");
 
     const [showAddCustomer, setShowAddCustomer] = useState(false);
     const [customers, setCustomers] = useState([]);
@@ -24,7 +23,7 @@ const CustomerListPage = () => {
 
     const fetchCustomers = async () => {
         setLoading(true);
-        setError("");
+        setErrorMessage("");
 
         try {
             const response = await fetch(mainURI, {
@@ -40,7 +39,7 @@ const CustomerListPage = () => {
             setCustomers(data)
         } catch (error) {
             console.log("Failed to fetch customers:", error);
-            setError("Asiakkaiden hakeminen epäonnistui.")
+            setErrorMessage("Asiakkaiden hakeminen epäonnistui.")
         } finally {
             setLoading(false);
         }
@@ -66,23 +65,22 @@ const CustomerListPage = () => {
             fetchCustomers();
         } catch {
             console.log("Error while deleting customer")
-            setError("Asiakkaan poistaminen ei onnistunut")
+            setErrorMessage("Asiakkaan poistaminen ei onnistunut")
         }
     }
 
     const btnSaveEdits = async () => {
-
         const requiredFields = ['name', 'email', 'phone', 'address', 'postalCode', 'city', 'country'];
         const isValid = requiredFields.every(
             key => String(selectedCustomer[key] || "").trim() !== ""
         );
 
         if (!isValid) {
-            setError("Täytä kaikki kentät!")
+            setErrorMessage("Täytä kaikki kentät!")
             return;
         }
 
-        const response = await fetch(`${mainURI}/customer/update`, {
+        const response = await fetch(`${mainURI}/update`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(selectedCustomer),
@@ -96,7 +94,7 @@ const CustomerListPage = () => {
             setSuccessMessage("Asiakastietojen päivitys onnistui!")
         } else {
             console.log("Error while saving edited customer data")
-            setError("Virhe tallennettaessa asiakastietoja.")
+            setErrorMessage("Virhe tallennettaessa asiakastietoja.")
         }
     }
 
@@ -112,6 +110,15 @@ const CustomerListPage = () => {
         }
     }, [success])
 
+    useEffect(() => {
+        if (errorMessage) {
+            setTimeout(() => {
+                setErrorMessage("")
+            }, 2500)
+        }
+    }, [errorMessage]);
+
+
     return (
         <>
             <Button onClick={() => setShowAddCustomer(true)}>Lisää uusi asiakas</Button>
@@ -122,7 +129,7 @@ const CustomerListPage = () => {
             /><br /><br />
 
             {loading && <Alert variant={"info"}>Ladataan asiakkaita...</Alert>}
-            {errorState && <Alert variant={"danger"}>{error}</Alert>}
+            {errorMessage && <Alert variant={"danger"}>{errorMessage}</Alert>}
             {success && <Alert variant={"success"}>{successMessage}</Alert>}
 
             <Table responsive striped bordered hover>
@@ -236,4 +243,4 @@ const CustomerListPage = () => {
     )
 }
 
-export { CustomerListPage }
+export default Customers;

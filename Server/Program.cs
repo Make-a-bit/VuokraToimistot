@@ -41,6 +41,8 @@ namespace API
             builder.Services.AddScoped<CustomerDelete>();
             builder.Services.AddScoped<CustomerRepository>();
             builder.Services.AddScoped<CustomerUpdate>();
+            builder.Services.AddScoped<OfficeAdd>();
+            builder.Services.AddScoped<OfficeRepository>();
             builder.Services.AddScoped<UserAccessManager>();
 
 
