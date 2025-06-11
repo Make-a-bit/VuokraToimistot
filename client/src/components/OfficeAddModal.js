@@ -3,25 +3,29 @@ import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
+import Spinner from "react-bootstrap/Spinner";
 
 const mainURI = "https://localhost:7017/office";
 
 const AddOffice = ({ show, onHide, onOfficeAdded }) => {
     const firstInputRef = useRef(null);
-    const initialFormData = { name: "", address: "", postal: "", city: "", country: "", phone: "", email: "" };
+    const initialFormData = { name: "", address: "", postalCode: "", city: "", country: "", phone: "", email: "" };
 
-    const [formData, setFormData] = useState({ name: "", address: "", postal: "", city: "", country: "", phone: "", email: "" });
+    const [formData, setFormData] = useState({ name: "", address: "", postalCode: "", city: "", country: "", phone: "", email: "" });
     const [errorState, setErrorState] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
 
         const isValid = Object.values(formData).every(value => value.trim() !== "");
 
         if (!isValid) {
             setErrorState(true);
             setErrorMessage("Täytä kaikki kentät!")
+            setLoading(false);
             return;
         }
 
@@ -45,6 +49,8 @@ const AddOffice = ({ show, onHide, onOfficeAdded }) => {
             setErrorState(true);
             setErrorMessage("Verkkovirhe. Tarkista internet yhteys.")
             console.log("Network error while adding a new office:", err)
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -107,7 +113,7 @@ const AddOffice = ({ show, onHide, onOfficeAdded }) => {
                         <Form.Control
                             type="text"
                             value={formData.postal}
-                            onChange={(e) => setFormData({ ...formData, postal: e.target.value })}
+                            onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
                             required
                             />
                     </Form.Group>
@@ -156,7 +162,19 @@ const AddOffice = ({ show, onHide, onOfficeAdded }) => {
 
             <Modal.Footer>
                 <Button variant="secondary" onClick={onHide}>Peruuta</Button>
-                <Button variant="primary" onClick={handleSubmit}>Tallenna</Button>
+                <Button variant="primary" onClick={handleSubmit} disabled={loading}>
+                    {loading ? (
+                    <Spinner
+                        as="span"
+                        animation="border"
+                        size="sm"
+                        role="status"
+                        aria-hidden="true"
+                    />
+                    ) : (
+                    "Tallenna"
+                    )}
+                </Button>
             </Modal.Footer>
         </Modal>
     )

@@ -2,9 +2,11 @@
 import AddOffice from "../components/OfficeAddModal";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
+import ConfirmModal from "../components/ConfirmModal";
 import Form from "react-bootstrap/Form";
+import Spinner from "react-bootstrap/Spinner";
 import Table from "react-bootstrap/Table";
-import InputValidation from "../utils/inputValidation";
+import inputValidation from "../utils/inputValidation";
 
 const mainURI = "https://localhost:7017/office";
 
@@ -17,6 +19,7 @@ const Offices = () => {
     const [offices, setOffices] = useState([]);
     const [selectedOffice, setSelectedOffice] = useState({});
     const [editOfficeId, setEditOfficeId] = useState(null);
+    const [showConfirm, setShowConfirm] = useState(false);
 
     const fetchOffices = async () => {
         setLoading(true);
@@ -47,16 +50,19 @@ const Offices = () => {
         setEditOfficeId(office.id);
     }
 
-    const btnDeleteOffice = () => {
-
+    const btnDeleteOffice = (office) => {
+        setSelectedOffice(office)
+        setShowConfirm(true)
     }
 
     const btnSaveEdits = async () => {
+        setLoading(true)
         const requiredFields = ['name', 'address', 'postalCode', 'city', 'country', 'phone', 'email']
-        const isValid = InputValidation(selectedOffice, requiredFields);
+        const isValid = inputValidation(selectedOffice, requiredFields);
 
         if (!isValid) {
             setErrorMessage("Täytä kaikki kentät!");
+            setLoading(false)
             return;
         }
 
@@ -74,6 +80,23 @@ const Offices = () => {
         } else {
             console.log("Error while updating office data")
             setErrorMessage("Virhe tietojen päivityksessä.")
+        }
+        setLoading(false)
+    }
+
+    const handleDeletion = async () => {
+        setLoading(true)
+        try {
+            await fetch(`${mainURI}/delete/${selectedOffice.id}`, {
+                method: "DELETE"
+            })
+            setSuccessMessage("Toimiston poistaminen onnistui");
+            fetchOffices();
+        } catch {
+            console.log("Error while deleting office");
+            setErrorMessage("Toimiston poistaminen ei onnistunut");
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -187,7 +210,19 @@ const Offices = () => {
                                         />
                                 </td>
 
-                                <td><Button variant="primary" onClick={() => btnSaveEdits()}>Tallenna</Button></td>
+                                <td><Button variant="primary" onClick={() => btnSaveEdits()}>
+                                    {loading ? (
+                                    <Spinner
+                                        as="span"
+                                        animation="border"
+                                        size="sm"
+                                        role="status"
+                                        aria-hidden="true"
+                                    />
+                                        ) : (
+                                        "Tallenna"
+                                    )}
+                                    </Button></td>
                                 <td><Button variant="danger" disabled>Poista</Button></td>
 
                             </tr>
@@ -208,6 +243,16 @@ const Offices = () => {
                     ))}
                 </tbody>
             </Table>
+
+            <ConfirmModal
+                show={showConfirm}
+                onHide={() => setShowConfirm(false)}
+                title="Poista toimisto"
+                message={`Haluatko varmasti poistaa toimiston ${selectedOffice?.name}?`}
+                confirmText="Poista"
+                cancelText="Peruuta"
+                onConfirm={handleDeletion}
+            />
         </>
     )
 }

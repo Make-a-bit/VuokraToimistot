@@ -4,8 +4,9 @@ import ConfirmModal from "../components/ConfirmModal";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
+import Spinner from "react-bootstrap/Spinner";
 import Table from "react-bootstrap/Table";
-import InputValidation from "../utils/inputValidation";
+import inputValidation from "../utils/inputValidation";
 
 const mainURI = "https://localhost:7017/customer";
 
@@ -69,11 +70,13 @@ const Customers = () => {
     }
 
     const btnSaveEdits = async () => {
+        setLoading(true);
         const requiredFields = ['name', 'email', 'phone', 'address', 'postalCode', 'city', 'country'];
-        const isValid = InputValidation(selectedCustomer, requiredFields);
+        const isValid = inputValidation(selectedCustomer, requiredFields);
 
         if (!isValid) {
             setErrorMessage("Täytä kaikki kentät!")
+            setLoading(false);
             return;
         }
 
@@ -92,6 +95,7 @@ const Customers = () => {
             console.log("Error while saving edited customer data")
             setErrorMessage("Virhe tietojen päivityksessä.")
         }
+        setLoading(false);
     }
 
     useEffect(() => {
@@ -205,7 +209,19 @@ const Customers = () => {
                                     />
                                 </td>
 
-                                <td><Button variant="primary" onClick={() => btnSaveEdits()}>Tallenna</Button></td>
+                                <td><Button variant="primary" onClick={() => btnSaveEdits()}>
+                                    {loading ? (
+                                    <Spinner
+                                        as="span"
+                                        animation="border"
+                                        size="sm"
+                                        role="status"
+                                        aria-hidden="true"
+                                    />
+                                    ) : (
+                                        "Tallenna"
+                                    )}
+                                    </Button></td>
                                 <td><Button variant="danger" disabled>Poista</Button></td>
                             </tr>
                         ) : (

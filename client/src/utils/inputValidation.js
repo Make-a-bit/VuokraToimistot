@@ -4,10 +4,10 @@
  * @param {Array<string>} requiredFields - List of keys that are required.
  * @returns {boolean} - True if all required fields are valid.
  */
-const InputValidation = (data, requiredFields) => {
+const inputValidation = (data, requiredFields) => {
     return requiredFields.every(
         key => String(data[key] || "").trim() !== ""
     );
 };
 
-export default InputValidation;
+export default inputValidation;

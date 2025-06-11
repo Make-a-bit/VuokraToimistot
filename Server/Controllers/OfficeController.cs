@@ -9,13 +9,15 @@ namespace API.Controllers
     public class OfficeController : Controller
     {
         private readonly OfficeAdd _officeAdd;
+        private readonly OfficeDelete _officeDelete;
         private readonly OfficeRepository _officeRepo; 
         private readonly OfficeUpdate _officeUpdate;
 
-        public OfficeController(OfficeAdd officeAdd, OfficeRepository officeRepo, OfficeUpdate update)
+        public OfficeController(OfficeAdd add, OfficeDelete delete, OfficeRepository repo, OfficeUpdate update)
         {
-            _officeAdd = officeAdd;
-            _officeRepo = officeRepo;
+            _officeAdd = add;
+            _officeDelete = delete;
+            _officeRepo = repo;
             _officeUpdate = update;
         }
 
@@ -42,6 +44,17 @@ namespace API.Controllers
         public async Task<ActionResult> UpdateOffice([FromBody] Office office)
         {
             var success = await _officeUpdate.UpdateOffice(office);
+
+            if (success) return Ok();
+
+            else return BadRequest();
+        }
+
+        [HttpDelete]
+        [Route("delete/{id}")]
+        public async Task<ActionResult> DeleteOffice([FromRoute] int id)
+        {
+            var success = await _officeDelete.DeleteOffice(id);
 
             if (success) return Ok();
 

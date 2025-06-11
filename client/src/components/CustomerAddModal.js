@@ -3,6 +3,7 @@ import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
+import Spinner from "react-bootstrap/Spinner"; 
 
 const mainURI = "https://localhost:7017/customer";
 
@@ -13,6 +14,7 @@ const AddCustomer = ({ show, onHide, onCustomerAdded }) => {
     const [formData, setFormData] = useState({ name: "", email: "", phone: "", address: "", postalCode: "", city: "", country: "" })
     const [error, setError] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+    const [loading, setLoading] = useState(false);
     
     useEffect(() => {
         if (show) {
@@ -38,6 +40,7 @@ const AddCustomer = ({ show, onHide, onCustomerAdded }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
 
         // Check for empty fields
         const isValid = Object.values(formData).every(value => value.trim() !== "");
@@ -45,6 +48,7 @@ const AddCustomer = ({ show, onHide, onCustomerAdded }) => {
         if (!isValid) {
             setError(true);
             setErrorMessage("Täytä kaikki kentät!")
+            setLoading(false)
             return;
         }
 
@@ -68,6 +72,8 @@ const AddCustomer = ({ show, onHide, onCustomerAdded }) => {
             setError(true);
             setErrorMessage("Verkkovirhe. Tarkista internet yhteys.")
             console.log("Network error while adding a customer:", err)
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -156,7 +162,19 @@ const AddCustomer = ({ show, onHide, onCustomerAdded }) => {
 
             <Modal.Footer>
                 <Button variant="secondary" onClick={onHide}>Peruuta</Button>
-                <Button variant="primary" onClick={handleSubmit}>Tallenna</Button>
+                <Button variant="primary" onClick={handleSubmit} disabled={loading}>
+                    {loading ? (
+                    <Spinner
+                        as="span"
+                        animation="border"
+                        size="sm"
+                        role="status"
+                        aria-hidden="true"
+                        />
+                    ) : (
+                    "Tallenna"
+                    )}
+                </Button>
             </Modal.Footer>
         </Modal>
     )
