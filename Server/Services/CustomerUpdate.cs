@@ -23,7 +23,7 @@ namespace API.Services
                     "SET customer_name = @name, customer_email = @email, customer_phone = @phone, " +
                     "customer_address = @address, customer_postalcode = @postal, customer_city = @city, " +
                     "customer_country = @country " +
-                    "WHERE customer_id = " + customer.Id, conn);
+                    "WHERE customer_id = @id", conn);
 
                 cmd.Parameters.AddWithValue("@name", customer.Name);
                 cmd.Parameters.AddWithValue("@email", customer.Email);
@@ -32,6 +32,7 @@ namespace API.Services
                 cmd.Parameters.AddWithValue("@postal", customer.PostalCode);
                 cmd.Parameters.AddWithValue("@city", customer.City);
                 cmd.Parameters.AddWithValue("@country", customer.Country);
+                cmd.Parameters.AddWithValue("@id", customer.Id);
 
                 int rowsAffected = await cmd.ExecuteNonQueryAsync();
 
