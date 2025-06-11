@@ -11,7 +11,6 @@ const AddCustomer = ({ show, onHide, onCustomerAdded }) => {
     const initialFormData = { name: "", email: "", phone: "", address: "", postalCode: "", city: "", country: "" };
 
     const [formData, setFormData] = useState({ name: "", email: "", phone: "", address: "", postalCode: "", city: "", country: "" })
-    const [inputValidity, setInputValidity] = useState(false);
     const [error, setError] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     
@@ -30,14 +29,6 @@ const AddCustomer = ({ show, onHide, onCustomerAdded }) => {
     }, [show]);
 
     useEffect(() => {
-        if (inputValidity) {
-            setTimeout(() => {
-                setInputValidity(false)
-            }, 2000);
-        }
-    }, [inputValidity]);
-
-    useEffect(() => {
         if (error) {
             setTimeout(() => {
                 setError(false);
@@ -52,7 +43,7 @@ const AddCustomer = ({ show, onHide, onCustomerAdded }) => {
         const isValid = Object.values(formData).every(value => value.trim() !== "");
 
         if (!isValid) {
-            setInputValidity(true);
+            setError(true);
             setErrorMessage("Täytä kaikki kentät!")
             return;
         }
@@ -86,7 +77,6 @@ const AddCustomer = ({ show, onHide, onCustomerAdded }) => {
                 <Modal.Title>Lisää uusi asiakas</Modal.Title>
             </Modal.Header>
 
-            {inputValidity && <Alert variant={"danger"}>{errorMessage}</Alert>}
             {error && <Alert variant={"danger"}>{errorMessage}</Alert>}
 
             <Modal.Body>
