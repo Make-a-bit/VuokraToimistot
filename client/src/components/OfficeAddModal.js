@@ -8,9 +8,9 @@ const mainURI = "https://localhost:7017/office";
 
 const AddOffice = ({ show, onHide, onOfficeAdded }) => {
     const firstInputRef = useRef(null);
-    const initialFormData = { name: "", address: "", postal: "", city: "", country: "", phone: "", email: "" };
+    const initialFormData = { name: "", address: "", postalCode: "", city: "", country: "", phone: "", email: "" };
 
-    const [formData, setFormData] = useState({ name: "", address: "", postal: "", city: "", country: "", phone: "", email: "" });
+    const [formData, setFormData] = useState({ name: "", address: "", postalCode: "", city: "", country: "", phone: "", email: "" });
     const [errorState, setErrorState] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
 
@@ -107,7 +107,7 @@ const AddOffice = ({ show, onHide, onOfficeAdded }) => {
                         <Form.Control
                             type="text"
                             value={formData.postal}
-                            onChange={(e) => setFormData({ ...formData, postal: e.target.value })}
+                            onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
                             required
                             />
                     </Form.Group>

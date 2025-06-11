@@ -20,7 +20,7 @@ namespace API.Services
                 await conn.OpenAsync();
 
                 using var cmd = new SqlCommand("INSERT INTO Offices " +
-                    "office_name, office_address, office_postalcode, office_city, " +
+                    "(office_name, office_address, office_postalcode, office_city, " +
                     "office_country, office_phone, office_email) " +
                     "VALUES (@name, @address, @postal, @city, @country, @phone, @email)", conn);
 

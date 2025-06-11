@@ -2,9 +2,10 @@
 import AddOffice from "../components/OfficeAddModal";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
+import ConfirmModal from "../components/ConfirmModal";
 import Form from "react-bootstrap/Form";
 import Table from "react-bootstrap/Table";
-import InputValidation from "../utils/inputValidation";
+import inputValidation from "../utils/inputValidation";
 
 const mainURI = "https://localhost:7017/office";
 
@@ -17,6 +18,7 @@ const Offices = () => {
     const [offices, setOffices] = useState([]);
     const [selectedOffice, setSelectedOffice] = useState({});
     const [editOfficeId, setEditOfficeId] = useState(null);
+    const [showConfirm, setShowConfirm] = useState(false);
 
     const fetchOffices = async () => {
         setLoading(true);
@@ -47,13 +49,14 @@ const Offices = () => {
         setEditOfficeId(office.id);
     }
 
-    const btnDeleteOffice = () => {
-
+    const btnDeleteOffice = (office) => {
+        setSelectedOffice(office)
+        setShowConfirm(true)
     }
 
     const btnSaveEdits = async () => {
         const requiredFields = ['name', 'address', 'postalCode', 'city', 'country', 'phone', 'email']
-        const isValid = InputValidation(selectedOffice, requiredFields);
+        const isValid = inputValidation(selectedOffice, requiredFields);
 
         if (!isValid) {
             setErrorMessage("Täytä kaikki kentät!");
@@ -74,6 +77,19 @@ const Offices = () => {
         } else {
             console.log("Error while updating office data")
             setErrorMessage("Virhe tietojen päivityksessä.")
+        }
+    }
+
+    const handleDeletion = async () => {
+        try {
+            await fetch(`${mainURI}/delete/${selectedOffice.id}`, {
+                method: "DELETE"
+            })
+            setSuccessMessage("Toimiston poistaminen onnistui");
+            fetchOffices();
+        } catch {
+            console.log("Error while deleting office");
+            setErrorMessage("Toimiston poistaminen ei onnistunut");
         }
     }
 
@@ -208,6 +224,16 @@ const Offices = () => {
                     ))}
                 </tbody>
             </Table>
+
+            <ConfirmModal
+                show={showConfirm}
+                onHide={() => setShowConfirm(false)}
+                title="Poista toimisto"
+                message={`Haluatko varmasti poistaa toimiston ${selectedOffice?.name}?`}
+                confirmText="Poista"
+                cancelText="Peruuta"
+                onConfirm={handleDeletion}
+            />
         </>
     )
 }
