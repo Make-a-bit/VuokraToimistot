@@ -2,7 +2,9 @@
 import AddOffice from "../components/OfficeAddModal";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
 import Table from "react-bootstrap/Table";
+import InputValidation from "../utils/inputValidation";
 
 const mainURI = "https://localhost:7017/office";
 
@@ -10,8 +12,11 @@ const Offices = () => {
     const [showAddOffice, setShowAddOffice] = useState(false)
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
 
     const [offices, setOffices] = useState([]);
+    const [selectedOffice, setSelectedOffice] = useState({});
+    const [editOfficeId, setEditOfficeId] = useState(null);
 
     const fetchOffices = async () => {
         setLoading(true);
@@ -37,12 +42,39 @@ const Offices = () => {
         }
     }
 
-    const btnEditOffice = () => {
-
+    const btnEditOffice = (office) => {
+        setSelectedOffice(office);
+        setEditOfficeId(office.id);
     }
 
     const btnDeleteOffice = () => {
 
+    }
+
+    const btnSaveEdits = async () => {
+        const requiredFields = ['name', 'address', 'postalCode', 'city', 'country', 'phone', 'email']
+        const isValid = InputValidation(selectedOffice, requiredFields);
+
+        if (!isValid) {
+            setErrorMessage("Täytä kaikki kentät!");
+            return;
+        }
+
+        const response = await fetch(`${mainURI}/update`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(selectedOffice),
+        });
+
+        if (response.ok) {
+            await fetchOffices();
+            setSelectedOffice(null)
+            setEditOfficeId(null)
+            setSuccessMessage("Toimiston tietojen päivitys onnistui!")
+        } else {
+            console.log("Error while updating office data")
+            setErrorMessage("Virhe tietojen päivityksessä.")
+        }
     }
 
     useEffect(() => {
@@ -53,10 +85,17 @@ const Offices = () => {
         if (errorMessage) {
             setTimeout(() => {
                 setErrorMessage("")
-            }, 2500)
+            }, 3000)
         }
     }, [errorMessage]);
 
+    useEffect(() => {
+        if (successMessage) {
+            setTimeout(() => {
+                setSuccessMessage("")
+            }, 3000)
+        }
+    }, [successMessage])
 
     return (
         <>
@@ -69,6 +108,7 @@ const Offices = () => {
 
             {loading && <Alert variant={"info"}>Ladataan toimistot...</Alert>}
             {errorMessage && <Alert variant={"danger"}>{errorMessage}</Alert>}
+            {successMessage && <Alert variant={"success"}>{successMessage}</Alert>}
 
             <Table responsive striped bordered hover>
                 <thead>
@@ -88,6 +128,70 @@ const Offices = () => {
 
                 <tbody>
                     {offices.map((office) => (
+                        editOfficeId === office.id ? (
+                            <tr key={office.id}>
+                                <td>{office.id}</td>
+                                <td>
+                                    <Form.Control
+                                        type="text"
+                                        value={selectedOffice.name}
+                                        onChange={(e) => setSelectedOffice({ ...selectedOffice, name: e.target.value })}
+                                        />
+                                </td>
+
+                                <td>
+                                    <Form.Control
+                                        type="text"
+                                        value={selectedOffice.address}
+                                        onChange={(e) => setSelectedOffice({ ...selectedOffice, address: e.target.value })}
+                                        />
+                                </td>
+
+                                <td>
+                                    <Form.Control
+                                        type="text"
+                                        value={selectedOffice.postalCode}
+                                        onChange={(e) => setSelectedOffice({ ...selectedOffice, postalCode: e.target.value })}
+                                        />
+                                </td>
+
+                                <td>
+                                    <Form.Control
+                                        type="text"
+                                        value={selectedOffice.city}
+                                        onChange={(e) => setSelectedOffice({ ...selectedOffice, city: e.target.value })}
+                                        />
+                                </td>
+
+                                <td>
+                                    <Form.Control
+                                        type="text"
+                                        value={selectedOffice.country}
+                                        onChange={(e) => setSelectedOffice({ ...selectedOffice, country: e.target.value })}
+                                        />
+                                </td>
+
+                                <td>
+                                    <Form.Control
+                                        type="text"
+                                        value={selectedOffice.phone}
+                                        onChange={(e) => setSelectedOffice({ ...selectedOffice, phone: e.target.value })}
+                                        />
+                                </td>
+
+                                <td>
+                                    <Form.Control
+                                        type="text"
+                                        value={selectedOffice.email}
+                                        onChange={(e) => setSelectedOffice({ ...selectedOffice, email: e.target.value })}
+                                        />
+                                </td>
+
+                                <td><Button variant="primary" onClick={() => btnSaveEdits()}>Tallenna</Button></td>
+                                <td><Button variant="danger" disabled>Poista</Button></td>
+
+                            </tr>
+                        ) : (
                         <tr key={office.id}>
                             <td>{office.id}</td>
                             <td>{office.name}</td>
@@ -100,6 +204,7 @@ const Offices = () => {
                             <td><Button variant="secondary" onClick={() => btnEditOffice(office)}>Muokkaa</Button></td>
                             <td><Button variant="danger" onClick={() => btnDeleteOffice(office)}>Poista</Button></td>
                         </tr>
+                        )
                     ))}
                 </tbody>
             </Table>

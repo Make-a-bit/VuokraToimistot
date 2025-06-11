@@ -5,6 +5,7 @@ import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Table from "react-bootstrap/Table";
+import InputValidation from "../utils/inputValidation";
 
 const mainURI = "https://localhost:7017/customer";
 
@@ -17,7 +18,6 @@ const Customers = () => {
 
     const [selectedCustomer, setSelectedCustomer] = useState({});
     const [editCustomerId, setEditCustomerId] = useState(null);
-    const [success, setSuccess] = useState(false);
     const [successMessage, setSuccessMessage] = useState("");
     const [showConfirm, setShowConfirm] = useState(false);
 
@@ -60,7 +60,6 @@ const Customers = () => {
             await fetch(`${mainURI}/delete/${selectedCustomer.id}`, {
                 method: "DELETE"
             })
-            setSuccess(true)
             setSuccessMessage("Asiakkaan poistaminen onnistui!");
             fetchCustomers();
         } catch {
@@ -71,9 +70,7 @@ const Customers = () => {
 
     const btnSaveEdits = async () => {
         const requiredFields = ['name', 'email', 'phone', 'address', 'postalCode', 'city', 'country'];
-        const isValid = requiredFields.every(
-            key => String(selectedCustomer[key] || "").trim() !== ""
-        );
+        const isValid = InputValidation(selectedCustomer, requiredFields);
 
         if (!isValid) {
             setErrorMessage("Täytä kaikki kentät!")
@@ -90,11 +87,10 @@ const Customers = () => {
             await fetchCustomers();
             setSelectedCustomer(null);
             setEditCustomerId(null);
-            setSuccess(true);
             setSuccessMessage("Asiakastietojen päivitys onnistui!")
         } else {
             console.log("Error while saving edited customer data")
-            setErrorMessage("Virhe tallennettaessa asiakastietoja.")
+            setErrorMessage("Virhe tietojen päivityksessä.")
         }
     }
 
@@ -103,18 +99,18 @@ const Customers = () => {
     }, []);
 
     useEffect(() => {
-        if (success) {
+        if (successMessage) {
             setTimeout(() => {
-                setSuccess(false)
-            }, 2500)
+                setSuccessMessage("")
+            }, 3000)
         }
-    }, [success])
+    }, [successMessage])
 
     useEffect(() => {
         if (errorMessage) {
             setTimeout(() => {
                 setErrorMessage("")
-            }, 2500)
+            }, 3000)
         }
     }, [errorMessage]);
 
@@ -130,7 +126,7 @@ const Customers = () => {
 
             {loading && <Alert variant={"info"}>Ladataan asiakkaita...</Alert>}
             {errorMessage && <Alert variant={"danger"}>{errorMessage}</Alert>}
-            {success && <Alert variant={"success"}>{successMessage}</Alert>}
+            {successMessage && <Alert variant={"success"}>{successMessage}</Alert>}
 
             <Table responsive striped bordered hover>
                 <thead>
@@ -225,8 +221,8 @@ const Customers = () => {
                                 <td><Button variant="secondary" onClick={() => btnEditCustomer(customer)}>Muokkaa</Button></td>
                                 <td><Button variant="danger" onClick={() => btnDeleteCustomer(customer)}>Poista</Button></td>
                             </tr>
-                        )
-                    ))}
+                            )
+                         ))}
                 </tbody>
             </Table>
 

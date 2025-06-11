@@ -43,6 +43,7 @@ namespace API
             builder.Services.AddScoped<CustomerUpdate>();
             builder.Services.AddScoped<OfficeAdd>();
             builder.Services.AddScoped<OfficeRepository>();
+            builder.Services.AddScoped<OfficeUpdate>();
             builder.Services.AddScoped<UserAccessManager>();
 
 
