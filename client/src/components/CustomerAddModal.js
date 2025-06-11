@@ -163,4 +163,4 @@ const AddCustomer = ({ show, onHide, onCustomerAdded }) => {
     )
 }
 
-export { AddCustomer }
+export default AddCustomer;
