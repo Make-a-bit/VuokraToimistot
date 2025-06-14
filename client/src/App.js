@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Content } from './components/layout/content';
-import { Home } from './pages/home'
-import { ErrorPage } from './pages/errorpage';
+import Content from './components/layout/content';
+import Home from './pages/home'
+import ErrorPage from './pages/errorpage';
 import Customers from "../src/pages/customers";
 import Offices from "../src/pages/offices";
-
 
 const App = () => {
     return (
@@ -13,8 +12,9 @@ const App = () => {
             <Routes>
                 <Route path="/" element={<Content />}>
                     <Route index element={<Home />} />
-                    <Route path="/customers/" element={<Customers />} />
-                    <Route path="/offices/" element={<Offices /> } />
+                    <Route path="/asiakkaat/" element={<Customers />} />
+                    <Route path="/vuokraus/" element={<ErrorPage />} />
+                    <Route path="/vuokraus/kohteet/" element={<Offices /> } />
                     <Route path="*" element={<ErrorPage />} />
                 </Route>
             </Routes>

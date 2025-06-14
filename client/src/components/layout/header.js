@@ -1,57 +1,115 @@
 ﻿import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
-import Container from "react-bootstrap/Container"
-import Nav from "react-bootstrap/Nav"
-import Navbar from "react-bootstrap/Navbar"
-import NavDropdown from "react-bootstrap/NavDropdown"
+import { NavLink, useLocation } from "react-router-dom";
+import navigationLinks from '../../constants/navigation';
+
+import AppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Container from "@mui/material/Container";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Toolbar from "@mui/material/Toolbar";
 
 const Header = () => {
+    const [anchorEls, setAnchorEls] = useState({});
+    const location = useLocation();
 
-    const navLinks = [
-        { path: "/", label: "Etusivu" },
-        { path: "/customers/", label: "Asiakkaat" },
-        { path: "/offices/", label: "Toimistot" },
-        {
-            label: "Muut",
-            dropdown: [
-                { path: "/muu/1", label: "Muuta 1" },
-                { path: "muu/2", label: "Muuta 2" }
-            ]
-        },
-    ]
+    // Open dropdown menu for key
+    const handleMenuOpen = (event, key) => {
+        setAnchorEls(prev => ({ ...prev, [key]: event.currentTarget }));
+    };
+
+    // Close dropdown menu for key
+    const handleMenuClose = (key) => {
+        setAnchorEls(prev => ({ ...prev, [key]: null }));
+    };
+
+    // Check if any dropdown link is active
+    const isDropdownActive = (dropdown) =>
+        dropdown.some(link => location.pathname === link.path);
 
     return (
-        <Navbar expand="lg" bg="success-subtle" className="mb-3">
-            <Container>
-                <Navbar.Toggle aria-controls="main-navbar" />
-                <Navbar.Collapse id="main-navbar">
-                    <Nav className="me-auto">
-                        {navLinks.map(({ path, label, dropdown }) => (
-                        dropdown ? (
-                            <NavDropdown title={label} key={label} id="customers-dropdown">
-                                {dropdown.map(({ path, label }) => (
-                                    <NavDropdown.Item as={NavLink}
-                                        to={path}
-                                        key={path}
-                                        className={({ isActive }) =>
-                                            "dropdown-item" + (isActive ? "active" : "")}>{label}</NavDropdown.Item>
-                                ))}
-                            </NavDropdown>
-                        ) : (
-                        <Nav.Link
-                            as={NavLink}
-                            key={path}
-                            to={path}
-                            end
-                            className={({ isActive }) =>
-                                'nav-link' + (isActive ? ' active border-bottom border-success' : '')}>{label}
-                        </Nav.Link>
-                        )))}
-                    </Nav>
-                </Navbar.Collapse>
-            </Container>
-        </Navbar>
-    )
-}
+        <AppBar
+            position="static"
+            elevation={0}
+            sx={{ bgcolor: "transparent", mb: 3 }}
+        >
+            <Container
+                maxWidth="xl"
+                sx={{ bgcolor: "success.light", borderRadius: 2 }}
+            >
+                <Toolbar disableGutters>
+                    <Box sx={{ display: 'flex', gap: 2 }}>
+                        {navigationLinks.map(({ path, label, dropdown }) => {
+                            if (dropdown) {
+                                const open = Boolean(anchorEls[label]);
+                                return (
+                                    <Box key={label}>
+                                        <Button
+                                            onClick={(e) => handleMenuOpen(e, label)}
+                                            sx={{
+                                                color: 'white',
+                                                textTransform: 'none',
+                                                borderRadius: 0,
+                                            }}
+                                            aria-controls={open ? `${label}-menu` : undefined}
+                                            aria-haspopup="true"
+                                            aria-expanded={open ? 'true' : undefined}
+                                        >
+                                            {label}
+                                        </Button>
+                                        <Menu
+                                            id={`${label}-menu`}
+                                            anchorEl={anchorEls[label]}
+                                            open={open}
+                                            onClose={() => handleMenuClose(label)}
+                                            MenuListProps={{
+                                                'aria-labelledby': `${label}-button`,
+                                            }}
+                                            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                                            transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+                                            keepMounted
+                                        >
+                                            {dropdown.map(({ path: subPath, label: subLabel }) => (
+                                                <MenuItem
+                                                    key={subPath}
+                                                    component={NavLink}
+                                                    to={subPath}
+                                                    onClick={() => handleMenuClose(label)}
+                                                    sx={{
+                                                        color: 'black',
+                                                    }}
+                                                >
+                                                    {subLabel}
+                                                </MenuItem>
+                                            ))}
+                                        </Menu>
+                                    </Box>
+                                );
+                            }
 
-export { Header };
+                            // Top-level link without dropdown
+                            return (
+                                <Button
+                                    key={path}
+                                    component={NavLink}
+                                    to={path}
+                                    end
+                                    sx={{
+                                        color: 'white',
+                                        textTransform: 'none',
+                                        borderRadius: 0,
+                                    }}
+                                >
+                                    {label}
+                                </Button>
+                            );
+                        })}
+                    </Box>
+                </Toolbar>
+            </Container>
+        </AppBar>
+    );
+};
+
+export default Header;
