@@ -1,26 +1,26 @@
-﻿import React, { useState, useEffect } from "react";
-import AddCustomer from "../components/CustomerAddModal";
+﻿import React, { useState, useEffect, useMemo } from "react";
+import AddEntry from "../components/AddEntryModal";
 import ConfirmModal from "../components/ConfirmModal";
-import Alert from "react-bootstrap/Alert";
-import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
-import Spinner from "react-bootstrap/Spinner";
-import Table from "react-bootstrap/Table";
 import inputValidation from "../utils/inputValidation";
+import customerSchema from "../schema/customer";
+import dataGridColumns from "../utils/datagridcolumns";
+
+import Alert from "@mui/material/Alert";
+import Button from "@mui/material/Button";
+import { DataGrid } from "@mui/x-data-grid";
+import Snackbar from "@mui/material/Snackbar";
+import Typography from "@mui/material/Typography";
 
 const mainURI = "https://localhost:7017/customer";
 
 const Customers = () => {
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
-
-    const [showAddCustomer, setShowAddCustomer] = useState(false);
-    const [customers, setCustomers] = useState([]);
-
-    const [selectedCustomer, setSelectedCustomer] = useState({});
-    const [editCustomerId, setEditCustomerId] = useState(null);
     const [successMessage, setSuccessMessage] = useState("");
+    const [showAddCustomer, setShowAddCustomer] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
+    const [customers, setCustomers] = useState([]);
+    const [selectedCustomer, setSelectedCustomer] = useState({});
 
     const fetchCustomers = async () => {
         setLoading(true);
@@ -40,21 +40,23 @@ const Customers = () => {
             setCustomers(data)
         } catch (error) {
             console.log("Failed to fetch customers:", error);
-            setErrorMessage("Asiakkaiden hakeminen epäonnistui.")
+            setErrorMessage("Asiakkaiden hakeminen epäonnistui!")
         } finally {
             setLoading(false);
         }
     };
 
-    const btnEditCustomer = (customer) => {
-        setSelectedCustomer(customer);
-        setEditCustomerId(customer.id);
+    const customerAdded = () => {
+        setSuccessMessage("Asiakkaan tallennus onnistui!");
+        fetchCustomers();
     }
 
     const btnDeleteCustomer = (customer) => {
         setSelectedCustomer(customer);
         setShowConfirm(true);
     }
+
+    const columns = React.useMemo(() => dataGridColumns(customerSchema, btnDeleteCustomer), []);
 
     const handleDeletion = async () => {
         try {
@@ -65,182 +67,115 @@ const Customers = () => {
             fetchCustomers();
         } catch {
             console.log("Error while deleting customer")
-            setErrorMessage("Asiakkaan poistaminen ei onnistunut")
+            setErrorMessage("Asiakkaan poistaminen ei onnistunut!")
         }
     }
 
-    const btnSaveEdits = async () => {
-        setLoading(true);
-        const requiredFields = ['name', 'email', 'phone', 'address', 'postalCode', 'city', 'country'];
-        const isValid = inputValidation(selectedCustomer, requiredFields);
+    const btnSaveEdits = async (updatedRow, originalRow) => {
+        const requiredFields = ["name", "email", "phone", "address", "postalCode", "city", "country"];
+        const isValid = inputValidation(updatedRow, requiredFields);
 
         if (!isValid) {
             setErrorMessage("Täytä kaikki kentät!")
-            setLoading(false);
-            return;
+            return originalRow;
         }
 
-        const response = await fetch(`${mainURI}/update`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(selectedCustomer),
-        });
+        try {
+            const response = await fetch(`${mainURI}/update`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(updatedRow),
+            });
 
-        if (response.ok) {
-            await fetchCustomers();
-            setSelectedCustomer(null);
-            setEditCustomerId(null);
-            setSuccessMessage("Asiakastietojen päivitys onnistui!")
-        } else {
-            console.log("Error while saving edited customer data")
-            setErrorMessage("Virhe tietojen päivityksessä.")
+            if (response.ok) {
+                setSuccessMessage("Asiakastietojen päivitys onnistui!")
+                return updatedRow;
+            }
         }
-        setLoading(false);
+        catch (error) {
+            console.log("Error while saving edited customer data:", error)
+            setErrorMessage("Virhe tietojen päivityksessä!")
+            return originalRow;
+        }
+    }
+
+    const modalClosed = () => {
+        setShowAddCustomer(false)
+        setErrorMessage("");
     }
 
     useEffect(() => {
         fetchCustomers();
     }, []);
 
-    useEffect(() => {
-        if (successMessage) {
-            setTimeout(() => {
-                setSuccessMessage("")
-            }, 3000)
-        }
-    }, [successMessage])
-
-    useEffect(() => {
-        if (errorMessage) {
-            setTimeout(() => {
-                setErrorMessage("")
-            }, 3000)
-        }
-    }, [errorMessage]);
-
-
     return (
         <>
-            <Button onClick={() => setShowAddCustomer(true)}>Lisää uusi asiakas</Button>
-            <AddCustomer
+            <Button
+                variant="contained"
+                sx={{ marginBottom: "-10px" }}
+                onClick={() => setShowAddCustomer(true)}>Lisää uusi asiakas</Button>
+
+            <AddEntry
+                schema={customerSchema}
+                apiEndPoint={mainURI}
                 show={showAddCustomer}
-                onHide={() => setShowAddCustomer(false)}
-                onCustomerAdded={() => fetchCustomers()}
+                onHide={modalClosed}
+                title="Lisää uusi asiakas"
+                onAdded={() => customerAdded()}
             /><br /><br />
 
-            {loading && <Alert variant={"info"}>Ladataan asiakkaita...</Alert>}
-            {errorMessage && <Alert variant={"danger"}>{errorMessage}</Alert>}
-            {successMessage && <Alert variant={"success"}>{successMessage}</Alert>}
+            {errorMessage &&
+                <Snackbar
+                    anchorOrigin={{ horizontal: "right", vertical: "top" }}
+                    open={Boolean(errorMessage)}
+                    autoHideDuration={3000}
+                    onClose={() => setErrorMessage("")}>
+                    <Alert
+                        color="error"
+                        severity="error"
+                        variant="filled"
+                        sx={{ border: "1px solid #000", width: "100%" }}>
+                        {errorMessage}
+                    </Alert>
+                </Snackbar>
+            }
 
-            <Table responsive striped bordered hover>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Nimi</th>
-                        <th>Sähköposti</th>
-                        <th>Puhelin</th>
-                        <th>Katuosoite</th>
-                        <th>Postinumero</th>
-                        <th>Postitoimipaikka</th>
-                        <th>Maa</th>
-                        <th>Muokkaa</th>
-                        <th>Poista</th>
-                    </tr>
-                </thead>
+            {successMessage &&
+                <Snackbar
+                    anchorOrigin={{ horizontal: "right", vertical: "top" }}
+                    open={Boolean(successMessage)}
+                    autoHideDuration={3000}
+                    onClose={() => setSuccessMessage("")}>
+                    <Alert
+                        color="success"
+                        severity="success"
+                        variant="filled"
+                        sx={{ border: "1px solid #000", width: "100%" }}>
+                        {successMessage}
+                    </Alert>
+                </Snackbar>
+            }
 
-                <tbody>
-                    {customers.map((customer) => (
-                        editCustomerId === customer.id ? (
-                            <tr key={customer.id}>
-                                <td>{customer.id}</td>
-                                <td>
-                                    <Form.Control
-                                        type="text"
-                                        value={selectedCustomer.name}
-                                        onChange={(e) => setSelectedCustomer({ ...selectedCustomer, name: e.target.value })}
-                                    />
-                                </td>
+            { loading && <Alert variant="outlined" severity="info">Ladataan asiakkaita...</Alert> }
+            { customers.length > 0 && (
+            <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
+                 Kaksoisklikkaa solua muokataksesi sitä. Poistu solusta tallentaaksesi.
+                </Typography>
+            )}
 
-                                <td>
-                                    <Form.Control
-                                        type="text"
-                                        value={selectedCustomer.email}
-                                        onChange={(e) => setSelectedCustomer({ ...selectedCustomer, email: e.target.value })}
-                                    />
-                                </td>
-
-                                <td>
-                                    <Form.Control
-                                        type="text"
-                                        value={selectedCustomer.phone}
-                                        onChange={(e) => setSelectedCustomer({ ...selectedCustomer, phone: e.target.value })}
-                                    />
-                                </td>
-
-                                <td>
-                                    <Form.Control
-                                        type="text"
-                                        value={selectedCustomer.address}
-                                        onChange={(e) => setSelectedCustomer({ ...selectedCustomer, address: e.target.value })}
-                                    />
-                                </td>
-
-                                <td>
-                                    <Form.Control
-                                        type="text"
-                                        value={selectedCustomer.postalCode}
-                                        onChange={(e) => setSelectedCustomer({ ...selectedCustomer, postalCode: e.target.value })}
-                                    />
-                                </td>
-
-                                <td>
-                                    <Form.Control
-                                        type="text"
-                                        value={selectedCustomer.city}
-                                        onChange={(e) => setSelectedCustomer({ ...selectedCustomer, city: e.target.value })}
-                                    />
-                                </td>
-
-                                <td>
-                                    <Form.Control
-                                        type="text"
-                                        value={selectedCustomer.country}
-                                        onChange={(e) => setSelectedCustomer({ ...selectedCustomer, country: e.target.value })}
-                                    />
-                                </td>
-
-                                <td><Button variant="primary" onClick={() => btnSaveEdits()}>
-                                    {loading ? (
-                                    <Spinner
-                                        as="span"
-                                        animation="border"
-                                        size="sm"
-                                        role="status"
-                                        aria-hidden="true"
-                                    />
-                                    ) : (
-                                        "Tallenna"
-                                    )}
-                                    </Button></td>
-                                <td><Button variant="danger" disabled>Poista</Button></td>
-                            </tr>
-                        ) : (
-                            <tr key={customer.id}>
-                                <td>{customer.id}</td>
-                                <td>{customer.name}</td>
-                                <td>{customer.email}</td>
-                                <td>{customer.phone}</td>
-                                <td>{customer.address}</td>
-                                <td>{customer.postalCode}</td>
-                                <td>{customer.city}</td>
-                                <td>{customer.country}</td>
-                                <td><Button variant="secondary" onClick={() => btnEditCustomer(customer)}>Muokkaa</Button></td>
-                                <td><Button variant="danger" onClick={() => btnDeleteCustomer(customer)}>Poista</Button></td>
-                            </tr>
-                            )
-                         ))}
-                </tbody>
-            </Table>
+            <div style={{ height: 600, width: "100%" }}>
+                <DataGrid
+                    rows={customers}
+                    columns={columns}
+                    disableRowSelectionOnClick
+                    processRowUpdate={btnSaveEdits}
+                    onProcessRowUpdateError={(error) => {
+                        console.log("Row update error:", error);
+                        setErrorMessage("Tietojen tallennus epäonnistui!");
+                    }}
+                    experimentalFeatures={{ newEditingApi: true }}
+                />
+            </div>
 
             <ConfirmModal
                 show={showConfirm}

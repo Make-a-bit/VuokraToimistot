@@ -1,5 +1,12 @@
 ﻿import React, { useState } from 'react';
-import { Modal, Button, Spinner, Alert } from 'react-bootstrap';
+
+import Button from "@mui/material/Button";
+import CloseIcon from "@mui/icons-material/Close";
+import DeleteIcon from '@mui/icons-material/Delete';
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
 
 const ConfirmModal = ({
     show,
@@ -12,38 +19,49 @@ const ConfirmModal = ({
 }) => {
 
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState("");
 
     const handleConfirm = async () => {
         try {
             setIsLoading(true);
-            setError(null);
+            setError("");
             await onConfirm();
             onHide();
         } catch (err) {
-            setError("Asiakkaan poistaminen ei onnistunut.")
-            console.log("Error while deleting customer")
+            setError("Poistaminen ei onnistunut!")
+            console.log("Error while deleting data:", err)
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <Modal show={show} onHide={onHide} centered>
-            <Modal.Header closeButton>
-                <Modal.Title>{title}</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                {error && <Alert variant="danger">{error}</Alert>}
+        <Dialog open={show} onClose={onHide}>
+            <DialogTitle>{title}</DialogTitle>
+            <DialogContent dividers>
                 {message}
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={onHide} disabled={isLoading}>{cancelText}</Button>
-                <Button variant="danger" onClick={handleConfirm} disabled={isLoading}>
-                    {isLoading ? <Spinner animation="border" size="sm" /> : confirmText}
+            </DialogContent>
+            <DialogActions>
+                <Button
+                    size="small"
+                    color="secondary"
+                    variant="outlined"
+                    startIcon={<CloseIcon /> }
+                    onClick={onHide}
+                    disabled={isLoading}>
+                    {cancelText}
                 </Button>
-            </Modal.Footer>
-        </Modal>
+                <Button
+                    size="small"
+                    variant="contained"
+                    color="error"
+                    startIcon={<DeleteIcon />}
+                    onClick={handleConfirm}
+                    disabled={isLoading}>
+                    {confirmText}
+                </Button>
+            </DialogActions>
+        </Dialog>
     );
 };
 
