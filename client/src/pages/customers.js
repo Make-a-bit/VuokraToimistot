@@ -4,6 +4,9 @@ import ConfirmModal from "../components/ConfirmModal";
 import inputValidation from "../utils/inputValidation";
 import customerSchema from "../schema/customer";
 import dataGridColumns from "../utils/datagridcolumns";
+import dataGridSx from "../utils/dataGridSx";
+import { useDispatch, useSelector } from "react-redux";
+import { addCustomer, editCustomer, fetchCustomers, clearError, deleteCustomer, clearSuccess } from "../redux/actions";
 
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
@@ -11,45 +14,17 @@ import { DataGrid } from "@mui/x-data-grid";
 import Snackbar from "@mui/material/Snackbar";
 import Typography from "@mui/material/Typography";
 
-const mainURI = "https://localhost:7017/customer";
+const mainURI = "https://localhost:7017";
 
 const Customers = () => {
-    const [loading, setLoading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
-    const [successMessage, setSuccessMessage] = useState("");
+    const dispatch = useDispatch();
+    const customers = useSelector(state => state.customers);
+    const loading = useSelector(state => state.loadingState);
+    const errorMessage = useSelector(state => state.errorMessage);
+    const successMessage = useSelector(state => state.successMessage)
     const [showAddCustomer, setShowAddCustomer] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
-    const [customers, setCustomers] = useState([]);
     const [selectedCustomer, setSelectedCustomer] = useState({});
-
-    const fetchCustomers = async () => {
-        setLoading(true);
-        setErrorMessage("");
-
-        try {
-            const response = await fetch(mainURI, {
-                method: "GET",
-                headers: { "Content-type": "application/json" },
-            });
-
-            if (!response.ok) {
-                throw new Error(`Error! Status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            setCustomers(data)
-        } catch (error) {
-            console.log("Failed to fetch customers:", error);
-            setErrorMessage("Asiakkaiden hakeminen epäonnistui!")
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const customerAdded = () => {
-        setSuccessMessage("Asiakkaan tallennus onnistui!");
-        fetchCustomers();
-    }
 
     const btnDeleteCustomer = (customer) => {
         setSelectedCustomer(customer);
@@ -58,55 +33,44 @@ const Customers = () => {
 
     const columns = React.useMemo(() => dataGridColumns(customerSchema, btnDeleteCustomer), []);
 
-    const handleDeletion = async () => {
-        try {
-            await fetch(`${mainURI}/delete/${selectedCustomer.id}`, {
-                method: "DELETE"
-            })
-            setSuccessMessage("Asiakkaan poistaminen onnistui!");
-            fetchCustomers();
-        } catch {
-            console.log("Error while deleting customer")
-            setErrorMessage("Asiakkaan poistaminen ei onnistunut!")
-        }
-    }
-
-    const btnSaveEdits = async (updatedRow, originalRow) => {
+    const saveEdits = async (updatedRow, originalRow) => {
+        console.log("Edit customer:", originalRow)
         const requiredFields = ["name", "email", "phone", "address", "postalCode", "city", "country"];
         const isValid = inputValidation(updatedRow, requiredFields);
 
         if (!isValid) {
-            setErrorMessage("Täytä kaikki kentät!")
             return originalRow;
         }
 
-        try {
-            const response = await fetch(`${mainURI}/update`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(updatedRow),
-            });
-
-            if (response.ok) {
-                setSuccessMessage("Asiakastietojen päivitys onnistui!")
-                return updatedRow;
-            }
-        }
-        catch (error) {
-            console.log("Error while saving edited customer data:", error)
-            setErrorMessage("Virhe tietojen päivityksessä!")
-            return originalRow;
-        }
+        await dispatch(editCustomer(updatedRow));
+        return updatedRow;
     }
 
     const modalClosed = () => {
         setShowAddCustomer(false)
-        setErrorMessage("");
     }
 
     useEffect(() => {
-        fetchCustomers();
-    }, []);
+        dispatch(fetchCustomers());
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (errorMessage) {
+            const timer = setTimeout(() => {
+                dispatch(clearError());
+            }, 6000);
+            return () => clearTimeout(timer);
+        }
+    }, [errorMessage, dispatch]);
+
+    useEffect(() => {
+        if (successMessage) {
+            const timer = setTimeout(() => {
+                dispatch(clearSuccess());
+            }, 3500);
+            return () => clearTimeout(timer);
+        }
+    }, [successMessage, dispatch]);
 
     return (
         <>
@@ -117,11 +81,11 @@ const Customers = () => {
 
             <AddEntry
                 schema={customerSchema}
-                apiEndPoint={mainURI}
+                apiEndPoint={`${mainURI}/customer`}
                 show={showAddCustomer}
                 onHide={modalClosed}
                 title="Lisää uusi asiakas"
-                onAdded={() => customerAdded()}
+                action={addCustomer}
             /><br /><br />
 
             {errorMessage &&
@@ -129,7 +93,7 @@ const Customers = () => {
                     anchorOrigin={{ horizontal: "right", vertical: "top" }}
                     open={Boolean(errorMessage)}
                     autoHideDuration={3000}
-                    onClose={() => setErrorMessage("")}>
+                >
                     <Alert
                         color="error"
                         severity="error"
@@ -145,7 +109,7 @@ const Customers = () => {
                     anchorOrigin={{ horizontal: "right", vertical: "top" }}
                     open={Boolean(successMessage)}
                     autoHideDuration={3000}
-                    onClose={() => setSuccessMessage("")}>
+                >
                     <Alert
                         color="success"
                         severity="success"
@@ -156,24 +120,31 @@ const Customers = () => {
                 </Snackbar>
             }
 
-            { loading && <Alert variant="outlined" severity="info">Ladataan asiakkaita...</Alert> }
             { customers.length > 0 && (
             <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                 Kaksoisklikkaa solua muokataksesi sitä. Poistu solusta tallentaaksesi.
+                 Kaksoisklikkaa solua muokataksesi sitä, poistu solusta tallentaaksesi.
                 </Typography>
             )}
 
             <div style={{ height: 600, width: "100%" }}>
                 <DataGrid
                     rows={customers}
+                    getRowId={(row => row.id) }
                     columns={columns}
                     disableRowSelectionOnClick
-                    processRowUpdate={btnSaveEdits}
+                    processRowUpdate={saveEdits}
+                    loading={loading}
+                    slotProps={{
+                        loadingOverlay: {
+                            variant: "linear-progress",
+                            noRowsVariant: "skeleton"
+                        },
+                    }}
                     onProcessRowUpdateError={(error) => {
                         console.log("Row update error:", error);
-                        setErrorMessage("Tietojen tallennus epäonnistui!");
                     }}
                     experimentalFeatures={{ newEditingApi: true }}
+                    sx={dataGridSx}
                 />
             </div>
 
@@ -184,7 +155,7 @@ const Customers = () => {
                 message={`Haluatko varmasti poistaa asiakkaan ${selectedCustomer?.name}?`}
                 confirmText="Poista"
                 cancelText="Peruuta"
-                onConfirm={handleDeletion}
+                onConfirm={() => dispatch(deleteCustomer(selectedCustomer))}
             />
         </>
     )

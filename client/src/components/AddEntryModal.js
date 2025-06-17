@@ -9,14 +9,16 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import SaveIcon from "@mui/icons-material/Save";
 import TextField from "@mui/material/TextField";
+import { useDispatch, useSelector } from "react-redux";
 
-const AddEntry = ({ schema, show, onHide, onAdded, apiEndPoint, title }) => {
+const AddEntry = ({ schema, show, onHide, apiEndPoint, title, action }) => {
     const initialFormData = schema.reduce((acc, field) => ({ ...acc, [field.field]: "" }), {});
     const [formData, setFormData] = useState({});
     const [errorState, setErrorState] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
-    const [loading, setLoading] = useState(false);
+    const loading = useSelector(state => state.loadingState);
     const firstInputRef = useRef(null);
+    const dispatch = useDispatch();
 
     useEffect(() => {
         if (!show) {
@@ -33,36 +35,21 @@ const AddEntry = ({ schema, show, onHide, onAdded, apiEndPoint, title }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
 
         const isValid = Object.values(formData).every(value => value.trim() !== "");
 
         if (!isValid) {
             setErrorState(true);
             setErrorMessage("Täytä kaikki kentät!")
-            setLoading(false);
             return;
         }
 
         try {
-            const response = await fetch(apiEndPoint, {
-                method: "POST",
-                headers: { "Content-type": "application/json" },
-                body: JSON.stringify(formData),
-            });
-
-            if (response.ok) {
-                onAdded();
-                onHide();
-            } else {
-                throw new Error("API error")
-            }
-        } catch (err) {
-            setErrorState(true);
-            setErrorMessage("Verkkovirhe. Tarkista internet yhteys.")
-            console.log("Network error while adding a new office:", err)
-        } finally {
-            setLoading(false);
+            await dispatch(action(apiEndPoint, formData));
+            onHide();
+        } catch (error) {
+            setErrorState(true)
+            setErrorMessage("Tallennus epäonnistui!");
         }
     }
 

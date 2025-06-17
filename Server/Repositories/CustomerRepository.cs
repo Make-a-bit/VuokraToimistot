@@ -41,5 +41,30 @@ namespace API.Repositories
             }
             return customers;
         }
+
+        public async Task<Customer> GetCustomerById(int id)
+        {
+            var customer = new Customer();
+            var conn = _dbManager.GetConnection();
+            await conn.OpenAsync();
+
+            using var cmd = new SqlCommand("SELECT * FROM Customers WHERE customer_id = @id", conn);
+            cmd.Parameters.AddWithValue("@id", id);
+            using var reader = await cmd.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                customer.Id = reader.GetInt32(reader.GetOrdinal("customer_id"));
+                customer.Name = reader.GetString(reader.GetOrdinal("customer_name"));
+                customer.Address = reader.GetString(reader.GetOrdinal("customer_address"));
+                customer.PostalCode = reader.GetString(reader.GetOrdinal("customer_postalcode"));
+                customer.City = reader.GetString(reader.GetOrdinal("customer_city"));
+                customer.Country = reader.GetString(reader.GetOrdinal("customer_country"));
+                customer.Email = reader.GetString(reader.GetOrdinal("customer_email"));
+                customer.Phone = reader.GetString(reader.GetOrdinal("customer_phone"));
+                }
+
+            return customer;
+        }
     }
 }

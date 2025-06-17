@@ -7,6 +7,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
+import { useSelector } from "react-redux";
 
 const ConfirmModal = ({
     show,
@@ -18,21 +19,15 @@ const ConfirmModal = ({
     onConfirm,
 }) => {
 
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState("");
+    const loading = useSelector(state => state.loadingState);
 
     const handleConfirm = async () => {
         try {
-            setIsLoading(true);
-            setError("");
             await onConfirm();
             onHide();
         } catch (err) {
-            setError("Poistaminen ei onnistunut!")
-            console.log("Error while deleting data:", err)
-        } finally {
-            setIsLoading(false);
-        }
+            console.log("Error while deleting customer:", err)
+        } 
     };
 
     return (
@@ -48,7 +43,7 @@ const ConfirmModal = ({
                     variant="outlined"
                     startIcon={<CloseIcon /> }
                     onClick={onHide}
-                    disabled={isLoading}>
+                    disabled={loading}>
                     {cancelText}
                 </Button>
                 <Button
@@ -57,7 +52,7 @@ const ConfirmModal = ({
                     color="error"
                     startIcon={<DeleteIcon />}
                     onClick={handleConfirm}
-                    disabled={isLoading}>
+                    disabled={loading}>
                     {confirmText}
                 </Button>
             </DialogActions>

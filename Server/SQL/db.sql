@@ -209,3 +209,9 @@ BEGIN
         userPassword VARCHAR(255) NOT NULL,
     );
 END;
+
+
+-- MOCK DATA:
+
+INSERT INTO Customers (customer_name, customer_email, customer_phone, customer_address, customer_postalcode, customer_city, customer_country) 
+VALUES ('Testaaja 1', 'testi@test.com', '0401234567', 'Testikatu 10', '02340', 'Lahti', 'FIN');

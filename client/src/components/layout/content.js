@@ -5,7 +5,7 @@ import Grid from "@mui/material/Grid";
 import Header from "./header"
 import { Footer } from "./footer"
 import { Outlet } from "react-router-dom";
-import AppBreadcrumbs from "../layout/breadcrumbs";
+import AppBreadcrumbs from "./breadcrumbs";
 
 const Content = () => {
     return (

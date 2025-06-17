@@ -12,7 +12,7 @@ namespace API.Services
             _dbManager = dBManager;
         }
 
-        public async Task<bool> AddOffice(Office office)
+        public async Task<int?> AddOffice(Office office)
         {
             try
             {
@@ -22,6 +22,7 @@ namespace API.Services
                 using var cmd = new SqlCommand("INSERT INTO Offices " +
                     "(office_name, office_address, office_postalcode, office_city, " +
                     "office_country, office_phone, office_email) " +
+                    "OUTPUT INSERTED.office_id " +
                     "VALUES (@name, @address, @postal, @city, @country, @phone, @email)", conn);
 
                 cmd.Parameters.AddWithValue("@name", office.Name);
@@ -32,15 +33,19 @@ namespace API.Services
                 cmd.Parameters.AddWithValue("@phone", office.Phone);
                 cmd.Parameters.AddWithValue("@email", office.Email);
 
-                int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                var result = await cmd.ExecuteScalarAsync();
 
-                return rowsAffected > 0;
+                if (result != null && int.TryParse(result.ToString(), out int newId))
+                {
+                    return newId;
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("ERROR: ", ex.ToString());
-                return false;
+                Console.WriteLine("Error while creating a new office: ", ex.ToString());
             }
+
+            return null;
         }
     }
 }

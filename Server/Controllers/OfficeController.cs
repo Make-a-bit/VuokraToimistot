@@ -32,11 +32,18 @@ namespace API.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateOffice([FromBody] Office office)
         {
-            var success = await _officeAdd.AddOffice(office);
+            try
+            {
+                var officeID = await _officeAdd.AddOffice(office);
 
-            if (success) return Ok();
+                office.Id = officeID.Value;
 
-            else return BadRequest();
+                return Ok(office);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPut]
@@ -45,7 +52,11 @@ namespace API.Controllers
         {
             var success = await _officeUpdate.UpdateOffice(office);
 
-            if (success) return Ok();
+            if (success)
+            {
+                var updatedOffice = await _officeRepo.GetOfficeById(office.Id);
+                return Ok(updatedOffice);
+            }
 
             else return BadRequest();
         }
