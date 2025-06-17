@@ -2,6 +2,7 @@
 using API.Repositories;
 using API.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 namespace API.Controllers
 {
@@ -24,11 +25,18 @@ namespace API.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateCustomer([FromBody] Customer customer)
         {
-            var success = await _customerAdd.AddCustomer(customer);
+            try
+            {
+                var customerID = await _customerAdd.AddCustomer(customer);
 
-            if (success) return Ok();
+                customer.Id = customerID.Value;
 
-            else return BadRequest();
+                return Ok(customer);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet]
@@ -45,7 +53,11 @@ namespace API.Controllers
         {
             var success = await _customerUpdate.UpdateCustomer(customer);
 
-            if (success) return Ok();
+            if (success)
+            {
+                var updatedCustomer = await _customerRepo.GetCustomerById(customer.Id);
+                return Ok(updatedCustomer);
+            }
 
             else return BadRequest();
         }

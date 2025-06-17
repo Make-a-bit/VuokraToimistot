@@ -12,7 +12,7 @@ namespace API.Services
             _dbManager = dBManager;
         }
 
-        public async Task<bool> AddCustomer(Customer customer)
+        public async Task<int?> AddCustomer(Customer customer)
         {
             try
             {
@@ -21,7 +21,9 @@ namespace API.Services
 
                 using var cmd = new SqlCommand("INSERT INTO Customers " +
                     "(customer_name, customer_email, customer_phone, customer_address, " +
-                    "customer_postalcode, customer_city, customer_country) VALUES " +
+                    "customer_postalcode, customer_city, customer_country) " +
+                    "OUTPUT INSERTED.customer_id " + 
+                    "VALUES " +
                     "(@name, @email, @phone, @address, @postal, @city, @country)", conn);
 
                 cmd.Parameters.AddWithValue("@name", customer.Name);
@@ -32,16 +34,19 @@ namespace API.Services
                 cmd.Parameters.AddWithValue("@city", customer.City);
                 cmd.Parameters.AddWithValue("@country", customer.Country);
 
-                int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                var result = await cmd.ExecuteScalarAsync();
 
-                return rowsAffected > 0;
+                if (result != null && int.TryParse(result.ToString(), out int newId))
+                {
+                    return newId;
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: ", ex);
+                Console.WriteLine("Error while creating a new customer: ", ex.ToString());
             }
 
-            return false;
+            return null;
         }
     }
 }

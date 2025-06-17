@@ -5,6 +5,8 @@ import inputValidation from "../utils/inputValidation";
 import officeSchema from "../schema/office";
 import dataGridColumns from "../utils/datagridcolumns";
 import dataGridSx from "../utils/dataGridSx";
+import { useDispatch, useSelector } from "react-redux";
+import { addOffice, deleteOffice, editOffice, fetchOffices, clearError, clearSuccess } from "../redux/actions";
 
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
@@ -12,47 +14,17 @@ import { DataGrid } from "@mui/x-data-grid";
 import Snackbar from "@mui/material/Snackbar";
 import Typography from "@mui/material/Typography";
 
-const mainURI = "https://localhost:7017/office";
+const mainURI = "https://localhost:7017";
 
 const Offices = () => {
-    const [loading, setLoading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
-    const [successMessage, setSuccessMessage] = useState("");
-
+    const dispatch = useDispatch();
+    const loading = useSelector(state => state.loadingState);
+    const offices = useSelector(state => state.offices);
+    const errorMessage = useSelector(state => state.errorMessage);
+    const successMessage = useSelector(state => state.successMessage)
     const [showAddOffice, setShowAddOffice] = useState(false)
     const [showConfirm, setShowConfirm] = useState(false);
-
-    const [offices, setOffices] = useState([]);
     const [selectedOffice, setSelectedOffice] = useState({});
-
-    const fetchOffices = async () => {
-        setLoading(true);
-        setErrorMessage("");
-
-        try {
-            const response = await fetch(mainURI, {
-                method: "GET",
-                headers: { "Content-type": "application/json" },
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            setOffices(data)
-        } catch (error) {
-            console.log("Failed to fetch offices:", error);
-            setErrorMessage("Kohteiden hakeminen epäonnistui.")
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    const officeAdded = () => {
-        setSuccessMessage("Kohteen tallennus onnistui!");
-        fetchOffices();
-    }
 
     const btnDeleteOffice = (office) => {
         setSelectedOffice(office)
@@ -61,58 +33,46 @@ const Offices = () => {
 
     const columns = React.useMemo(() => dataGridColumns(officeSchema, btnDeleteOffice), []);
 
-    const handleDeletion = async () => {
-        setLoading(true)
-        try {
-            await fetch(`${mainURI}/delete/${selectedOffice.id}`, {
-                method: "DELETE"
-            })
-            setSuccessMessage("Kohteen poistaminen onnistui");
-            fetchOffices();
-        } catch {
-            console.log("Error while deleting office");
-            setErrorMessage("Kohteen poistaminen ei onnistunut");
-        } finally {
-            setLoading(false)
-        }
-    }
-
-    const btnSaveEdits = async (updatedRow, originalRow) => {
+    const saveEdits = async (updatedRow, originalRow) => {
+        console.log("Edit office:", originalRow)
         const requiredFields = ['name', 'address', 'postalCode', 'city', 'country', 'phone', 'email']
         const isValid = inputValidation(updatedRow, requiredFields);
 
         if (!isValid) {
-            setErrorMessage("Täytä kaikki kentät!");
             return originalRow;
         }
 
-        try {
-            const response = await fetch(`${mainURI}/update`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(selectedOffice),
-            });
-
-            if (response.ok) {
-                await fetchOffices();
-                setSelectedOffice(null)
-                setSuccessMessage("Toimiston tietojen päivitys onnistui!")
-            }
-        } catch (error) {
-            console.log("Error while saving edited office data:", error)
-            setErrorMessage("Virhe tietojen päivityksessä!")
-            return originalRow;
-        }
+        await dispatch(editOffice(updatedRow));
+        return updatedRow;
     }
+
+    // JATKA SIITÄ ETTÄ CONTROLLERI PALAUTTAA MUOKATUN OFFICEN 
 
     const modalClosed = () => {
         setShowAddOffice(false)
-        setErrorMessage("");
     }
 
     useEffect(() => {
-        fetchOffices();
-    }, []);
+        dispatch(fetchOffices());
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (errorMessage) {
+            const timer = setTimeout(() => {
+                dispatch(clearError());
+            }, 6000);
+            return () => clearTimeout(timer);
+        }
+    }, [errorMessage, dispatch]);
+
+    useEffect(() => {
+        if (successMessage) {
+            const timer = setTimeout(() => {
+                dispatch(clearSuccess());
+            }, 6000);
+            return () => clearTimeout(timer);
+        }
+    }, [successMessage, dispatch]);
 
     return (
         <>
@@ -123,19 +83,18 @@ const Offices = () => {
 
             <AddEntry
                 schema={officeSchema}
-                apiEndPoint={mainURI}
+                apiEndPoint={`${mainURI}/office`}
                 show={showAddOffice}
                 onHide={modalClosed}
                 title="Lisää uusi kohde"
-                onAdded={() => officeAdded()}
+                action={addOffice}
             /><br /><br />
 
             {errorMessage &&
                 <Snackbar
                     anchorOrigin={{ horizontal: "right", vertical: "top" }}
                     open={Boolean(errorMessage)}
-                    onClose={() => setErrorMessage("")}
-                    autoHideDuration={3000}>
+                    autoHideDuration={6000}>
                     <Alert
                         color="warning"
                         severity="warning"
@@ -150,8 +109,7 @@ const Offices = () => {
                 <Snackbar
                     anchorOrigin={{ horizontal: "right", vertical: "top" }}
                     open={Boolean(successMessage)}
-                    onClose={() => setSuccessMessage("")}
-                    autoHideDuration={3000}>
+                    autoHideDuration={6000}>
                     <Alert
                         color="success"
                         severity="success"
@@ -161,10 +119,10 @@ const Offices = () => {
                     </Alert>
                 </Snackbar>
             }
-            {loading && <Alert variant="outlined" severity="info">Ladataan kohteita...</Alert>}
+
             {offices.length > 0 && (
                 <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                    Kaksoisklikkaa solua muokataksesi sisältöä. Poistu solusta tallentaaksesi.
+                    Kaksoisklikkaa solua muokataksesi sitä, poistu solusta tallentaaksesi.
                 </Typography>
             )}
 
@@ -173,10 +131,16 @@ const Offices = () => {
                     rows={offices}
                     columns={columns}
                     disableRowSelectionOnClick
-                    processRowUpdate={btnSaveEdits}
+                    processRowUpdate={saveEdits}
+                    loading={loading}
+                    slotProps={{
+                        loadingOverlay: {
+                            variant: "linear-progress",
+                            noRowsVariant: "skeleton"
+                        },
+                    }}
                     onProcessRowUpdateError={(error) => {
                         console.log("Row update error:", error);
-                        setErrorMessage("Tietojen tallennus epäonnistui");
                     }}
                     experimentalFeatures={{ newEditingApi: true }}
                     sx={dataGridSx}
@@ -190,7 +154,7 @@ const Offices = () => {
                 message={`Haluatko varmasti poistaa toimiston ${selectedOffice?.name}?`}
                 confirmText="Poista"
                 cancelText="Peruuta"
-                onConfirm={handleDeletion}
+                onConfirm={() => dispatch(deleteOffice(selectedOffice))}
             />
         </>
     )
