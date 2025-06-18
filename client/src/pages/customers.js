@@ -6,8 +6,8 @@ import customerSchema from "../schema/customer";
 import dataGridColumns from "../utils/datagridcolumns";
 import dataGridSx from "../utils/dataGridSx";
 import { useDispatch, useSelector } from "react-redux";
-import { addCustomer, editCustomer, fetchCustomers, clearError, deleteCustomer, clearSuccess } from "../redux/actions";
-
+import { addCustomer, editCustomer, deleteCustomer } from "../redux/actions/customerActions";
+import { clearMessages } from "../redux/actions/uiActions";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import { DataGrid } from "@mui/x-data-grid";
@@ -18,10 +18,10 @@ const mainURI = "https://localhost:7017";
 
 const Customers = () => {
     const dispatch = useDispatch();
-    const customers = useSelector(state => state.customers);
-    const loading = useSelector(state => state.loadingState);
-    const errorMessage = useSelector(state => state.errorMessage);
-    const successMessage = useSelector(state => state.successMessage)
+    const customers = useSelector(state => state.customers.customers);
+    const loading = useSelector(state => state.ui.loadingState);
+    const errorMessage = useSelector(state => state.ui.errorMessage);
+    const successMessage = useSelector(state => state.ui.successMessage)
     const [showAddCustomer, setShowAddCustomer] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
     const [selectedCustomer, setSelectedCustomer] = useState({});
@@ -52,22 +52,13 @@ const Customers = () => {
     }
 
     useEffect(() => {
-        if (errorMessage) {
+        if (errorMessage || successMessage) {
             const timer = setTimeout(() => {
-                dispatch(clearError());
+                dispatch(clearMessages());
             }, 6000);
             return () => clearTimeout(timer);
         }
-    }, [errorMessage, dispatch]);
-
-    useEffect(() => {
-        if (successMessage) {
-            const timer = setTimeout(() => {
-                dispatch(clearSuccess());
-            }, 3500);
-            return () => clearTimeout(timer);
-        }
-    }, [successMessage, dispatch]);
+    }, [errorMessage, successMessage, dispatch]);
 
     return (
         <>

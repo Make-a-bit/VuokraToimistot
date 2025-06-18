@@ -16,42 +16,32 @@ import propertySchema from "../schema/property";
 import dataGridColumns from "../utils/datagridcolumns";
 import dataGridSx from "../utils/dataGridSx";
 import { useDispatch, useSelector } from "react-redux";
-import {
-    addProperty, deleteOfficeProperty, editOfficeProperty, fetchOfficeProperties,
-    clearError, clearSuccess, setOffice
-} from "../redux/actions";
+import { addProperty, deleteProperty, editProperty, fetchProperties } from "../redux/actions/propertyActions";
+import { setOffice } from "../redux/actions/officeActions";
+import { clearMessages } from "../redux/actions/uiActions";
 
 const mainURI = "https://localhost:7017";
 
 const Properties = () => {
     const dispatch = useDispatch();
-    const loading = useSelector(state => state.loadingState);
-    const offices = useSelector(state => state.offices);
-    const properties = useSelector(state => state.properties);
-    const errorMessage = useSelector(state => state.errorMessage);
-    const selectedOffice = useSelector(state => state.selectedOffice);
-    const successMessage = useSelector(state => state.successMessage)
+    const loading = useSelector(state => state.ui.loadingState);
+    const offices = useSelector(state => state.offices.offices);
+    const selectedOffice = useSelector(state => state.offices.selectedOffice);
+    const properties = useSelector(state => state.properties.properties);
+    const errorMessage = useSelector(state => state.ui.errorMessage);
+    const successMessage = useSelector(state => state.ui.successMessage)
     const [showAddProperty, setShowAddProperty] = useState(false)
     const [showConfirm, setShowConfirm] = useState(false);
     const [selectedProperty, setSelectedProperty] = useState({});
 
     useEffect(() => {
-        if (errorMessage) {
+        if (errorMessage || successMessage) {
             const timer = setTimeout(() => {
-                dispatch(clearError());
+                dispatch(clearMessages());
             }, 6000);
             return () => clearTimeout(timer);
         }
-    }, [errorMessage, dispatch]);
-
-    useEffect(() => {
-        if (successMessage) {
-            const timer = setTimeout(() => {
-                dispatch(clearSuccess());
-            }, 6000);
-            return () => clearTimeout(timer);
-        }
-    }, [successMessage, dispatch]);
+    }, [errorMessage, successMessage, dispatch]);
 
     useEffect(() => {
         if (selectedOffice && !offices.find(o => o.id === selectedOffice.id)) {
@@ -62,7 +52,7 @@ const Properties = () => {
     const handleOfficeChange = (e) => {
         const office = offices.find(o => o.id === e.target.value);
         dispatch(setOffice(office));
-        dispatch(fetchOfficeProperties(office.id));
+        dispatch(fetchProperties(office.id));
     };
 
     const btnDeleteProperty = (property) => {
@@ -81,7 +71,7 @@ const Properties = () => {
             return originalRow;
         }
 
-        await dispatch(editOfficeProperty(updatedRow));
+        await dispatch(editProperty(updatedRow));
 
         return updatedRow;
     }
@@ -191,7 +181,7 @@ const Properties = () => {
                 message={`Haluatko varmasti poistaa vuokrakohteen ${selectedProperty?.name}?`}
                 confirmText="Poista"
                 cancelText="Peruuta"
-                onConfirm={() => dispatch(deleteOfficeProperty(selectedProperty))}
+                onConfirm={() => dispatch(deleteProperty(selectedProperty))}
             />
 
         </>
