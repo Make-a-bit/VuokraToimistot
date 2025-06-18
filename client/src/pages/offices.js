@@ -6,8 +6,8 @@ import officeSchema from "../schema/office";
 import dataGridColumns from "../utils/datagridcolumns";
 import dataGridSx from "../utils/dataGridSx";
 import { useDispatch, useSelector } from "react-redux";
-import { addOffice, deleteOffice, editOffice, clearError, clearSuccess } from "../redux/actions";
-
+import { addOffice, deleteOffice, editOffice } from "../redux/actions/officeActions";
+import { clearMessages } from "../redux/actions/uiActions"
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import { DataGrid } from "@mui/x-data-grid";
@@ -18,31 +18,22 @@ const mainURI = "https://localhost:7017";
 
 const Offices = () => {
     const dispatch = useDispatch();
-    const loading = useSelector(state => state.loadingState);
-    const offices = useSelector(state => state.offices);
-    const errorMessage = useSelector(state => state.errorMessage);
-    const successMessage = useSelector(state => state.successMessage)
+    const loading = useSelector(state => state.ui.loadingState);
+    const offices = useSelector(state => state.offices.offices);
+    const errorMessage = useSelector(state => state.ui.errorMessage);
+    const successMessage = useSelector(state => state.ui.successMessage)
     const [showAddOffice, setShowAddOffice] = useState(false)
     const [showConfirm, setShowConfirm] = useState(false);
     const [selectedOffice, setSelectedOffice] = useState({});
 
     useEffect(() => {
-        if (errorMessage) {
+        if (errorMessage || successMessage) {
             const timer = setTimeout(() => {
-                dispatch(clearError());
+                dispatch(clearMessages());
             }, 6000);
             return () => clearTimeout(timer);
         }
-    }, [errorMessage, dispatch]);
-
-    useEffect(() => {
-        if (successMessage) {
-            const timer = setTimeout(() => {
-                dispatch(clearSuccess());
-            }, 6000);
-            return () => clearTimeout(timer);
-        }
-    }, [successMessage, dispatch]);
+    }, [errorMessage, successMessage, dispatch]);
 
     const btnDeleteOffice = (office) => {
         setSelectedOffice(office)

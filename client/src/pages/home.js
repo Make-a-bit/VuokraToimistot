@@ -1,6 +1,7 @@
 ﻿import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchCustomers, fetchOffices } from "../redux/actions"
+import { fetchCustomers } from "../redux/actions/customerActions"
+import { fetchOffices } from "../redux/actions/officeActions"
 
 
 const Home = () => {
