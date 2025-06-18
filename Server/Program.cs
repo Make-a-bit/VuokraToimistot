@@ -45,6 +45,10 @@ namespace API
             builder.Services.AddScoped<OfficeDelete>();
             builder.Services.AddScoped<OfficeRepository>();
             builder.Services.AddScoped<OfficeUpdate>();
+            builder.Services.AddScoped<PropertyAdd>();
+            builder.Services.AddScoped<PropertyDelete>();
+            builder.Services.AddScoped<PropertyRepository>();
+            builder.Services.AddScoped<PropertyUpdate>();
             builder.Services.AddScoped<UserAccessManager>();
 
 

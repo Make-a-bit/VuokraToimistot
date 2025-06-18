@@ -46,8 +46,6 @@ const Offices = () => {
         return updatedRow;
     }
 
-    // JATKA SIITÄ ETTÄ CONTROLLERI PALAUTTAA MUOKATUN OFFICEN 
-
     const modalClosed = () => {
         setShowAddOffice(false)
     }
