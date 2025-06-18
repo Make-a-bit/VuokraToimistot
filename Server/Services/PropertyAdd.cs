@@ -19,14 +19,15 @@ namespace API.Services
                 var conn = _dbManager.GetConnection();
                 await conn.OpenAsync();
 
-                using var cmd = new SqlCommand("INSERT INTO Properties " +
-                    "(office_id, property_name, property_area) " +
+                using var cmd = new SqlCommand("INSERT INTO Office_Properties " +
+                    "(office_id, property_name, property_area, property_price) " +
                     "OUTPUT INSERTED.property_id " +
-                    "VALUES (@oId, @name, @area)", conn);
+                    "VALUES (@oId, @name, @area, @price)", conn);
 
                 cmd.Parameters.AddWithValue("@oId", property.OfficeId);
                 cmd.Parameters.AddWithValue("@name", property.Name);
                 cmd.Parameters.AddWithValue("@area", property.Area);
+                cmd.Parameters.AddWithValue("@price", property.Price);
 
                 var result = await cmd.ExecuteScalarAsync();
 

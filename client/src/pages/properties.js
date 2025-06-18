@@ -1,30 +1,39 @@
 ﻿import React, { useState, useEffect } from "react";
+import Alert from "@mui/material/Alert";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import { DataGrid } from "@mui/x-data-grid";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import Snackbar from "@mui/material/Snackbar";
+import Typography from "@mui/material/Typography";
 import AddEntry from "../components/AddEntryModal";
 import ConfirmModal from "../components/ConfirmModal";
 import inputValidation from "../utils/inputValidation";
-import officeSchema from "../schema/office";
+import propertySchema from "../schema/property";
 import dataGridColumns from "../utils/datagridcolumns";
 import dataGridSx from "../utils/dataGridSx";
 import { useDispatch, useSelector } from "react-redux";
-import { addOffice, deleteOffice, editOffice, clearError, clearSuccess } from "../redux/actions";
-
-import Alert from "@mui/material/Alert";
-import Button from "@mui/material/Button";
-import { DataGrid } from "@mui/x-data-grid";
-import Snackbar from "@mui/material/Snackbar";
-import Typography from "@mui/material/Typography";
+import {
+    addProperty, deleteOfficeProperty, editOfficeProperty, fetchOfficeProperties,
+    clearError, clearSuccess, setOffice
+} from "../redux/actions";
 
 const mainURI = "https://localhost:7017";
 
-const Offices = () => {
+const Properties = () => {
     const dispatch = useDispatch();
     const loading = useSelector(state => state.loadingState);
     const offices = useSelector(state => state.offices);
+    const properties = useSelector(state => state.properties);
     const errorMessage = useSelector(state => state.errorMessage);
+    const selectedOffice = useSelector(state => state.selectedOffice);
     const successMessage = useSelector(state => state.successMessage)
-    const [showAddOffice, setShowAddOffice] = useState(false)
+    const [showAddProperty, setShowAddProperty] = useState(false)
     const [showConfirm, setShowConfirm] = useState(false);
-    const [selectedOffice, setSelectedOffice] = useState({});
+    const [selectedProperty, setSelectedProperty] = useState({});
 
     useEffect(() => {
         if (errorMessage) {
@@ -44,42 +53,69 @@ const Offices = () => {
         }
     }, [successMessage, dispatch]);
 
-    const btnDeleteOffice = (office) => {
-        setSelectedOffice(office)
+    useEffect(() => {
+        if (selectedOffice && !offices.find(o => o.id === selectedOffice.id)) {
+            dispatch(setOffice(null));
+        }
+    }, [selectedOffice, offices, dispatch]);
+
+    const handleOfficeChange = (e) => {
+        const office = offices.find(o => o.id === e.target.value);
+        dispatch(setOffice(office));
+        dispatch(fetchOfficeProperties(office.id));
+    };
+
+    const btnDeleteProperty = (property) => {
+        setSelectedProperty(property)
         setShowConfirm(true)
     }
 
-    const columns = React.useMemo(() => dataGridColumns(officeSchema, btnDeleteOffice), []);
+    const columns = React.useMemo(() => dataGridColumns(propertySchema, btnDeleteProperty), []);
 
     const saveEdits = async (updatedRow, originalRow) => {
-        console.log("Edit office:", originalRow)
-        const requiredFields = ["name", "address", "postalCode", "city", "country", "phone", "email"]
+        console.log("Edit property:", originalRow)
+        const requiredFields = ["name", "area", "price"]
         const isValid = inputValidation(updatedRow, requiredFields);
 
         if (!isValid) {
             return originalRow;
         }
 
-        await dispatch(editOffice(updatedRow));
+        await dispatch(editOfficeProperty(updatedRow));
 
         return updatedRow;
     }
 
     return (
         <>
+            <Box sx={{ marginTop: "20px", width: "200px" }}>
+                <FormControl>
+                    <InputLabel>
+                        {selectedOffice ? "Kohde" : "Valitse kohde"}
+                    </InputLabel>
+                    <Select
+                        label="Toimisto"
+                        value={selectedOffice?.id || ""}
+                        onChange={handleOfficeChange}
+                        sx={{ minWidth: "200px" }}
+                    >
+                        {offices.map((item) => (
+                            <MenuItem key={item.id} value={item.id}>
+                                {item.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            </Box>
+
             <Button
                 variant="contained"
+                disabled={!selectedOffice}
                 sx={{ marginBottom: "-10px" }}
-                onClick={() => setShowAddOffice(true)}>Lisää uusi kohde</Button>
-
-            <AddEntry
-                schema={officeSchema}
-                apiEndPoint={`${mainURI}/office`}
-                show={showAddOffice}
-                onHide={() => setShowAddOffice(false)}
-                title="Lisää uusi kohde"
-                action={addOffice}
-            /><br /><br />
+                onClick={() => setShowAddProperty(true)}
+            >
+                Lisää uusi vuokratila
+            </Button>
 
             {errorMessage &&
                 <Snackbar
@@ -111,7 +147,17 @@ const Offices = () => {
                 </Snackbar>
             }
 
-            {offices.length > 0 && (
+            <AddEntry
+                schema={propertySchema}
+                apiEndPoint={`${mainURI}/property`}
+                show={showAddProperty}
+                onHide={() => setShowAddProperty(false)}
+                title="Lisää uusi vuokratila"
+                action={addProperty}
+                extraData={selectedOffice ? { officeId: selectedOffice.id } : {}}
+            /><br /><br />
+
+            {properties.length > 0 && (
                 <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
                     Kaksoisklikkaa solua muokataksesi sitä, poistu solusta tallentaaksesi.
                 </Typography>
@@ -119,11 +165,11 @@ const Offices = () => {
 
             <div style={{ height: 600, width: "100%" }}>
                 <DataGrid
-                    rows={offices}
+                    rows={properties}
                     columns={columns}
                     disableRowSelectionOnClick
-                    processRowUpdate={saveEdits}
                     loading={loading}
+                    processRowUpdate={saveEdits}
                     slotProps={{
                         loadingOverlay: {
                             variant: "linear-progress",
@@ -141,14 +187,15 @@ const Offices = () => {
             <ConfirmModal
                 show={showConfirm}
                 onHide={() => setShowConfirm(false)}
-                title="Poista toimisto"
-                message={`Haluatko varmasti poistaa toimiston ${selectedOffice?.name}?`}
+                title="Poista vuokrakohde"
+                message={`Haluatko varmasti poistaa vuokrakohteen ${selectedProperty?.name}?`}
                 confirmText="Poista"
                 cancelText="Peruuta"
-                onConfirm={() => dispatch(deleteOffice(selectedOffice))}
+                onConfirm={() => dispatch(deleteOfficeProperty(selectedProperty))}
             />
+
         </>
     )
 }
 
-export default Offices;
+export default Properties;

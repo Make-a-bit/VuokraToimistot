@@ -2,12 +2,12 @@
     { path: "/", label: "Etusivu" },
     { path: "/asiakkaat/", label: "Asiakkaat" },
     {
-        path: "/vuokraus",
-        label: "Vuokraus",
+        path: "/yleiskatsaus",
+        label: "Tilojen hallinta",
         dropdown: [
-            { path: "/vuokraus/yleiskatsaus", label: "Yleiskatsaus" },
-            { path: "/vuokraus/kohteet", label: "Kohteet" },
-            { path: "/vuokraus/toimitilat", label: "Toimitilat" },
+            { path: "/tilahallinta/", label: "Tilahallinta" },
+            { path: "/tilahallinta/kohteet", label: "Kohteet" },
+            { path: "/tilahallinta/vuokratilat", label: "Vuokratilat" },
         ]
     },
     {

@@ -33,6 +33,16 @@ const buildPathLabelMap = (links) => {
     return map;
 };
 
+/**
+ * Capitalizes the first letter of a string.
+ * @param {string} str
+ * @returns {string}
+ */
+const capitalizeFirst = (str) =>
+    typeof str === "string" && str.length > 0
+        ? str.charAt(0).toUpperCase() + str.slice(1)
+        : str;
+
 const AppBreadcrumbs = () => {
     const location = useLocation();
     const pathname = location.pathname.replace(/\/+$/, "");
@@ -48,20 +58,22 @@ const AppBreadcrumbs = () => {
             const label = pathLabelMap[subPath] ?? segments[i];
             const isLast = i === segments.length - 1;
 
+            const displayLabel = capitalizeFirst(label);
+
             crumbs.push(
                 isLast ? (
                     <Typography color="text.primary" key={subPath}>
-                        {label}
+                        {displayLabel}
                     </Typography>
                 ) : (
                     <Link
-                            component={RouterLink}
-                            to={subPath}
-                            underline="hover"
-                            color="inherit"
-                            key={subPath}
+                        component={RouterLink}
+                        to={subPath}
+                        underline="hover"
+                        color="inherit"
+                        key={subPath}
                     >
-                        {label}
+                        {displayLabel}
                     </Link>
                 )
             );
@@ -77,18 +89,19 @@ const AppBreadcrumbs = () => {
             aria-label="breadcrumb"
             separator={<NavigateNextIcon fontSize="small" />}
             sx={{
-            my: 0.5,
-            "& .MuiTypography-root, & .MuiLink-root": { fontSize: "14px" } }}>
+                my: 0.5,
+                "& .MuiTypography-root, & .MuiLink-root": { fontSize: "14px" }
+            }}>
             <Link
                 component={RouterLink}
                 underline="hover"
-                color="inherit" to="/"
+                color="inherit"
+                to="/"
             >
-                Etusivu
+                {capitalizeFirst("Etusivu")}
             </Link>
             {buildBreadcrumbItems()}
         </Breadcrumbs>
     );
 };
-
 export default AppBreadcrumbs;

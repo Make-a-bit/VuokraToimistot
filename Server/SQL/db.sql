@@ -70,7 +70,8 @@ BEGIN
         property_id INT IDENTITY PRIMARY KEY,
         office_id INT NOT NULL,
         property_name VARCHAR(255) NOT NULL,
-        property_area DECIMAL(10, 2) NOT NULL
+        property_area DECIMAL(10, 2) NOT NULL,
+        property_price DECIMAL(10, 2) NOT NULL
         FOREIGN KEY (office_id) REFERENCES Offices (office_id)
         ON DELETE NO ACTION
         ON UPDATE CASCADE

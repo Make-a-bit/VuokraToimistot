@@ -2,7 +2,6 @@
 using API.Repositories;
 using API.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
 namespace API.Controllers
 {
@@ -31,7 +30,7 @@ namespace API.Controllers
 
                 customer.Id = customerID.Value;
 
-                return Ok(customer);
+                return Ok(customer);    
             }
             catch (Exception ex)
             {

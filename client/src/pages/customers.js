@@ -43,16 +43,13 @@ const Customers = () => {
         }
 
         await dispatch(editCustomer(updatedRow));
+
         return updatedRow;
     }
 
     const modalClosed = () => {
         setShowAddCustomer(false)
     }
-
-    useEffect(() => {
-        dispatch(fetchCustomers());
-    }, [dispatch]);
 
     useEffect(() => {
         if (errorMessage) {

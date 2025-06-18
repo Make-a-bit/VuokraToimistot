@@ -13,14 +13,15 @@ namespace API.Repositories
             _dbManager = db;
         }
 
-        public async Task<List<Property>> GetProperties()
+        public async Task<List<Property>> GetPropertiesById(int id)
         {
             var properties = new List<Property>();
 
             var conn = _dbManager.GetConnection();
             await conn.OpenAsync();
 
-            using var cmd = new SqlCommand("SELECT * FROM Properties", conn);
+            using var cmd = new SqlCommand("SELECT * FROM Office_Properties WHERE office_id = @id", conn);
+            cmd.Parameters.AddWithValue("@id", id);
             using var reader = await cmd.ExecuteReaderAsync();
 
             while (await reader.ReadAsync())
@@ -30,7 +31,8 @@ namespace API.Repositories
                     Id = reader.GetInt32(reader.GetOrdinal("property_id")),
                     OfficeId = reader.GetInt32(reader.GetOrdinal("office_id")),
                     Name = reader.GetString(reader.GetOrdinal("property_name")),
-                    Area = reader.GetString(reader.GetOrdinal("property_area")),
+                    Area = reader.GetDecimal(reader.GetOrdinal("property_area")),
+                    Price = reader.GetDecimal(reader.GetOrdinal("property_price")),
                 };
 
                 properties.Add(property);
@@ -44,7 +46,7 @@ namespace API.Repositories
             var conn = _dbManager.GetConnection();
             await conn.OpenAsync();
 
-            using var cmd = new SqlCommand("SELECT * FROM Properties WHERE property_id = @id", conn);
+            using var cmd = new SqlCommand("SELECT * FROM Office_Properties WHERE property_id = @id", conn);
             cmd.Parameters.AddWithValue("@id", id);
             using var reader = await cmd.ExecuteReaderAsync();
 
@@ -53,7 +55,8 @@ namespace API.Repositories
                 property.Id = reader.GetInt32(reader.GetOrdinal("property_id"));
                 property.OfficeId = reader.GetInt32(reader.GetOrdinal("office_id"));
                 property.Name = reader.GetString(reader.GetOrdinal("property_name"));
-                property.Area = reader.GetString(reader.GetOrdinal("property_area"));
+                property.Area = reader.GetDecimal(reader.GetOrdinal("property_area"));
+                property.Price = reader.GetDecimal(reader.GetOrdinal("property_price"));
             }
 
             return property;
