@@ -7,7 +7,7 @@ const initialState = {
     properties: [],
 }
 
-export function propertyReducer(state = initialState, action) {
+export const propertyReducer = (state = initialState, action) => {
     switch (action.type) {
         case ADD_PROPERTY_SUCCESS:
             return {

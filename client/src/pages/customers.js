@@ -7,12 +7,12 @@ import dataGridColumns from "../utils/datagridcolumns";
 import dataGridSx from "../utils/dataGridSx";
 import { useDispatch, useSelector } from "react-redux";
 import { addCustomer, editCustomer, deleteCustomer } from "../redux/actions/customerActions";
-import { clearMessages } from "../redux/actions/uiActions";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import { DataGrid } from "@mui/x-data-grid";
 import Snackbar from "@mui/material/Snackbar";
 import Typography from "@mui/material/Typography";
+import { useAutoClearMessages } from "../hooks/autoClearMessages";
 
 const mainURI = "https://localhost:7017";
 
@@ -20,8 +20,7 @@ const Customers = () => {
     const dispatch = useDispatch();
     const customers = useSelector(state => state.customers.customers);
     const loading = useSelector(state => state.ui.loadingState);
-    const errorMessage = useSelector(state => state.ui.errorMessage);
-    const successMessage = useSelector(state => state.ui.successMessage)
+    const { errorMessage, successMessage } = useSelector(state => state.ui);
     const [showAddCustomer, setShowAddCustomer] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
     const [selectedCustomer, setSelectedCustomer] = useState({});
@@ -30,6 +29,8 @@ const Customers = () => {
         setSelectedCustomer(customer);
         setShowConfirm(true);
     }
+
+    useAutoClearMessages(errorMessage, successMessage);
 
     const columns = React.useMemo(() => dataGridColumns(customerSchema, btnDeleteCustomer), []);
 
@@ -50,15 +51,6 @@ const Customers = () => {
     const modalClosed = () => {
         setShowAddCustomer(false)
     }
-
-    useEffect(() => {
-        if (errorMessage || successMessage) {
-            const timer = setTimeout(() => {
-                dispatch(clearMessages());
-            }, 6000);
-            return () => clearTimeout(timer);
-        }
-    }, [errorMessage, successMessage, dispatch]);
 
     return (
         <>

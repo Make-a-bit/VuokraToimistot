@@ -7,7 +7,7 @@ const initialState = {
     customers: [],
 }
 
-export function customerReducer(state = initialState, action) {
+export const customerReducer = (state = initialState, action) => {
     switch (action.type) {
         case ADD_CUSTOMER_SUCCESS:
             return {

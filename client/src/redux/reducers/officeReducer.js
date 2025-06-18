@@ -9,7 +9,7 @@ const initialState = {
     selectedOffice: null,
 };
 
-export function officeReducer(state = initialState, action) {
+export const officeReducer = (state = initialState, action) => {
     switch (action.type) {
         case ADD_OFFICE_SUCCESS:
             return {

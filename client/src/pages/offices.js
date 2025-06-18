@@ -7,7 +7,7 @@ import dataGridColumns from "../utils/datagridcolumns";
 import dataGridSx from "../utils/dataGridSx";
 import { useDispatch, useSelector } from "react-redux";
 import { addOffice, deleteOffice, editOffice } from "../redux/actions/officeActions";
-import { clearMessages } from "../redux/actions/uiActions"
+import { useAutoClearMessages } from "../hooks/autoClearMessages";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import { DataGrid } from "@mui/x-data-grid";
@@ -20,20 +20,12 @@ const Offices = () => {
     const dispatch = useDispatch();
     const loading = useSelector(state => state.ui.loadingState);
     const offices = useSelector(state => state.offices.offices);
-    const errorMessage = useSelector(state => state.ui.errorMessage);
-    const successMessage = useSelector(state => state.ui.successMessage)
+    const { errorMessage, successMessage } = useSelector(state => state.ui);
     const [showAddOffice, setShowAddOffice] = useState(false)
     const [showConfirm, setShowConfirm] = useState(false);
     const [selectedOffice, setSelectedOffice] = useState({});
 
-    useEffect(() => {
-        if (errorMessage || successMessage) {
-            const timer = setTimeout(() => {
-                dispatch(clearMessages());
-            }, 6000);
-            return () => clearTimeout(timer);
-        }
-    }, [errorMessage, successMessage, dispatch]);
+    useAutoClearMessages(errorMessage, successMessage);
 
     const btnDeleteOffice = (office) => {
         setSelectedOffice(office)
@@ -104,7 +96,7 @@ const Offices = () => {
 
             {offices.length > 0 && (
                 <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                    Kaksoisklikkaa solua muokataksesi sitä, poistu solusta tallentaaksesi.
+                    Kaksoisklikkaa solua muokataksesi, poistu solusta tallentaaksesi.
                 </Typography>
             )}
 
@@ -133,7 +125,7 @@ const Offices = () => {
                 show={showConfirm}
                 onHide={() => setShowConfirm(false)}
                 title="Poista toimisto"
-                message={`Haluatko varmasti poistaa toimiston ${selectedOffice?.name}?`}
+                message={`Haluatko varmasti poistaa kohteen ${selectedOffice?.name}?`}
                 confirmText="Poista"
                 cancelText="Peruuta"
                 onConfirm={() => dispatch(deleteOffice(selectedOffice))}
