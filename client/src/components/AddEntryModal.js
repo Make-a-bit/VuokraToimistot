@@ -11,7 +11,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import TextField from "@mui/material/TextField";
 import { useDispatch, useSelector } from "react-redux";
 
-const AddEntry = ({ schema, show, onHide, apiEndPoint, title, action }) => {
+const AddEntry = ({ schema, show, onHide, apiEndPoint, title, action, extraData }) => {
     const initialFormData = schema.reduce((acc, field) => ({ ...acc, [field.field]: "" }), {});
     const [formData, setFormData] = useState({});
     const [errorState, setErrorState] = useState(false);
@@ -44,8 +44,10 @@ const AddEntry = ({ schema, show, onHide, apiEndPoint, title, action }) => {
             return;
         }
 
+        const payload = { ...formData, ...extraData };
+
         try {
-            await dispatch(action(apiEndPoint, formData));
+            await dispatch(action(apiEndPoint, payload));
             onHide();
         } catch (error) {
             setErrorState(true)

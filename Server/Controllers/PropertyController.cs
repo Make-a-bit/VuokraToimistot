@@ -22,9 +22,10 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Property>>> GetProperties()
+        [Route("{id}")]
+        public async Task<ActionResult<List<Property>>> GetProperties([FromRoute] int id)
         {
-            var properties = await _propertyRepository.GetProperties();
+            var properties = await _propertyRepository.GetPropertiesById(id);
 
             return Ok(properties);
         }

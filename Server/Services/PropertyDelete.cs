@@ -19,7 +19,7 @@ namespace API.Services
                 var conn = _dbManager.GetConnection();
                 await conn.OpenAsync();
 
-                using var cmd = new SqlCommand("DELETE FROM Properties " +
+                using var cmd = new SqlCommand("DELETE FROM Office_Properties " +
                     "WHERE property_id = @id", conn);
 
                 cmd.Parameters.AddWithValue("@id", id);
