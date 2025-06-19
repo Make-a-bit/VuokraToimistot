@@ -62,7 +62,7 @@ namespace API.Repositories
                 customer.Country = reader.GetString(reader.GetOrdinal("customer_country"));
                 customer.Email = reader.GetString(reader.GetOrdinal("customer_email"));
                 customer.Phone = reader.GetString(reader.GetOrdinal("customer_phone"));
-                }
+            }
 
             return customer;
         }

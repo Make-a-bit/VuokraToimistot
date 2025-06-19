@@ -13,7 +13,7 @@ namespace API.Repositories
             _dbManager = db;
         }
 
-        public async Task<List<Property>> GetPropertiesById(int id)
+        public async Task<List<Property>> GetPropertiesByOfficeId(int id)
         {
             var properties = new List<Property>();
 
