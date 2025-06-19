@@ -2,7 +2,7 @@
 import { useDispatch } from "react-redux";
 import { clearMessages } from "../redux/actions/uiActions"; 
 
-export const useAutoClearMessages = (errorMessage, successMessage) => {
+const useAutoClearMessages = (errorMessage, successMessage) => {
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -14,3 +14,5 @@ export const useAutoClearMessages = (errorMessage, successMessage) => {
         }
     }, [errorMessage, successMessage, dispatch]);
 };
+
+export default useAutoClearMessages;

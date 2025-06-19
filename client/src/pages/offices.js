@@ -7,7 +7,7 @@ import dataGridColumns from "../utils/datagridcolumns";
 import dataGridSx from "../utils/dataGridSx";
 import { useDispatch, useSelector } from "react-redux";
 import { addOffice, deleteOffice, editOffice } from "../redux/actions/officeActions";
-import { useAutoClearMessages } from "../hooks/autoClearMessages";
+import useAutoClearMessages from "../hooks/autoClearMessages";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import { DataGrid } from "@mui/x-data-grid";

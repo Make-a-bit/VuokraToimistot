@@ -18,7 +18,7 @@ import dataGridSx from "../utils/dataGridSx";
 import { useDispatch, useSelector } from "react-redux";
 import { addProperty, deleteProperty, editProperty, fetchProperties } from "../redux/actions/propertyActions";
 import { setOffice } from "../redux/actions/officeActions";
-import { useAutoClearMessages } from "../hooks/autoClearMessages";
+import useAutoClearMessages from "../hooks/autoClearMessages";
 
 const mainURI = "https://localhost:7017";
 

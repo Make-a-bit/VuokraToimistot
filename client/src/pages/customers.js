@@ -12,7 +12,7 @@ import Button from "@mui/material/Button";
 import { DataGrid } from "@mui/x-data-grid";
 import Snackbar from "@mui/material/Snackbar";
 import Typography from "@mui/material/Typography";
-import { useAutoClearMessages } from "../hooks/autoClearMessages";
+import useAutoClearMessages from "../hooks/autoClearMessages";
 
 const mainURI = "https://localhost:7017";
 
