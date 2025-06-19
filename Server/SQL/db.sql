@@ -1,3 +1,5 @@
+CREATE DATABASE VuokraToimistot;
+Use VuokraToimistot;
 
 -- CREATE TABLES
 
@@ -80,17 +82,17 @@ END;
 
 IF NOT EXISTS (
 SELECT * FROM INFORMATION_SCHEMA.TABLES 
-WHERE TABLE_NAME = 'Property_services'
+WHERE TABLE_NAME = 'Office_services'
 AND TABLE_SCHEMA = 'dbo'
 ) 
 BEGIN
-    CREATE TABLE Property_services (
+    CREATE TABLE Office_services (
         service_id INT IDENTITY PRIMARY KEY,
-        property_id INT NOT NULL,
+        office_id INT NOT NULL,
         service_name VARCHAR(255) NOT NULL,
         service_unit VARCHAR(255) NOT NULL,
         service_price DECIMAL(10, 2) NOT NULL,
-        FOREIGN KEY (property_id) REFERENCES Office_properties (property_id)
+        FOREIGN KEY (office_id) REFERENCES offices (office_id)
         ON DELETE NO ACTION
         ON UPDATE CASCADE
     );
@@ -98,16 +100,17 @@ END;
 
 IF NOT EXISTS (
 SELECT * FROM INFORMATION_SCHEMA.TABLES 
-WHERE TABLE_NAME = 'Property_devices'
+WHERE TABLE_NAME = 'Office_devices'
 AND TABLE_SCHEMA = 'dbo'
 )
 BEGIN
-    CREATE TABLE Property_devices (
+    CREATE TABLE Office_devices (
         device_id INT IDENTITY PRIMARY KEY,
-        property_id INT NOT NULL,
+        office_id INT NOT NULL,
         device_name VARCHAR(255) NOT NULL,
         device_price DECIMAL(10, 2) NOT NULL,
-        FOREIGN KEY (property_id) REFERENCES Office_properties (property_id)
+        reserved BIT NOT NULL DEFAULT (0),
+        FOREIGN KEY (office_id) REFERENCES Offices (office_id)
         ON DELETE NO ACTION
         ON UPDATE CASCADE
     );
@@ -170,7 +173,7 @@ BEGIN
         FOREIGN KEY (reservation_id) REFERENCES Reservations (reservation_id)
         ON DELETE NO ACTION
         ON UPDATE NO ACTION,
-        FOREIGN KEY (device_id) REFERENCES Property_devices (device_id)
+        FOREIGN KEY (device_id) REFERENCES Office_devices (device_id)
         ON DELETE NO ACTION
         ON UPDATE NO ACTION
     );
@@ -193,7 +196,7 @@ BEGIN
         FOREIGN KEY (reservation_id) REFERENCES Reservations (reservation_id)
         ON DELETE NO ACTION
         ON UPDATE NO ACTION,
-        FOREIGN KEY (service_id) REFERENCES Property_services (service_id)
+        FOREIGN KEY (service_id) REFERENCES Office_services (service_id)
         ON DELETE NO ACTION
         ON UPDATE NO ACTION
     );
@@ -215,4 +218,20 @@ END;
 -- MOCK DATA:
 
 INSERT INTO Customers (customer_name, customer_email, customer_phone, customer_address, customer_postalcode, customer_city, customer_country) 
-VALUES ('Testaaja 1', 'testi@test.com', '0401234567', 'Testikatu 10', '02340', 'Lahti', 'FIN');
+VALUES 
+('Janne T.', 'janne@test.com', '0401122334', 'Katu 3', '15100', 'Lahti', 'FIN'),
+('Testaaja 1', 'testi@test.com', '0401234567', 'Testikatu 10', '02340', 'Lahti', 'FIN')
+;
+
+INSERT INTO Offices (office_name, office_address, office_city, office_postalcode, office_phone, office_email, office_country)
+VALUES
+('Toimistohotelli Lahti', 'Lahdenkatu 10', 'Lahti', '15100', '0409876543', 'thlahti@test.fi', 'Suomi'),
+('Lahden varastot', 'Varastotie 3', 'Lahti', '15300', '0401002003', 'varasto@test.fi', 'Suomi')
+;
+
+INSERT INTO Office_devices (office_id, device_name, device_price)
+VALUES 
+(1, 'Kannettava tietokone', 20),
+(1, 'Tulostin', 20),
+(1, 'Näyttö 42"', 15.25)
+;

@@ -89,9 +89,8 @@ export const fetchProperties = (id) => {
         dispatch({ type: SHOW_LOADING })
         dispatch({ type: FETCH_PROPERTIES });
         try {
-            const response = await fetch(`${mainURI}/property/${id}`, {
+            const response = await fetch(`${mainURI}/property/?id=${id}`, {
                 method: "GET",
-                headers: { "Content-type": "application/json" },
             });
             const data = await response.json();
             dispatch({ type: FETCH_PROPERTIES_SUCCESS, payload: data });
