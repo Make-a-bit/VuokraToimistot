@@ -1,10 +1,12 @@
 ﻿import {
     ADD_PROPERTY_SUCCESS, DELETE_PROPERTY_SUCCESS,
-    EDIT_PROPERTY_SUCCESS, FETCH_PROPERTIES_SUCCESS
+    EDIT_PROPERTY_SUCCESS, FETCH_PROPERTIES_SUCCESS,
+    SELECTED_PROPERTY_OFFICE_SET
 } from "../actions/actiontypes"
 
 const initialState = {
     properties: [],
+    selectedPropertyOffice: null,
 }
 
 export const propertyReducer = (state = initialState, action) => {
@@ -33,6 +35,12 @@ export const propertyReducer = (state = initialState, action) => {
             return {
                 ...state,
                 properties: action.payload
+            }
+
+        case SELECTED_PROPERTY_OFFICE_SET:
+            return {
+                ...state,
+                selectedPropertyOffice: action.payload
             }
 
         default: return state;

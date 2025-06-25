@@ -6,6 +6,7 @@ import ErrorPage from './pages/errorpage';
 import Customers from "../src/pages/customers";
 import Offices from "../src/pages/offices";
 import Properties from "../src/pages/properties";
+import Services from "../src/pages/services";
 
 const App = () => {
     return (
@@ -17,6 +18,7 @@ const App = () => {
                     <Route path="/tilahallinta/" element={<ErrorPage />} />
                     <Route path="/tilahallinta/kohteet/" element={<Offices />} />
                     <Route path="/tilahallinta/vuokratilat/" element={<Properties />} />
+                    <Route path="/tilahallinta/palvelut/" element={<Services/> } />
                     <Route path="*" element={<ErrorPage />} />
                 </Route>
             </Routes>

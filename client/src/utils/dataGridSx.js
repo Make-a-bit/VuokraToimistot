@@ -1,4 +1,5 @@
 ﻿const dataGridSx = {
+    marginBottom: "20px",
     "& .MuiDataGrid-footerContainer": {
         display: "flex",
         alignItems: "center",

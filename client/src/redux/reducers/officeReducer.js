@@ -1,12 +1,10 @@
 ﻿import {
     ADD_OFFICE_SUCCESS, DELETE_OFFICE_SUCCESS,
     EDIT_OFFICE_SUCCESS, FETCH_OFFICES_SUCCESS,
-    SELECTED_OFFICE_SET
 } from "../actions/actiontypes"
 
 const initialState = {
     offices: [],
-    selectedOffice: null,
 };
 
 export const officeReducer = (state = initialState, action) => {
@@ -36,12 +34,6 @@ export const officeReducer = (state = initialState, action) => {
                 ...state,
                 offices: action.payload
             };
-
-        case SELECTED_OFFICE_SET:
-            return {
-                ...state,
-                selectedOffice: action.payload
-            }
 
         default: return state;
     }

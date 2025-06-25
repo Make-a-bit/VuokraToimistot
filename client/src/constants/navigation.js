@@ -8,6 +8,8 @@
             { path: "/tilahallinta/", label: "Tilahallinta" },
             { path: "/tilahallinta/kohteet", label: "Kohteet" },
             { path: "/tilahallinta/vuokratilat", label: "Vuokratilat" },
+            { path: "/tilahallinta/palvelut", label: "Kohteiden palvelut" },
+            { path: "/tilahallinta/laitteet", label: "Kohteiden laitteet" },
         ]
     },
     {

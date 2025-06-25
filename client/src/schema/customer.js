@@ -1,11 +1,11 @@
 ﻿const customerSchema = [
-    { field: "name", header: "Nimi" },
-    { field: "address", header: "Katuosoite" },
-    { field: "postalCode", header: "Postinumero" },
-    { field: "city", header: "Postitoimipaikka" },
-    { field: "country", header: "Maa" },
-    { field: "phone", header: "Puhelin" },
-    { field: "email", header: "Sähköposti" },
+    { field: "name", header: "Nimi", type: "string" },
+    { field: "address", header: "Katuosoite", type: "string" },
+    { field: "postalCode", header: "Postinumero", type: "string" },
+    { field: "city", header: "Postitoimipaikka", type: "string" },
+    { field: "country", header: "Maa", type: "string" },
+    { field: "phone", header: "Puhelin", type: "string" },
+    { field: "email", header: "Sähköposti", type: "string" },
 ];
 
 export default customerSchema;

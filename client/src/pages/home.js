@@ -1,8 +1,7 @@
-﻿import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+﻿import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { fetchCustomers } from "../redux/actions/customerActions"
 import { fetchOffices } from "../redux/actions/officeActions"
-
 
 const Home = () => {
     const dispatch = useDispatch();

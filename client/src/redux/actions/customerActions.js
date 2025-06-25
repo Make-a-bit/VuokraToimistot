@@ -1,8 +1,8 @@
 ﻿import {
-    ADD_CUSTOMER, ADD_CUSTOMER_FAILURE, ADD_CUSTOMER_SUCCESS,
-    DELETE_CUSTOMER, DELETE_CUSTOMER_FAILURE, DELETE_CUSTOMER_SUCCESS,
-    EDIT_CUSTOMER, EDIT_CUSTOMER_FAILURE, EDIT_CUSTOMER_SUCCESS,
-    FETCH_CUSTOMERS, FETCH_CUSTOMERS_FAILURE, FETCH_CUSTOMERS_SUCCESS,
+    ADD_CUSTOMER_SUCCESS,
+    DELETE_CUSTOMER_SUCCESS,
+    EDIT_CUSTOMER_SUCCESS,
+    FETCH_CUSTOMERS_SUCCESS,
     HIDE_LOADING, SHOW_ERROR, SHOW_LOADING, SHOW_SUCCESS
 } from "./actiontypes"
 
@@ -12,7 +12,6 @@ export const addCustomer = (apiEndPoint, customer) => {
     console.log("Customer:", customer)
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
-        dispatch({ type: ADD_CUSTOMER })
         try {
             const response = await fetch(apiEndPoint, {
                 method: "POST",
@@ -29,7 +28,6 @@ export const addCustomer = (apiEndPoint, customer) => {
                 throw new Error("API error")
             }
         } catch (err) {
-            dispatch({ type: ADD_CUSTOMER_FAILURE })
             dispatch({ type: SHOW_ERROR, payload: "Asiakkaan tallennus epäonnistui!" })
             console.log("Error while adding a new customer:", err)
         } finally {
@@ -42,7 +40,6 @@ export const deleteCustomer = (customer) => {
     console.log("Customer to del:", customer);
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
-        dispatch({ type: DELETE_CUSTOMER });
         try {
             await fetch(`${mainURI}/customer/delete/${customer.id}`, {
                 method: "DELETE"
@@ -51,7 +48,6 @@ export const deleteCustomer = (customer) => {
             dispatch({ type: SHOW_SUCCESS, payload: "Asiakkaan poistaminen onnistui!" })
         } catch (error) {
             console.log("Error while deleting customer:", error)
-            dispatch({ type: DELETE_CUSTOMER_FAILURE })
             dispatch({ type: SHOW_ERROR, payload: "Asiakkaan poistaminen epäonnistui!" })
         } finally {
             dispatch({ type: HIDE_LOADING })
@@ -62,7 +58,6 @@ export const deleteCustomer = (customer) => {
 export const editCustomer = (customer) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
-        dispatch({ type: EDIT_CUSTOMER })
         try {
             const response = await fetch(`${mainURI}/customer/update`, {
                 method: "PUT",
@@ -79,7 +74,6 @@ export const editCustomer = (customer) => {
         }
         catch (error) {
             console.log("Error while saving edited customer data:", error)
-            dispatch({ type: EDIT_CUSTOMER_FAILURE })
             dispatch({ type: SHOW_ERROR, payload: "Asiakkaan päivitys epäonnistui!" })
         } finally {
             dispatch({ type: HIDE_LOADING })
@@ -90,7 +84,6 @@ export const editCustomer = (customer) => {
 export const fetchCustomers = () => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
-        dispatch({ type: FETCH_CUSTOMERS });
         try {
             const response = await fetch(`${mainURI}/customer`, {
                 method: "GET",
@@ -100,7 +93,6 @@ export const fetchCustomers = () => {
             dispatch({ type: FETCH_CUSTOMERS_SUCCESS, payload: data });
         } catch (error) {
             console.log("Error while fetching customers:", error)
-            dispatch({ type: FETCH_CUSTOMERS_FAILURE });
             dispatch({ type: SHOW_ERROR, payload: "Asiakkaiden nouto epäonnistui!" })
         } finally {
             dispatch({ type: HIDE_LOADING })

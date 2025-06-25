@@ -1,7 +1,8 @@
-﻿import React, { useState, useEffect } from "react";
+﻿import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Alert from "@mui/material/Alert";
-import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
 import { DataGrid } from "@mui/x-data-grid";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
@@ -9,66 +10,59 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import Snackbar from "@mui/material/Snackbar";
 import Typography from "@mui/material/Typography";
+import { addOfficeService, deleteService, editService, fetchServices, setOffice } from "../redux/actions/serviceActions"
 import AddEntry from "../components/AddEntryModal";
 import ConfirmModal from "../components/ConfirmModal";
 import inputValidation from "../utils/inputValidation";
-import propertySchema from "../schema/property";
 import dataGridColumns from "../utils/datagridcolumns";
 import dataGridSx from "../utils/dataGridSx";
-import { useDispatch, useSelector } from "react-redux";
-import { addProperty, deleteProperty, editProperty, fetchProperties, setPropertyOffice } from "../redux/actions/propertyActions";
-import useAutoClearMessages from "../hooks/autoClearMessages";
 import { SHOW_ERROR } from "../redux/actions/actiontypes";
+import serviceSchema from "../schema/service";
+import useAutoClearMessages from "../hooks/autoClearMessages";
 
 const mainURI = "https://localhost:7017";
 
-const Properties = () => {
+const Services = () => {
     const dispatch = useDispatch();
     const loading = useSelector(state => state.ui.loadingState);
     const offices = useSelector(state => state.offices.offices);
-    const selectedOffice = useSelector(state => state.properties.selectedPropertyOffice);
-    const properties = useSelector(state => state.properties.properties);
+    const services = useSelector(state => state.services.services);
+    const selectedOffice = useSelector(state => state.services.selectedServiceOffice);
     const { errorMessage, successMessage } = useSelector(state => state.ui);
-    const [showAddProperty, setShowAddProperty] = useState(false)
-    const [showConfirm, setShowConfirm] = useState(false);
-    const [selectedProperty, setSelectedProperty] = useState({});
+    const [showAddService, setShowAddService] = useState(false)
+    const [showConfirm, setShowConfirm] = useState(false)
+    const [selectedService, setSelectedService] = useState({})
 
     useAutoClearMessages(errorMessage, successMessage);
 
-    useEffect(() => {
-        if (selectedOffice && !offices.find(o => o.id === selectedOffice.id)) {
-            dispatch(setPropertyOffice(null));
-        }
-    }, [selectedOffice, offices, dispatch]);
-
     const handleOfficeChange = (e) => {
         const office = offices.find(o => o.id === e.target.value);
-        dispatch(setPropertyOffice(office));
-        dispatch(fetchProperties(office.id));
+        dispatch(setOffice(office));
+        dispatch(fetchServices(office.id));
     };
-
-    const btnDeleteProperty = (property) => {
-        setSelectedProperty(property)
-        setShowConfirm(true)
-    }
-
-    const columns = React.useMemo(() => dataGridColumns(propertySchema, btnDeleteProperty), []);
 
     const saveEdits = async (updatedRow, originalRow) => {
         console.log("Edit property:", originalRow)
-        const requiredFields = ["name", "area", "price"]
+        const requiredFields = ["name", "unit", "price"]
         const decimalFields = ["price"]
         const isValid = inputValidation(updatedRow, requiredFields, decimalFields);
 
         if (!isValid) {
-            await dispatch({ type: SHOW_ERROR, payload: "Vuokratilan päivitys epäonnistui!" })
+            await dispatch({ type: SHOW_ERROR, payload: "Palvelun päivitys epäonnistui!" })
             return originalRow;
         }
 
-        await dispatch(editProperty(updatedRow));
+        await dispatch(editService(updatedRow));
 
         return updatedRow;
     }
+
+    const btnDeleteService = (service) => {
+        setSelectedService(service)
+        setShowConfirm(true)
+    }
+
+    const columns = React.useMemo(() => dataGridColumns(serviceSchema, btnDeleteService), []);
 
     return (
         <>
@@ -96,9 +90,9 @@ const Properties = () => {
                 variant="contained"
                 disabled={!selectedOffice}
                 sx={{ marginBottom: "-10px" }}
-                onClick={() => setShowAddProperty(true)}
+                onClick={() => setShowAddService(true)}
             >
-                Lisää uusi vuokratila
+                Lisää uusi palvelu
             </Button>
 
             {errorMessage &&
@@ -107,8 +101,8 @@ const Properties = () => {
                     open={Boolean(errorMessage)}
                     autoHideDuration={6000}>
                     <Alert
-                        color="warning"
-                        severity="warning"
+                        color="error"
+                        severity="error"
                         variant="filled"
                         sx={{ border: "1px solid #000", width: "100%" }}>
                         {errorMessage}
@@ -132,16 +126,16 @@ const Properties = () => {
             }
 
             <AddEntry
-                schema={propertySchema}
-                apiEndPoint={`${mainURI}/property`}
-                show={showAddProperty}
-                onHide={() => setShowAddProperty(false)}
-                title="Lisää uusi vuokratila"
-                action={addProperty}
+                schema={serviceSchema}
+                apiEndPoint={`${mainURI}/service`}
+                show={showAddService}
+                onHide={() => setShowAddService(false)}
+                title="Lisää uusi palvelu"
+                action={addOfficeService}
                 extraData={selectedOffice ? { officeId: selectedOffice.id } : {}}
             /><br /><br />
 
-            {properties.length > 0 && (
+            {services.length > 0 && (
                 <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
                     Kaksoisklikkaa solua muokataksesi sitä, poistu solusta tallentaaksesi.
                 </Typography>
@@ -149,7 +143,7 @@ const Properties = () => {
 
             <div style={{ height: "auto", width: "100%" }}>
                 <DataGrid
-                    rows={properties}
+                    rows={services}
                     columns={columns}
                     disableRowSelectionOnClick
                     loading={loading}
@@ -171,15 +165,14 @@ const Properties = () => {
             <ConfirmModal
                 show={showConfirm}
                 onHide={() => setShowConfirm(false)}
-                title="Poista vuokrakohde"
-                message={`Haluatko varmasti poistaa vuokrakohteen ${selectedProperty?.name}?`}
+                title="Poista palvelu"
+                message={`Haluatko varmasti poistaa palvelun ${selectedService?.name}?`}
                 confirmText="Poista"
                 cancelText="Peruuta"
-                onConfirm={() => dispatch(deleteProperty(selectedProperty))}
+                onConfirm={() => dispatch(deleteService(selectedService))}
             />
-
         </>
     )
 }
 
-export default Properties;
+export default Services;

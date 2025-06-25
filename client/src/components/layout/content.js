@@ -12,7 +12,7 @@ const Content = () => {
         <Box
             display="flex"
             flexDirection="column"
-            minHeight="100vh"
+            minHeight="auto"
             sx={{ alignItems: "center" }}
         >
             <Header />
