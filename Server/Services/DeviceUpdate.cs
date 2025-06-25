@@ -24,7 +24,6 @@ namespace API.Services
             cmd.Parameters.AddWithValue("@id", device.Id);
             cmd.Parameters.AddWithValue("@name", device.Name);
             cmd.Parameters.AddWithValue("@price", device.Price);
-            cmd.Parameters.AddWithValue("@rsv", device.Reserved);
 
             int rowsAffected = await cmd.ExecuteNonQueryAsync();
 

@@ -109,7 +109,6 @@ BEGIN
         office_id INT NOT NULL,
         device_name VARCHAR(255) NOT NULL,
         device_price DECIMAL(10, 2) NOT NULL,
-        reserved BIT NOT NULL DEFAULT (0),
         FOREIGN KEY (office_id) REFERENCES Offices (office_id)
         ON DELETE NO ACTION
         ON UPDATE CASCADE

@@ -34,7 +34,6 @@ namespace API.Repositories
                     OfficeId = reader.GetInt32(reader.GetOrdinal("office_id")),
                     Name = reader.GetString(reader.GetOrdinal("device_name")),
                     Price = reader.GetDecimal(reader.GetOrdinal("device_price")),
-                    Reserved = reader.GetBoolean(reader.GetOrdinal("reserved"))
                 };
 
                 devices.Add(device);
@@ -60,7 +59,6 @@ namespace API.Repositories
                 device.OfficeId = reader.GetInt32(reader.GetOrdinal("office_id"));
                 device.Name = reader.GetString(reader.GetOrdinal("device_name"));
                 device.Price = reader.GetDecimal(reader.GetOrdinal("device_price"));
-                device.Reserved = reader.GetBoolean(reader.GetOrdinal("reserved"));
             }
 
             return device;
