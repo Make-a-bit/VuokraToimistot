@@ -1,18 +1,18 @@
 ﻿import {
-    ADD_PROPERTY, ADD_PROPERTY_FAILURE, ADD_PROPERTY_SUCCESS,
-    EDIT_PROPERTY, EDIT_PROPERTY_FAILURE, EDIT_PROPERTY_SUCCESS,
-    DELETE_PROPERTY, DELETE_PROPERTY_FAILURE, DELETE_PROPERTY_SUCCESS,
-    FETCH_PROPERTIES, FETCH_PROPERTIES_FAILURE, FETCH_PROPERTIES_SUCCESS,
-    HIDE_LOADING, SHOW_LOADING, SHOW_ERROR, SHOW_SUCCESS
+    ADD_PROPERTY_SUCCESS,
+    DELETE_PROPERTY_SUCCESS,
+    EDIT_PROPERTY_SUCCESS,
+    FETCH_PROPERTIES_SUCCESS,
+    HIDE_LOADING, SHOW_LOADING, SHOW_ERROR, SHOW_SUCCESS,
+    SELECTED_PROPERTY_OFFICE_SET
 } from "./actiontypes";
 
 const mainURI = "https://localhost:7017";
 
-export const addProperty= (apiEndPoint, property) => {
+export const addProperty = (apiEndPoint, property) => {
     console.log("Property:", property);
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
-        dispatch({ type: ADD_PROPERTY })
         try {
             const response = await fetch(apiEndPoint, {
                 method: "POST",
@@ -29,7 +29,6 @@ export const addProperty= (apiEndPoint, property) => {
                 throw new Error("API error")
             }
         } catch (err) {
-            dispatch({ type: ADD_PROPERTY_FAILURE })
             dispatch({ type: SHOW_ERROR, payload: "Vuokratilan tallennus epäonnistui!" })
             console.log("Error while adding a new property:", err)
         } finally {
@@ -38,11 +37,10 @@ export const addProperty= (apiEndPoint, property) => {
     }
 }
 
-export const deleteProperty= (property) => {
+export const deleteProperty = (property) => {
     console.log("Property to del:", property)
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
-        dispatch({ type: DELETE_PROPERTY })
         try {
             await fetch(`${mainURI}/property/delete/${property.id}`, {
                 method: "DELETE"
@@ -51,7 +49,6 @@ export const deleteProperty= (property) => {
             dispatch({ type: SHOW_SUCCESS, payload: "Vuokratilan poisto onnistui!" })
         } catch (error) {
             console.log("Error while deleting property:", error)
-            dispatch({ type: DELETE_PROPERTY_FAILURE })
             dispatch({ type: SHOW_ERROR, payload: "Vuokratilan poisto epäonnistui!" })
         } finally {
             dispatch({ type: HIDE_LOADING })
@@ -62,7 +59,6 @@ export const deleteProperty= (property) => {
 export const editProperty = (property) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
-        dispatch({ type: EDIT_PROPERTY })
         try {
             const response = await fetch(`${mainURI}/property/update`, {
                 method: "PUT",
@@ -78,8 +74,9 @@ export const editProperty = (property) => {
             }
         } catch (error) {
             console.log("Error while saving edited property data:", error)
-            dispatch({ type: EDIT_PROPERTY_FAILURE })
             dispatch({ type: SHOW_ERROR, payload: "Vuokratilan päivitys epäonnistui!" })
+        } finally {
+            dispatch({ type: HIDE_LOADING })
         }
     }
 }
@@ -87,7 +84,6 @@ export const editProperty = (property) => {
 export const fetchProperties = (id) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
-        dispatch({ type: FETCH_PROPERTIES });
         try {
             const response = await fetch(`${mainURI}/property/?id=${id}`, {
                 method: "GET",
@@ -96,10 +92,15 @@ export const fetchProperties = (id) => {
             dispatch({ type: FETCH_PROPERTIES_SUCCESS, payload: data });
         } catch (error) {
             console.log("Error while fetching office properties:", error)
-            dispatch({ type: FETCH_PROPERTIES_FAILURE })
             dispatch({ type: SHOW_ERROR, payload: "Vuokratilojen nouto epäonnistui!" })
         } finally {
             dispatch({ type: HIDE_LOADING })
         }
+    }
+}
+
+export const setPropertyOffice = (office) => {
+    return async (dispatch) => {
+        dispatch({ type: SELECTED_PROPERTY_OFFICE_SET, payload: office })
     }
 }

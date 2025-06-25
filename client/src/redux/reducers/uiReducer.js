@@ -11,10 +11,10 @@ const initialState = {
 export const uiReducer = (state = initialState, action) => {
     switch (action.type) {
         case SHOW_LOADING:
-            return { ...state, loading: true };
+            return { ...state, loadingState: true };
 
         case HIDE_LOADING:
-            return { ...state, loading: false };
+            return { ...state, loadingState: false };
 
         case SHOW_ERROR:
             return { ...state, errorMessage: action.payload };

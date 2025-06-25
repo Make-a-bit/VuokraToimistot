@@ -29,7 +29,6 @@ const buildPathLabelMap = (links) => {
             });
         }
     });
-    console.log(map)
     return map;
 };
 

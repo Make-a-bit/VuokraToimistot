@@ -1,18 +1,19 @@
-﻿import React, { useState, useEffect, useMemo } from "react";
-import AddEntry from "../components/AddEntryModal";
-import ConfirmModal from "../components/ConfirmModal";
-import inputValidation from "../utils/inputValidation";
-import customerSchema from "../schema/customer";
-import dataGridColumns from "../utils/datagridcolumns";
-import dataGridSx from "../utils/dataGridSx";
+﻿import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addCustomer, editCustomer, deleteCustomer } from "../redux/actions/customerActions";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import { DataGrid } from "@mui/x-data-grid";
 import Snackbar from "@mui/material/Snackbar";
 import Typography from "@mui/material/Typography";
+import { addCustomer, editCustomer, deleteCustomer } from "../redux/actions/customerActions";
+import AddEntry from "../components/AddEntryModal";
+import ConfirmModal from "../components/ConfirmModal";
+import customerSchema from "../schema/customer";
+import dataGridColumns from "../utils/datagridcolumns";
+import dataGridSx from "../utils/dataGridSx";
+import inputValidation from "../utils/inputValidation";
 import useAutoClearMessages from "../hooks/autoClearMessages";
+import { SHOW_ERROR } from "../redux/actions/actiontypes";
 
 const mainURI = "https://localhost:7017";
 
@@ -40,6 +41,7 @@ const Customers = () => {
         const isValid = inputValidation(updatedRow, requiredFields);
 
         if (!isValid) {
+            await dispatch({ type: SHOW_ERROR, payload: "Asiakkaan päivitys epäonnistui!" })
             return originalRow;
         }
 
@@ -106,7 +108,7 @@ const Customers = () => {
                 </Typography>
             )}
 
-            <div style={{ height: 600, width: "100%" }}>
+            <div style={{ height: "auto", width: "100%" }}>
                 <DataGrid
                     rows={customers}
                     getRowId={(row => row.id) }

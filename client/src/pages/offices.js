@@ -1,18 +1,19 @@
 ﻿import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import Alert from "@mui/material/Alert";
+import Button from "@mui/material/Button";
+import { DataGrid } from "@mui/x-data-grid";
+import Snackbar from "@mui/material/Snackbar";
+import Typography from "@mui/material/Typography";
 import AddEntry from "../components/AddEntryModal";
 import ConfirmModal from "../components/ConfirmModal";
 import inputValidation from "../utils/inputValidation";
 import officeSchema from "../schema/office";
 import dataGridColumns from "../utils/datagridcolumns";
 import dataGridSx from "../utils/dataGridSx";
-import { useDispatch, useSelector } from "react-redux";
+import { SHOW_ERROR } from "../redux/actions/actiontypes";
 import { addOffice, deleteOffice, editOffice } from "../redux/actions/officeActions";
 import useAutoClearMessages from "../hooks/autoClearMessages";
-import Alert from "@mui/material/Alert";
-import Button from "@mui/material/Button";
-import { DataGrid } from "@mui/x-data-grid";
-import Snackbar from "@mui/material/Snackbar";
-import Typography from "@mui/material/Typography";
 
 const mainURI = "https://localhost:7017";
 
@@ -40,6 +41,7 @@ const Offices = () => {
         const isValid = inputValidation(updatedRow, requiredFields);
 
         if (!isValid) {
+            await dispatch({ type: SHOW_ERROR, payload: "Asiakkaan päivitys epäonnistui!" })
             return originalRow;
         }
 
@@ -100,7 +102,7 @@ const Offices = () => {
                 </Typography>
             )}
 
-            <div style={{ height: 600, width: "100%" }}>
+            <div style={{ height: "auto", width: "100%" }}>
                 <DataGrid
                     rows={offices}
                     columns={columns}

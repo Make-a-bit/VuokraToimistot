@@ -10,15 +10,16 @@ import DialogActions from "@mui/material/DialogActions";
 import SaveIcon from "@mui/icons-material/Save";
 import TextField from "@mui/material/TextField";
 import { useDispatch, useSelector } from "react-redux";
+import { SHOW_LOADING, HIDE_LOADING } from "../redux/actions/actiontypes";
 
 const AddEntry = ({ schema, show, onHide, apiEndPoint, title, action, extraData }) => {
     const initialFormData = schema.reduce((acc, field) => ({ ...acc, [field.field]: "" }), {});
     const [formData, setFormData] = useState({});
     const [errorState, setErrorState] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
-    const loading = useSelector(state => state.loadingState);
     const firstInputRef = useRef(null);
     const dispatch = useDispatch();
+    const loading = useSelector(state => state.ui.loadingState);
 
     useEffect(() => {
         if (!show) {
@@ -35,13 +36,27 @@ const AddEntry = ({ schema, show, onHide, apiEndPoint, title, action, extraData 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        dispatch({ type: SHOW_LOADING })
 
         const isValid = Object.values(formData).every(value => value.trim() !== "");
 
         if (!isValid) {
             setErrorState(true);
             setErrorMessage("Täytä kaikki kentät!")
+            dispatch({ type: HIDE_LOADING })
             return;
+        }
+
+        // Check for decimal fields
+        for (const input of schema) {
+            if (input.type === "decimal") {
+                const value = formData[input.field];
+                if (!/^\d+(\.\d{1,2})?$/.test(value)) {
+                    setErrorState(true);
+                    setErrorMessage(`Käytä ${input.header} kentän erottimena pistettä (esim. 12.34).`);
+                    return;
+                }
+            }
         }
 
         const payload = { ...formData, ...extraData };
@@ -52,6 +67,8 @@ const AddEntry = ({ schema, show, onHide, apiEndPoint, title, action, extraData 
         } catch (error) {
             setErrorState(true)
             setErrorMessage("Tallennus epäonnistui!");
+        } finally {
+            dispatch({ type: HIDE_LOADING })
         }
     }
 
