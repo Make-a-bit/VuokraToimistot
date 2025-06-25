@@ -3,7 +3,7 @@ import { combineReducers } from "redux";
 import { customerReducer } from "./reducers/customerReducer";
 import { officeReducer } from "./reducers/officeReducer";
 import { propertyReducer } from "./reducers/propertyReducer";
-import { serviceReducer } from "./reducers/serviceReducer"
+import { serviceReducer } from "./reducers/serviceReducer";
 import { uiReducer } from "./reducers/uiReducer";
 
 const rootReducer = combineReducers({
