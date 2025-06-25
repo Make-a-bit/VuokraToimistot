@@ -25,9 +25,7 @@ export const addProperty = (apiEndPoint, property) => {
                 console.log("Created property:", createdProperty)
                 dispatch({ type: ADD_PROPERTY_SUCCESS, payload: createdProperty })
                 dispatch({ type: SHOW_SUCCESS, payload: "Vuokratilan tallennus onnistui!" })
-            } else {
-                throw new Error("API error")
-            }
+            } 
         } catch (err) {
             dispatch({ type: SHOW_ERROR, payload: "Vuokratilan tallennus epäonnistui!" })
             console.log("Error while adding a new property:", err)
@@ -81,11 +79,11 @@ export const editProperty = (property) => {
     }
 }
 
-export const fetchProperties = (id) => {
+export const fetchProperties = (officeId) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
         try {
-            const response = await fetch(`${mainURI}/property/?id=${id}`, {
+            const response = await fetch(`${mainURI}/property/?id=${officeId}`, {
                 method: "GET",
             });
             const data = await response.json();

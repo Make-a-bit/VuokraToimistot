@@ -10,59 +10,61 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import Snackbar from "@mui/material/Snackbar";
 import Typography from "@mui/material/Typography";
-import { addOfficeService, deleteService, editService, fetchServices, setOffice } from "../redux/actions/serviceActions"
 import AddEntry from "../components/AddEntryModal";
 import ConfirmModal from "../components/ConfirmModal";
+import { addDevice, editDevice, deleteDevice, fetchDevices, setDeviceOffice } from "../redux/actions/deviceActions";
 import dataGridColumns from "../utils/datagridcolumns";
 import dataGridSx from "../utils/dataGridSx";
+import deviceSchema from "../schema/device";
 import inputValidation from "../utils/inputValidation";
 import { SHOW_ERROR } from "../redux/actions/actiontypes";
-import serviceSchema from "../schema/service";
 import useAutoClearMessages from "../hooks/autoClearMessages";
+
 
 const mainURI = "https://localhost:7017";
 
-const Services = () => {
+const Devices = () => {
     const dispatch = useDispatch();
     const loading = useSelector(state => state.ui.loadingState);
     const offices = useSelector(state => state.offices.offices);
-    const services = useSelector(state => state.services.services);
-    const selectedOffice = useSelector(state => state.services.selectedServiceOffice);
+    const devices = useSelector(state => state.devices.devices);
+    const selectedOffice = useSelector(state => state.devices.selectedDeviceOffice);
     const { errorMessage, successMessage } = useSelector(state => state.ui);
-    const [showAddService, setShowAddService] = useState(false)
+    const [showAddDevice, setShowAddDevice] = useState(false)
     const [showConfirm, setShowConfirm] = useState(false)
-    const [selectedService, setSelectedService] = useState({})
+    const [selectedDevice, setSelectedDevice] = useState({})
 
     useAutoClearMessages(errorMessage, successMessage);
 
     const handleOfficeChange = (e) => {
         const office = offices.find(o => o.id === e.target.value);
-        dispatch(setOffice(office));
-        dispatch(fetchServices(office.id));
+        dispatch(setDeviceOffice(office));
+        dispatch(fetchDevices(office.id));
     };
 
     const saveEdits = async (updatedRow, originalRow) => {
-        console.log("Edit property:", originalRow)
-        const requiredFields = ["name", "unit", "price"]
+        console.log("Edit device:", originalRow)
+        const requiredFields = ["name", "price"]
         const decimalFields = ["price"]
         const isValid = inputValidation(updatedRow, requiredFields, decimalFields);
 
         if (!isValid) {
-            await dispatch({ type: SHOW_ERROR, payload: "Palvelun päivitys epäonnistui!" })
+            await dispatch({ type: SHOW_ERROR, payload: "Laitteen päivitys epäonnistui!" })
             return originalRow;
         }
 
-        await dispatch(editService(updatedRow));
+        await dispatch(editDevice(updatedRow));
 
         return updatedRow;
     }
 
-    const btnDeleteService = (service) => {
-        setSelectedService(service)
+    const btnDeleteDevice = (device) => {
+        setSelectedDevice(device)
         setShowConfirm(true)
     }
 
-    const columns = React.useMemo(() => dataGridColumns(serviceSchema, btnDeleteService), []);
+    const columns = React.useMemo(() => dataGridColumns(deviceSchema, btnDeleteDevice), []);
+
 
     return (
         <>
@@ -90,9 +92,9 @@ const Services = () => {
                 variant="contained"
                 disabled={!selectedOffice}
                 sx={{ marginBottom: "-10px" }}
-                onClick={() => setShowAddService(true)}
+                onClick={() => setShowAddDevice(true)}
             >
-                Lisää uusi palvelu
+                Lisää uusi laite
             </Button>
 
             {errorMessage &&
@@ -126,16 +128,16 @@ const Services = () => {
             }
 
             <AddEntry
-                schema={serviceSchema}
-                apiEndPoint={`${mainURI}/service`}
-                show={showAddService}
-                onHide={() => setShowAddService(false)}
-                title="Lisää uusi palvelu"
-                action={addOfficeService}
+                schema={deviceSchema}
+                apiEndPoint={`${mainURI}/device`}
+                show={showAddDevice}
+                onHide={() => setShowAddDevice(false)}
+                title="Lisää uusi laite"
+                action={addDevice}
                 extraData={selectedOffice ? { officeId: selectedOffice.id } : {}}
             /><br /><br />
 
-            {services.length > 0 && (
+            {devices.length > 0 && (
                 <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
                     Kaksoisklikkaa solua muokataksesi sitä, poistu solusta tallentaaksesi.
                 </Typography>
@@ -143,7 +145,7 @@ const Services = () => {
 
             <div style={{ height: "auto", width: "100%" }}>
                 <DataGrid
-                    rows={services}
+                    rows={devices}
                     columns={columns}
                     disableRowSelectionOnClick
                     loading={loading}
@@ -165,14 +167,15 @@ const Services = () => {
             <ConfirmModal
                 show={showConfirm}
                 onHide={() => setShowConfirm(false)}
-                title="Poista palvelu"
-                message={`Haluatko varmasti poistaa palvelun ${selectedService?.name}?`}
+                title="Poista laite"
+                message={`Haluatko varmasti poistaa laitteen ${selectedDevice?.name}?`}
                 confirmText="Poista"
                 cancelText="Peruuta"
-                onConfirm={() => dispatch(deleteService(selectedService))}
+                onConfirm={() => dispatch(deleteDevice(selectedDevice))}
             />
+
         </>
     )
 }
 
-export default Services;
+export default Devices;

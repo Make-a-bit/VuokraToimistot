@@ -22,7 +22,7 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Device>>> GetDevicesByOfficeId([FromQuery] int id)
+        public async Task<ActionResult> GetDevices([FromQuery] int id)
         {
             try
             {
