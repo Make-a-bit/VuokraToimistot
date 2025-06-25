@@ -92,7 +92,7 @@ BEGIN
         service_name VARCHAR(255) NOT NULL,
         service_unit VARCHAR(255) NOT NULL,
         service_price DECIMAL(10, 2) NOT NULL,
-        FOREIGN KEY (office_id) REFERENCES offices (office_id)
+        FOREIGN KEY (office_id) REFERENCES Offices (office_id)
         ON DELETE NO ACTION
         ON UPDATE CASCADE
     );
@@ -234,4 +234,11 @@ VALUES
 (1, 'Kannettava tietokone', 20),
 (1, 'Tulostin', 20),
 (1, 'Näyttö 42"', 15.25)
+;
+
+INSERT INTO Office_services (office_id, service_name, service_unit, service_price)
+VALUES 
+(1, 'Loppusiivous', 'Tunti', 35.25),
+(1, 'Nopeampi netti (1gb/1gb)', 'pv', 10),
+(1, 'Aamupala', 'kpl', 15)
 ;

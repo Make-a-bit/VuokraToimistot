@@ -32,7 +32,7 @@ const Content = () => {
                     borderRadius: 2,
                     backgroundColor: "background.paper",
                 }}>
-                <Grid item xs={12}>
+                <Grid>
                     <AppBreadcrumbs />
                     <Outlet />
                 </Grid>
