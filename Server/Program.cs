@@ -53,6 +53,7 @@ namespace API
             builder.Services.AddScoped<PropertyDelete>();
             builder.Services.AddScoped<PropertyRepository>();
             builder.Services.AddScoped<PropertyUpdate>();
+            builder.Services.AddScoped<ReservationAdd>();
             builder.Services.AddScoped<ServiceAdd>();
             builder.Services.AddScoped<ServiceDelete>();
             builder.Services.AddScoped<ServiceRepository>();
