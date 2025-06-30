@@ -40,9 +40,9 @@ namespace API.Controllers
 
                 return Ok(property);
             }
-            catch (Exception ex)
+            catch 
             {
-                return BadRequest(ex.Message);
+                return BadRequest();
             }
         }
 
