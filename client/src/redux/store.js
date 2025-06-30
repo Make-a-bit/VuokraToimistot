@@ -13,7 +13,7 @@ const rootReducer = combineReducers({
     offices: officeReducer,
     properties: propertyReducer,
     services: serviceReducer,
-    ui: uiReducer
+    ui: uiReducer,
 })
 export const store = configureStore({
     reducer: rootReducer,
