@@ -4,6 +4,7 @@ import { customerReducer } from "./reducers/customerReducer";
 import { deviceReducer } from "./reducers/deviceReducer";
 import { officeReducer } from "./reducers/officeReducer";
 import { propertyReducer } from "./reducers/propertyReducer";
+import { reservationReducer } from "./reducers/reservationReducer";
 import { serviceReducer } from "./reducers/serviceReducer";
 import { uiReducer } from "./reducers/uiReducer";
 
@@ -12,6 +13,7 @@ const rootReducer = combineReducers({
     devices: deviceReducer,
     offices: officeReducer,
     properties: propertyReducer,
+    reservations: reservationReducer,
     services: serviceReducer,
     ui: uiReducer,
 })

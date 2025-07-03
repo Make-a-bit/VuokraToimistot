@@ -8,10 +8,14 @@ import Devices from "../src/pages/devices";
 import Offices from "../src/pages/offices";
 import Properties from "../src/pages/properties";
 import Services from "../src/pages/services";
+import Reservation from "../src/pages/reservation";
 
 const App = () => {
     return (
-        <BrowserRouter>
+        <BrowserRouter future={{
+            v7_relativeSplatPath: true,
+            v7_startTransition: true
+        }}>
             <Routes>
                 <Route path="/" element={<Content />}>
                     <Route index element={<Home />} />
@@ -21,6 +25,7 @@ const App = () => {
                     <Route path="/tilahallinta/vuokratilat/" element={<Properties />} />
                     <Route path="/tilahallinta/palvelut/" element={<Services />} />
                     <Route path="/tilahallinta/laitteet/" element={<Devices />} />
+                    <Route path="/varaushallinta/varaus/" element={<Reservation />} />
                     <Route path="*" element={<ErrorPage />} />
                 </Route>
             </Routes>

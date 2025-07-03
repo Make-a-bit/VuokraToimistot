@@ -1,12 +1,10 @@
 ﻿import React from 'react';
 
-import Button from "@mui/material/Button";
+import {
+    Button, Dialog, DialogTitle, DialogContent, DialogActions
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from '@mui/icons-material/Delete';
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
 import { useDispatch, useSelector } from "react-redux";
 import { SHOW_LOADING, HIDE_LOADING } from "../redux/actions/actiontypes";
 

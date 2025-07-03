@@ -1,7 +1,6 @@
 ﻿import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Alert from "@mui/material/Alert";
-import Snackbar from "@mui/material/Snackbar";
+import { Alert, Snackbar } from "@mui/material";
 import { fetchCustomers } from "../redux/actions/customerActions"
 import { fetchOffices } from "../redux/actions/officeActions"
 import useAutoClearMessages from "../hooks/autoClearMessages";

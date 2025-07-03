@@ -2,13 +2,7 @@
 import { NavLink, useLocation } from "react-router-dom";
 import navigationLinks from '../../constants/navigation';
 
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Container from "@mui/material/Container";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import Toolbar from "@mui/material/Toolbar";
+import { AppBar, Box, Button, Container, Menu, MenuItem, Toolbar } from "@mui/material";
 
 const Header = () => {
     const [anchorEls, setAnchorEls] = useState({});

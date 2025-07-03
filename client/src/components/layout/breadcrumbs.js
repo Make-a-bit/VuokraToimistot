@@ -1,43 +1,10 @@
 ﻿import React from "react";
 import { useLocation, Link as RouterLink } from "react-router-dom";
-import Breadcrumbs from "@mui/material/Breadcrumbs";
-import Link from "@mui/material/Link";
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import Typography from "@mui/material/Typography";
+import { Breadcrumbs, Link, Typography } from "@mui/material";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import navigationLinks from "../../constants/navigation";
 
-/**
- * Flattens the navigation structure into a map of path (without trailing slash) to label.
- * Handles both top-level navigation items and their dropdown children.
- *
- * @param {Array} links - The navigation links array.
- * @returns {Object} A map where keys are normalized paths and values are their labels.
- */
-const buildPathLabelMap = (links) => {
-    const map = {};
-
-    links.forEach(item => {
-        if (item.path) {
-            // Remove trailing slash for consistency
-            const basePath = item.path.replace(/\/+$/, "");
-            map[basePath] = item.label;
-        }
-        if (item.dropdown) {
-            item.dropdown.forEach(sub => {
-                const subPath = sub.path.replace(/\/+$/, "");
-                map[subPath] = sub.label;
-            });
-        }
-    });
-    return map;
-};
-
-/**
- * Capitalizes the first letter of a string.
- * @param {string} str
- * @returns {string}
- */
-const capitalizeFirst = (str) =>
+const capitalizeFirst = str =>
     typeof str === "string" && str.length > 0
         ? str.charAt(0).toUpperCase() + str.slice(1)
         : str;
@@ -47,41 +14,52 @@ const AppBreadcrumbs = () => {
     const pathname = location.pathname.replace(/\/+$/, "");
     const segments = pathname.split("/").filter(Boolean);
 
-    const pathLabelMap = buildPathLabelMap(navigationLinks);
-
-    const buildBreadcrumbItems = () => {
-        const crumbs = [];
-
-        for (let i = 0; i < segments.length; i++) {
-            const subPath = "/" + segments.slice(0, i + 1).join("/");
-            const label = pathLabelMap[subPath] ?? segments[i];
-            const isLast = i === segments.length - 1;
-
-            const displayLabel = capitalizeFirst(label);
-
-            crumbs.push(
-                isLast ? (
-                    <Typography color="text.primary" key={subPath}>
-                        {displayLabel}
-                    </Typography>
-                ) : (
-                    <Link
-                        component={RouterLink}
-                        to={subPath}
-                        underline="hover"
-                        color="inherit"
-                        key={subPath}
-                    >
-                        {displayLabel}
-                    </Link>
-                )
-            );
-        }
-
-        return crumbs;
-    };
-
     if (segments.length === 0) return null;
+
+    const crumbs = [];
+
+    // Add "Etusivu" link
+    crumbs.push(
+        <Link component={RouterLink} to="/" underline="hover" color="inherit" key="home">
+            Etusivu
+        </Link>
+    );
+
+    const fullPath = `/${segments.join("/")}`;
+
+    // Find matching child route
+    let found = null;
+    let parentLabel = null;
+
+    for (const nav of navigationLinks) {
+        if (nav.dropdownParent && nav.dropdown) {
+            const match = nav.dropdown.find(d => d.path.replace(/\/+$/, "") === fullPath);
+            if (match) {
+                found = match;
+                parentLabel = nav.label;
+                break;
+            }
+        } else if (nav.path && nav.path.replace(/\/+$/, "") === fullPath) {
+            found = nav;
+            break;
+        }
+    }
+
+    if (parentLabel) {
+        crumbs.push(
+            <Typography color="text.primary" key="parent">
+                {capitalizeFirst(parentLabel)}
+            </Typography>
+        );
+    }
+
+    if (found) {
+        crumbs.push(
+            <Typography color="text.primary" key={found.path}>
+                {capitalizeFirst(found.label)}
+            </Typography>
+        );
+    }
 
     return (
         <Breadcrumbs
@@ -90,17 +68,11 @@ const AppBreadcrumbs = () => {
             sx={{
                 my: 0.5,
                 "& .MuiTypography-root, & .MuiLink-root": { fontSize: "14px" }
-            }}>
-            <Link
-                component={RouterLink}
-                underline="hover"
-                color="inherit"
-                to="/"
-            >
-                {capitalizeFirst("Etusivu")}
-            </Link>
-            {buildBreadcrumbItems()}
+            }}
+        >
+            {crumbs}
         </Breadcrumbs>
     );
 };
+
 export default AppBreadcrumbs;

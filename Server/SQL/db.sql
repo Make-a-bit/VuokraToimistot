@@ -127,6 +127,7 @@ BEGIN
         customer_id INT NOT NULL,
         reservation_start DATE NOT NULL,
         reservation_end DATE NOT NULL,
+        invoiced BIT DEFAULT(0),
         FOREIGN KEY (property_id) REFERENCES Office_properties (property_id)
         ON DELETE NO ACTION
         ON UPDATE CASCADE,

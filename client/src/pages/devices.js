@@ -1,15 +1,10 @@
 ﻿import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Alert from "@mui/material/Alert";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
+import {
+    Alert, Box, Button, FormControl, InputLabel, MenuItem, Select,
+    Snackbar, Typography
+} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
-import Snackbar from "@mui/material/Snackbar";
-import Typography from "@mui/material/Typography";
 import AddEntry from "../components/AddEntryModal";
 import ConfirmModal from "../components/ConfirmModal";
 import { addDevice, editDevice, deleteDevice, fetchDevices, setDeviceOffice } from "../redux/actions/deviceActions";
