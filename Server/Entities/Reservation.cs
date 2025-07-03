@@ -10,5 +10,11 @@
         public List<Device> Devices { get; set; }
         public List<Service> Services { get; set; }
         public bool Invoiced { get; set; }
+
+        public Reservation()
+        {
+            Devices = new List<Device>();
+            Services = new List<Service>();
+        }
     }
 }
