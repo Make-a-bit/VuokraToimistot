@@ -18,6 +18,21 @@ namespace API.Controllers
         }
 
         [HttpGet]
+        public async Task<ActionResult> GetReservations()
+        {
+            try
+            {
+                var reservations = await _reservationRepository.GetReservations();
+
+                return Ok(reservations);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpGet]
         [Route("reserved-dates/{propertyId}")]
         public async Task<ActionResult> GetReservedDates(int propertyId)
         {
@@ -43,7 +58,7 @@ namespace API.Controllers
 
                 return Ok(reservation);
             }
-            catch 
+            catch
             {
                 return BadRequest();
             }

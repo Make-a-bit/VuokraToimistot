@@ -77,6 +77,7 @@ export const AddReservation = ({ show, onHide }) => {
                 setEndDate(null);
                 setSelectedDeviceIds([]);
                 setSelectedServiceIds([]);
+                dispatch(fetchReservedDates(selectedOfficeProperty.id));
                 onHide();
             })
     }
