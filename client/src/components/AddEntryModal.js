@@ -1,14 +1,11 @@
 ﻿import React, { useState, useEffect, useRef } from "react";
 
-import Alert from "@mui/material/Alert";
-import Button from "@mui/material/Button";
 import CloseIcon from "@mui/icons-material/Close";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
+import {
+    Alert, Button, Dialog, DialogTitle,
+    DialogContent, DialogActions, TextField
+} from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
-import TextField from "@mui/material/TextField";
 import { useDispatch, useSelector } from "react-redux";
 import { SHOW_LOADING, HIDE_LOADING } from "../redux/actions/actiontypes";
 

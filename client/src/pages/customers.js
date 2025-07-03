@@ -1,10 +1,7 @@
 ﻿import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Alert from "@mui/material/Alert";
-import Button from "@mui/material/Button";
+import { Alert, Button, Snackbar, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import Snackbar from "@mui/material/Snackbar";
-import Typography from "@mui/material/Typography";
 import { addCustomer, editCustomer, deleteCustomer } from "../redux/actions/customerActions";
 import AddEntry from "../components/AddEntryModal";
 import ConfirmModal from "../components/ConfirmModal";
@@ -50,10 +47,6 @@ const Customers = () => {
         return updatedRow;
     }
 
-    const modalClosed = () => {
-        setShowAddCustomer(false)
-    }
-
     return (
         <>
             <Button
@@ -65,7 +58,7 @@ const Customers = () => {
                 schema={customerSchema}
                 apiEndPoint={`${mainURI}/customer`}
                 show={showAddCustomer}
-                onHide={modalClosed}
+                onHide={() => setShowAddCustomer(false)}
                 title="Lisää uusi asiakas"
                 action={addCustomer}
             /><br /><br />

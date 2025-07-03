@@ -1,10 +1,7 @@
 ﻿import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Alert from "@mui/material/Alert";
-import Button from "@mui/material/Button";
+import { Alert, Button, Snackbar, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import Snackbar from "@mui/material/Snackbar";
-import Typography from "@mui/material/Typography";
 import AddEntry from "../components/AddEntryModal";
 import ConfirmModal from "../components/ConfirmModal";
 import inputValidation from "../utils/inputValidation";
