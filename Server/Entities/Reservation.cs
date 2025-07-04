@@ -4,7 +4,10 @@
     {
         public int Id { get; set; }
         public int PropertyId { get; set; }
+        public string OfficeName { get; set; }
+        public string PropertyName { get; set; }
         public int CustomerId { get; set; }
+        public string CustomerName { get; set; }
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }
         public List<Device> Devices { get; set; }

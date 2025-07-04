@@ -1,7 +1,7 @@
 ﻿import React, { useState, useMemo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-    addReservation, fetchReservedDates,
+    addReservation, fetchReservations, fetchReservedDates,
     setOffice, setProperty
 } from "../redux/actions/reservationActions";
 import { fetchDevices } from "../redux/actions/deviceActions";
@@ -136,6 +136,7 @@ export const AddReservation = ({ show, onHide }) => {
                 qty: d.qty,
                 discount: d.discount
             }));
+
         const services = itemRows
             .filter(row => row.type === "service")
             .map(s => ({
@@ -163,6 +164,7 @@ export const AddReservation = ({ show, onHide }) => {
                 setEndDate(null);
                 setItemRows([]);
                 dispatch(fetchReservedDates(selectedOfficeProperty.id));
+                dispatch(fetchReservations());
                 onHide();
             })
     }

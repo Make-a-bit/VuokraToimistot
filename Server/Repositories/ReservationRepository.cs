@@ -23,7 +23,23 @@ namespace API.Repositories
                 using var conn = _dbManager.GetConnection();
                 await conn.OpenAsync();
 
-                using var cmd = new SqlCommand("SELECT * FROM Reservations", conn);
+                var query = @"
+            SELECT 
+                r.reservation_id,
+                r.property_id,
+                r.customer_id,
+                r.reservation_start,
+                r.reservation_end,
+                r.invoiced,
+                c.customer_name,
+                p.property_name,
+                o.office_name
+            FROM Reservations r
+            JOIN Customers c ON r.customer_id = c.customer_id
+            JOIN Office_properties p ON r.property_id = p.property_id
+            JOIN Offices o ON p.office_id = o.office_id";
+
+                using var cmd = new SqlCommand(query, conn);
                 using var reader = await cmd.ExecuteReaderAsync();
 
                 while (await reader.ReadAsync())
@@ -31,8 +47,11 @@ namespace API.Repositories
                     var reservation = new Reservation();
 
                     reservation.Id = reader.GetInt32(reader.GetOrdinal("reservation_id"));
+                    reservation.OfficeName = reader.GetString(reader.GetOrdinal("office_name"));
+                    reservation.PropertyName = reader.GetString(reader.GetOrdinal("property_name"));
                     reservation.PropertyId = reader.GetInt32(reader.GetOrdinal("property_id"));
                     reservation.CustomerId = reader.GetInt32(reader.GetOrdinal("customer_id"));
+                    reservation.CustomerName = reader.GetString(reader.GetOrdinal("customer_name"));
                     reservation.StartDate = DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("reservation_start")));
                     reservation.EndDate = DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("reservation_end")));
                     reservation.Invoiced = reader.GetBoolean(reader.GetOrdinal("invoiced"));

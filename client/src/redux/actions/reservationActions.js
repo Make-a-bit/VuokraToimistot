@@ -34,12 +34,31 @@ export const addReservation = (reservation) => {
     }
 }
 
+export const fetchReservations = () => {
+    return async (dispatch) => {
+        dispatch({ type: SHOW_LOADING })
+        try {
+            const response = await fetch(`${mainURI}/reservation`, {
+                method: "GET"
+            });
+            const data = await response.json();
+            console.log("Reservations:", data)
+            dispatch({ type: FETCH_RESERVATION_SUCCESS, payload: data })
+        } catch (error) {
+            console.log("Error while fetching reservations:", error)
+            dispatch({ type: SHOW_ERROR, payload: "Varausten nouto epäonnistui!" })
+        } finally {
+            dispatch({ type: HIDE_LOADING })
+        }
+    }
+}
+
 export const fetchReservedDates = (propertyId) => async (dispatch) => {
     dispatch({ type: SHOW_LOADING });
     try {
         const response = await fetch(`${mainURI}/reservation/reserved-dates/${propertyId}`);
         const data = await response.json();
-        dispatch({ type: SET_RESERVED_DATES, payload: data });
+        dispatch({ type: FETCH_RESERVED_DATES_SUCCESS, payload: data });
     } catch (error) {
         dispatch({ type: SHOW_ERROR, payload: "Virhe varaustietojen haussa!" });
     } finally {
