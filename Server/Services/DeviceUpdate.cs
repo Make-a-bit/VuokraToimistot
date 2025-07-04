@@ -18,12 +18,13 @@ namespace API.Services
             await conn.OpenAsync();
 
             using var cmd = new SqlCommand("UPDATE Office_devices " +
-                "SET device_name = @name, device_price = @price, reserved = @rsv " +
+                "SET device_name = @name, device_price = @price, device_vat = @vat " +
                 "WHERE device_id = @id", conn);
 
             cmd.Parameters.AddWithValue("@id", device.Id);
             cmd.Parameters.AddWithValue("@name", device.Name);
             cmd.Parameters.AddWithValue("@price", device.Price);
+            cmd.Parameters.AddWithValue("@vat", device.Vat);
 
             int rowsAffected = await cmd.ExecuteNonQueryAsync();
 

@@ -51,6 +51,7 @@ const AddEntry = ({ schema, show, onHide, apiEndPoint, title, action, extraData 
                 if (!/^\d+(\.\d{1,2})?$/.test(value)) {
                     setErrorState(true);
                     setErrorMessage(`Käytä ${input.header} kentän erottimena pistettä (esim. 12.34).`);
+                    dispatch({ type: HIDE_LOADING })
                     return;
                 }
             }

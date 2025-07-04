@@ -34,6 +34,7 @@ namespace API.Repositories
                     OfficeId = reader.GetInt32(reader.GetOrdinal("office_id")),
                     Name = reader.GetString(reader.GetOrdinal("device_name")),
                     Price = reader.GetDecimal(reader.GetOrdinal("device_price")),
+                    Vat = reader.GetDecimal(reader.GetOrdinal("device_vat"))
                 };
 
                 devices.Add(device);
@@ -59,6 +60,7 @@ namespace API.Repositories
                 device.OfficeId = reader.GetInt32(reader.GetOrdinal("office_id"));
                 device.Name = reader.GetString(reader.GetOrdinal("device_name"));
                 device.Price = reader.GetDecimal(reader.GetOrdinal("device_price"));
+                device.Vat = reader.GetDecimal(reader.GetOrdinal("device_vat"));
             }
 
             return device;

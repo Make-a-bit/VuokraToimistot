@@ -38,8 +38,8 @@ const Services = () => {
 
     const saveEdits = async (updatedRow, originalRow) => {
         console.log("Edit property:", originalRow)
-        const requiredFields = ["name", "unit", "price"]
-        const decimalFields = ["price"]
+        const requiredFields = ["name", "unit", "price", "vat"]
+        const decimalFields = ["price", "vat"]
         const isValid = inputValidation(updatedRow, requiredFields, decimalFields);
 
         if (!isValid) {

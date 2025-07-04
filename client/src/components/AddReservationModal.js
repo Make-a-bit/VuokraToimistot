@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef } from "react";
+﻿import React, { useState, useMemo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
     addReservation, fetchReservedDates,
@@ -9,9 +9,12 @@ import { fetchProperties } from "../redux/actions/propertyActions";
 import { fetchServices } from "../redux/actions/serviceActions";
 import {
     Autocomplete, Box, Button, Dialog, DialogTitle, DialogActions,
-    DialogContent, FormControl, InputLabel, MenuItem, Select, TextField,
+    DialogContent, Divider, FormControl, InputLabel, MenuItem, Select,
+    TextField, Typography,
 } from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid";
 import CloseIcon from "@mui/icons-material/Close";
+import DeleteIcon from '@mui/icons-material/Delete';
 import SaveIcon from "@mui/icons-material/Save";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -31,42 +34,125 @@ export const AddReservation = ({ show, onHide }) => {
     const selectedOffice = useSelector(state => state.reservations.selectedReservationOffice);
     const selectedOfficeProperty = useSelector(state => state.reservations.selectedReservationOfficeProperty);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
-    const [selectedServiceIds, setSelectedServiceIds] = useState([]);
-    const [selectedDeviceIds, setSelectedDeviceIds] = useState([]);
+    const [selectedDevice, setSelectedDevice] = useState(null);
+    const [selectedService, setSelectedService] = useState(null);
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
-    const firstInputRef = useRef(null);
+    const [itemRows, setItemRows] = useState([]);
 
-    const handlePropertyChange = (e) => {
-        const property = properties.find(p => p.id === e.target.value);
-        dispatch(setProperty(property));
-        if (property) {
-            dispatch(fetchReservedDates(property.id));
+    useEffect(() => {
+        if (selectedDevice && selectedDevice.id !== undefined) {
+            if (!itemRows.some(row => row.type === "device" && row.itemId === selectedDevice.id)) {
+                setItemRows(prev => [
+                    ...prev,
+                    {
+                        id: `device-${selectedDevice.id}`,
+                        itemId: selectedDevice.id,
+                        name: selectedDevice.name,
+                        price: selectedDevice.price,
+                        vat: selectedDevice.vat,
+                        qty: getDuration(),
+                        discount: 0,
+                        type: "device"
+                    }
+                ]);
+            }
+            setSelectedDevice(null); // Clear the field after adding
         }
-    }
+    }, [selectedDevice]);
+
+    useEffect(() => {
+        if (selectedService && selectedService.id !== undefined) {
+            if (!itemRows.some(row => row.type === "service" && row.itemId === selectedService.id)) {
+                setItemRows(prev => [
+                    ...prev,
+                    {
+                        id: `service-${selectedService.id}`,
+                        itemId: selectedService.id,
+                        name: selectedService.name,
+                        price: selectedService.price,
+                        vat: selectedService.vat,
+                        qty: getDuration(),
+                        discount: 0,
+                        type: "service"
+                    }
+                ]);
+            }
+            setSelectedService(null); // Clear the field after adding
+        }
+    }, [selectedService]);
+
+    useEffect(() => {
+        if (!startDate || !endDate) return;
+
+        const days = getDuration(startDate, endDate);
+        setItemRows((prev) =>
+            prev.map((row) => ({
+                ...row,
+                qty: days,
+            }))
+        );
+    }, [startDate, endDate]);
+
+    const deviceOptions = useMemo(() =>
+        devices.filter(
+            d => !itemRows.some(row => row.type === "device" && row.itemId === d.id)
+        ), [devices, itemRows]);
+
+    const serviceOptions = useMemo(() =>
+        services.filter(
+            s => !itemRows.some(row => row.type === "service" && row.itemId === s.id)
+        ), [services, itemRows]
+    );
+
+    const getDuration = () => {
+        if (!startDate || !endDate) return 1;
+        return endDate.diff(startDate, 'day') + 1; // +1 for inclusive range
+    };
+
+    // Handle datagrid cell edit
+    const handleRowEdit = (newRow) => {
+        setItemRows(itemRows.map(row =>
+            row.id === newRow.id ? { ...row, ...newRow } : row
+        ));
+        return newRow;
+    };
+
+    // Remove item from datagrid
+    const handleRowDelete = (id) => {
+        setItemRows(itemRows.filter(row => row.id !== id));
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        // Separate devices and services
+        const devices = itemRows
+            .filter(row => row.type === "device")
+            .map(d => ({
+                id: d.itemId,
+                price: d.price,
+                vat: d.vat,
+                qty: d.qty,
+                discount: d.discount
+            }));
+        const services = itemRows
+            .filter(row => row.type === "service")
+            .map(s => ({
+                id: s.itemId,
+                price: s.price,
+                vat: s.vat,
+                qty: s.qty,
+                discount: s.discount
+            }));
 
         const reservation = {
             propertyId: selectedOfficeProperty.id,
             customerId: selectedCustomer.id,
             startDate: startDate.format("YYYY-MM-DD"),
             endDate: endDate.format("YYYY-MM-DD"),
-            devices: selectedDeviceIds.map(d => ({
-                id: d.id,
-                price: d.price,
-                vat: d.vat,
-                qty: endDate.diff(startDate, "day") + 1,
-                discount: d.discount
-            })),
-            services: selectedServiceIds.map(s => ({
-                id: s.id,
-                price: s.price,
-                vat: s.vat,
-                qty: endDate.diff(startDate, "day") + 1,
-                discount: s.discount
-            })),
+            devices,
+            services,
             invoiced: false
         };
 
@@ -75,8 +161,7 @@ export const AddReservation = ({ show, onHide }) => {
                 setSelectedCustomer(null);
                 setStartDate(null);
                 setEndDate(null);
-                setSelectedDeviceIds([]);
-                setSelectedServiceIds([]);
+                setItemRows([]);
                 dispatch(fetchReservedDates(selectedOfficeProperty.id));
                 onHide();
             })
@@ -106,25 +191,21 @@ export const AddReservation = ({ show, onHide }) => {
         return false;
     };
 
-    const fieldMargins = 
-        { 
+    const fieldMargins =
+    {
         marginBottom: "10px",
+        marginRight: "10px",
         minWidth: "350px",
-        }
-    
+    }
+
     return (
         <Dialog
             open={show}
             onClose={onHide}
-            slotProps={{
-                transition: {
-                    onEntered: () => {
-                        if (firstInputRef.current) {
-                            firstInputRef.current.focus();
-                        }
-                    }
-                },
-            }}>
+            PaperProps={{
+                sx: { width: "900px", maxWidth: "100%" }
+            }}
+        >
 
             <DialogTitle>Tee uusi varaus</DialogTitle>
             <DialogContent dividers>
@@ -154,7 +235,6 @@ export const AddReservation = ({ show, onHide }) => {
                         isOptionEqualToValue={(option, value) => option.id === value?.id}
                     />
                 </FormControl>
-                <br />
 
                 <FormControl>
                     <Autocomplete
@@ -238,31 +318,103 @@ export const AddReservation = ({ show, onHide }) => {
                 </FormControl>
                 <br />
 
-                <Autocomplete
-                    multiple
-                    disabled={!endDate}
-                    disableCloseOnSelect
-                    options={devices}
-                    getOptionLabel={(option) => option.name}
-                    value={selectedDeviceIds}
-                    onChange={(event, newValue) => setSelectedDeviceIds(newValue)}
-                    renderInput={(params) => (
-                        <TextField {...params} label="Laitteet" />
-                    )}
-                    sx={{ ...fieldMargins }}
-                />
+                <FormControl>
+                    <Autocomplete
+                        disabled={!endDate}
+                        options={deviceOptions}
+                        getOptionLabel={option => option.name}
+                        value={selectedDevice}
+                        onChange={(event, newValue) => setSelectedDevice(newValue)}
+                        renderInput={params => (
+                            <TextField {...params} label="Lisää laite" />
+                        )}
+                        sx={{ ...fieldMargins }}
+                        isOptionEqualToValue={(option, value) => option?.id === value?.id}
+                    />
+                </FormControl>
 
-                <Autocomplete
-                    multiple
-                    disabled={!endDate}
-                    disableCloseOnSelect
-                    options={services}
-                    getOptionLabel={(option) => option.name}
-                    value={selectedServiceIds}
-                    onChange={(event, newValue) => setSelectedServiceIds(newValue)}
-                    renderInput={(params) => (
-                        <TextField {...params} label="Lisäpalvelut" />
-                    )}
+                <FormControl>
+                    <Autocomplete
+                        disabled={!endDate}
+                        options={serviceOptions}
+                        getOptionLabel={option => option.name}
+                        value={selectedService}
+                        onChange={(event, newValue) => setSelectedService(newValue)}
+                        renderInput={params => (
+                            <TextField {...params} label="Lisäpalvelut" />
+                        )}
+                        sx={{ ...fieldMargins }}
+                        isOptionEqualToValue={(option, value) => option?.id === value?.id}
+                    />
+                </FormControl>
+
+                <Divider sx={{ my: 2 }} />
+
+                <Typography variant="h6" sx={{ mb: 1 }}>
+                    Vuokrattavat laitteet ja lisäpalvelut
+                </Typography>
+
+                <DataGrid
+                    rows={itemRows}
+                    columns={[
+                        {
+                            field: "type",
+                            headerName: "Tyyppi",
+                            width: 80,
+                            renderCell: (params) => params.row.type === "device" ? "Laite" : "Palvelu"
+                        },
+                        { field: "name", headerName: "Nimi", flex: 1 },
+                        { field: "price", headerName: "Hinta", width: 80, editable: true },
+                        { field: "vat", headerName: "ALV %", width: 80 },
+                        { field: "qty", headerName: "Määrä", width: 80, editable: true },
+                        { field: "discount", headerName: "Alennus %", width: 100, editable: true },
+                        {
+                            field: "total",
+                            headerName: "Yhteensä",
+                            width: 120,
+                            renderCell: (params) => {
+                                const row = params.row;
+                                if (!row) return "";
+
+                                const price = parseFloat(row.price) || 0;
+                                const qty = parseFloat(row.qty) || 0;
+                                const discount = parseFloat(row.discount) || 0;
+                                const vat = parseFloat(row.vat) || 0;
+
+                                let total = (price + (vat / 100 * price)) * qty;
+
+                                if (discount !== 0) {
+                                    total = total - (discount / 100 * total);
+                                }
+
+                                return (
+                                    <span>{total.toFixed(2)} €</span>
+                                );
+                            }
+                        },
+                        {
+                            field: "actions",
+                            headerName: "Poista",
+                            width: 80,
+                            renderCell: (params) => (
+                                <Button
+                                    color="error"
+                                    size="small"
+                                    onClick={() => handleRowDelete(params.id)}
+                                >
+                                    <DeleteIcon />
+                                </Button>
+                            )
+                        }
+                    ]}
+                    autoHeight
+                    hideFooter
+                    disableSelectionOnClick
+                    processRowUpdate={handleRowEdit}
+                    sx={{
+                        marginBottom: "20px",
+                        minHeight: "175px",
+                    }}
                 />
             </DialogContent>
 

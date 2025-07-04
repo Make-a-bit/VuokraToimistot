@@ -39,8 +39,8 @@ const Devices = () => {
 
     const saveEdits = async (updatedRow, originalRow) => {
         console.log("Edit device:", originalRow)
-        const requiredFields = ["name", "price"]
-        const decimalFields = ["price"]
+        const requiredFields = ["name", "price", "vat"]
+        const decimalFields = ["price", "vat"]
         const isValid = inputValidation(updatedRow, requiredFields, decimalFields);
 
         if (!isValid) {

@@ -20,13 +20,15 @@ namespace API.Services
                 await conn.OpenAsync();
 
                 using var cmd = new SqlCommand("UPDATE Office_services " +
-                    "SET service_name = @name, service_unit = @unit, service_price = @price " +
+                    "SET service_name = @name, service_unit = @unit, " + 
+                    "service_price = @price, service_vat = @vat " +
                     "WHERE service_id = @id", conn);
 
                 cmd.Parameters.AddWithValue("@id", service.Id);
                 cmd.Parameters.AddWithValue("@name", service.Name);
                 cmd.Parameters.AddWithValue("@unit", service.Unit);
                 cmd.Parameters.AddWithValue("@price", service.Price);
+                cmd.Parameters.AddWithValue("@vat", service.Vat);
 
                 int rowsAffected = await cmd.ExecuteNonQueryAsync();
 
