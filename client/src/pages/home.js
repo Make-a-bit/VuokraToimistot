@@ -1,8 +1,9 @@
 ﻿import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Alert, Snackbar } from "@mui/material";
-import { fetchCustomers } from "../redux/actions/customerActions"
-import { fetchOffices } from "../redux/actions/officeActions"
+import { fetchCustomers } from "../redux/actions/customerActions";
+import { fetchOffices } from "../redux/actions/officeActions";
+import { fetchReservations } from "../redux/actions/reservationActions";
 import useAutoClearMessages from "../hooks/autoClearMessages";
 
 const Home = () => {
@@ -17,6 +18,10 @@ const Home = () => {
 
     useEffect(() => {
         dispatch(fetchCustomers());
+    }, [dispatch]);
+
+    useEffect(() => {
+        dispatch(fetchReservations());
     }, [dispatch]);
 
     return (

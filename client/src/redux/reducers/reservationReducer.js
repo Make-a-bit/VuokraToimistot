@@ -3,7 +3,7 @@
     EDIT_RESERVATION_SUCCESS, FETCH_RESERVATION_SUCCESS,
     FETCH_RESERVED_DATES_SUCCESS,
     SELECTED_RESERVATION_OFFICE_SET, SELECTED_RESERVATION_OFFICE_PROPERTY_SET,
-    SET_RESERVED_DATES, SET_AVAILABLE_DEVICES, SET_AVAILABLE_SERVICES,
+    SET_AVAILABLE_DEVICES, SET_AVAILABLE_SERVICES,
 } from "../actions/actiontypes";
 
 const initialState = {
@@ -24,6 +24,12 @@ export const reservationReducer = (state = initialState, action) => {
                 reservations: [...state.reservations, action.payload]
             }
 
+        case FETCH_RESERVATION_SUCCESS:
+            return {
+                ...state,
+                reservations: action.payload
+            }
+
         case FETCH_RESERVED_DATES_SUCCESS:
             return {
                 ...state,
@@ -40,12 +46,6 @@ export const reservationReducer = (state = initialState, action) => {
             return {
                 ...state,
                 selectedReservationOfficeProperty: action.payload
-            }
-
-        case SET_RESERVED_DATES:
-            return {
-                ...state,
-                reservedDates: action.payload
             }
 
         case SET_AVAILABLE_DEVICES:
