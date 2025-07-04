@@ -92,6 +92,7 @@ BEGIN
         service_name VARCHAR(255) NOT NULL,
         service_unit VARCHAR(255) NOT NULL,
         service_price DECIMAL(10, 2) NOT NULL,
+        service_vat DECIMAL(10,2) NOT NULL,
         FOREIGN KEY (office_id) REFERENCES Offices (office_id)
         ON DELETE NO ACTION
         ON UPDATE CASCADE
@@ -109,6 +110,7 @@ BEGIN
         office_id INT NOT NULL,
         device_name VARCHAR(255) NOT NULL,
         device_price DECIMAL(10, 2) NOT NULL,
+        device_vat DECIMAL(10,2) NOT NULL,
         FOREIGN KEY (office_id) REFERENCES Offices (office_id)
         ON DELETE NO ACTION
         ON UPDATE CASCADE

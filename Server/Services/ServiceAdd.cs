@@ -20,14 +20,15 @@ namespace API.Services
                 await conn.OpenAsync();
 
                 using var cmd = new SqlCommand("INSERT INTO Office_services " +
-                    "(office_id, service_name, service_unit, service_price) " +
+                    "(office_id, service_name, service_unit, service_price, service_vat) " +
                     "OUTPUT INSERTED.service_id " +
-                    "VALUES (@id, @name, @unit, @price)", conn);
+                    "VALUES (@id, @name, @unit, @price, @vat)", conn);
 
                 cmd.Parameters.AddWithValue("@id", service.OfficeId);
                 cmd.Parameters.AddWithValue("@name", service.Name);
                 cmd.Parameters.AddWithValue("@unit", service.Unit);
                 cmd.Parameters.AddWithValue("@price", service.Price);
+                cmd.Parameters.AddWithValue("@vat", service.Vat);
 
                 var result = await cmd.ExecuteScalarAsync();
 

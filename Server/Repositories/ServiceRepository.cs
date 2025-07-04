@@ -34,7 +34,8 @@ namespace API.Repositories
                     OfficeId = reader.GetInt32(reader.GetOrdinal("office_id")),
                     Name = reader.GetString(reader.GetOrdinal("service_name")),
                     Unit = reader.GetString(reader.GetOrdinal("service_unit")),
-                    Price = reader.GetDecimal(reader.GetOrdinal("service_price"))
+                    Price = reader.GetDecimal(reader.GetOrdinal("service_price")),
+                    Vat = reader.GetDecimal(reader.GetOrdinal("service_vat"))
                 };
 
                 services.Add(service);
@@ -62,6 +63,7 @@ namespace API.Repositories
                 service.Name = reader.GetString(reader.GetOrdinal("service_name"));
                 service.Unit = reader.GetString(reader.GetOrdinal("service_unit"));
                 service.Price = reader.GetDecimal(reader.GetOrdinal("service_price"));
+                service.Vat = reader.GetDecimal(reader.GetOrdinal("service_vat"));
             }
             return service;
         }
