@@ -54,7 +54,9 @@ namespace API
             builder.Services.AddScoped<PropertyRepository>();
             builder.Services.AddScoped<PropertyUpdate>();
             builder.Services.AddScoped<ReservationAdd>();
+            builder.Services.AddScoped<ReservationDelete>();
             builder.Services.AddScoped<ReservationRepository>();
+            builder.Services.AddScoped<ReservationUpdate>();
             builder.Services.AddScoped<ServiceAdd>();
             builder.Services.AddScoped<ServiceDelete>();
             builder.Services.AddScoped<ServiceRepository>();

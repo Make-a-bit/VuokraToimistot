@@ -10,11 +10,13 @@ namespace API.Controllers
     {
         private readonly ReservationAdd _reservationAdd;
         private readonly ReservationRepository _reservationRepository;
+        private readonly ReservationUpdate _reservationUpdate;
 
-        public ReservationController(ReservationAdd ra, ReservationRepository rr)
+        public ReservationController(ReservationAdd ra, ReservationRepository rr, ReservationUpdate ru)
         {
             _reservationAdd = ra;
             _reservationRepository = rr;
+            _reservationUpdate = ru;
         }
 
         [HttpGet]
@@ -62,6 +64,26 @@ namespace API.Controllers
             {
                 return BadRequest();
             }
+        }
+
+        [HttpPut]
+        public async Task<ActionResult> UpdateReservation([FromBody] Reservation reservation)
+        {
+            try
+            {
+                var success = await _reservationUpdate.UpdateReservation(reservation);
+
+                if (success)
+                {
+                    var updatedReservation = await _reservationRepository.GetReservationById(reservation.Id);
+                    return Ok(updatedReservation);
+                }
+            }
+            catch
+            {
+                // logger
+            }
+            return BadRequest();
         }
     }
 }

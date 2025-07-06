@@ -21,12 +21,27 @@ namespace API.Controllers
             _deviceUpdate = du;
         }
 
-        [HttpGet]
+        [HttpGet("all")]
+        public async Task<ActionResult<List<Device>>> GetDevices()
+        {
+            try
+            {
+                var properties = await _deviceRepository.GetDevices();
+                return Ok(properties);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+
+        [HttpGet("by-office")]
         public async Task<ActionResult> GetDevices([FromQuery] int id)
         {
             try
             {
-                var devices = await _deviceRepository.GetDevicesByOfficeId(id);
+                var devices = await _deviceRepository.GetDevices(id);
 
                 return Ok(devices);
             }

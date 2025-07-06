@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+﻿import React, { useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
     addReservation, fetchReservedDates,
@@ -14,9 +14,10 @@ import { fetchServices } from "../redux/actions/serviceActions";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
-import { AddReservation } from "../components/AddReservationModal";
+import { AddReservation } from "../components/ReservationModal";
+import { EditReservationModal } from "../components/EditReservationModal";
 import ConfirmModal from "../components/ConfirmModal";
-import dayjs from "dayjs";
+import dayjs from "../../src/dayjs-setup";
 
 const Reservation = () => {
     const dispatch = useDispatch();
@@ -26,21 +27,31 @@ const Reservation = () => {
     const properties = useSelector(state => state.properties.properties);
     const allReservations = useSelector(state => state.reservations.reservations);
     const reservedDates = useSelector(state => state.reservations.reservedDates);
-    const selectedOffice = useSelector(state => state.reservations.selectedReservationOffice);
-    const selectedOfficeProperty = useSelector(state => state.reservations.selectedReservationOfficeProperty);
+
     const [showAddReservation, setShowAddReservation] = useState(false);
-    const [showConfirm, setShowConfirm] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
+    const [selectedOffice, setSelectedOffice] = useState(null);
+    const [selectedProperty, setSelectedProperty] = useState(null);
     const [selectedReservation, setSelectedReservation] = useState(null);
+    const [modalOffice, setModalOffice] = useState(null);
+    const [modalProperty, setModalProperty] = useState(null);
     const [isEditable, setIsEditable] = useState(false);
+
+    const propertyOptions = useMemo(() =>
+        properties.filter(
+            p => selectedOffice && p.officeId === selectedOffice.id
+        ),
+        [properties, selectedOffice]
+    );
 
     const officePropertyIds = selectedOffice
         ? properties.filter(p => p.officeId === selectedOffice.id).map(p => p.id)
         : [];
 
     const reservations = allReservations.filter(r => {
-        if (selectedOfficeProperty) {
-            return r.propertyId === selectedOfficeProperty.id;
+        if (selectedProperty) {
+            return r.propertyId === selectedProperty.id;
         } else if (selectedOffice) {
             return officePropertyIds.includes(r.propertyId);
         }
@@ -49,7 +60,8 @@ const Reservation = () => {
 
     const handleRowClick = (params) => {
         setSelectedReservation(params.row);
-        setIsEditable(!params.row.invoiced); // editable if invoiced is false
+        dispatch(fetchReservedDates(params.row.propertyId));
+        setIsEditable(!params.row.invoiced); 
         setShowEditModal(true);
     };
 
@@ -57,9 +69,6 @@ const Reservation = () => {
         console.log("CLICK")
 
     };
-
-    console.log(selectedReservation)
-
 
     const disableDates = (date) =>
         reservedDates.some((d) => dayjs(d).isSame(date, "day"));
@@ -94,7 +103,11 @@ const Reservation = () => {
         <>
             <Button
                 variant="contained"
-                onClick={() => setShowAddReservation(true)}
+                onClick={() => {
+                    setModalOffice(selectedOffice)
+                    setModalProperty(selectedProperty)
+                    setShowAddReservation(true)
+                }}
                 sx={{ marginTop: "10px" }}
             >
                 Tee uusi varaus
@@ -103,10 +116,12 @@ const Reservation = () => {
             <Button
                 variant="outlined"
                 color="secondary"
-                disabled={!selectedOffice && !selectedOfficeProperty}
+                disabled={!selectedOffice && !selectedProperty}
                 onClick={() => {
-                    dispatch(setOffice(null))
-                    dispatch(setProperty(null))
+                    setSelectedOffice(null)
+                    setSelectedProperty(null)
+                    setModalOffice(null)
+                    setModalProperty(null)
                 }}
                 sx={{ marginLeft: "10px", marginTop: "10px" }}
             >
@@ -119,6 +134,14 @@ const Reservation = () => {
                     setShowAddReservation(false)
                 }
                 action={addReservation}
+                office={modalOffice}
+                property={modalProperty}
+            />
+
+            <EditReservationModal
+                show={showEditModal}
+                onHide={() => setShowEditModal(false)}
+                reservation={selectedReservation}
             />
 
             <Box sx={{ marginTop: "20px", gap: 2, display: "flex", alignItems: "flex-start" }}>
@@ -126,19 +149,11 @@ const Reservation = () => {
                     <Autocomplete
                         options={Array.isArray(offices) ? offices : []}
                         getOptionLabel={option => option?.name || ""}
-                        value={offices.find(o => o.id === selectedOffice?.id) || null}
+                        value={selectedOffice}
                         onChange={(event, newValue) => {
-                            const simplifiedOffice = newValue
-                                ? { id: newValue.id, name: newValue.name }
-                                : null;
-
-                            dispatch(setOffice(simplifiedOffice));
-
-                            if (simplifiedOffice) {
-                                dispatch(fetchProperties(simplifiedOffice.id));
-                                dispatch(setProperty(null));
-                                dispatch(fetchDevices(simplifiedOffice.id));
-                                dispatch(fetchServices(simplifiedOffice.id));
+                            setSelectedOffice(newValue)
+                            if (newValue) {
+                                setSelectedProperty(null);
                             }
                         }}
                         isOptionEqualToValue={(option, value) => option.id === value?.id}
@@ -151,18 +166,14 @@ const Reservation = () => {
 
                 <FormControl>
                     <Autocomplete
-                        options={Array.isArray(properties) ? properties : []}
+                        options={propertyOptions}
                         getOptionLabel={option => option?.name || ""}
-                        value={properties.find(p => p.id === selectedOfficeProperty?.id) || null}
+                        value={properties.find(p => p.id === selectedProperty?.id) || null}
                         onChange={(event, newValue) => {
-                            const simplifiedProperty = newValue
-                                ? { id: newValue.id, name: newValue.name }
-                                : null;
+                            setSelectedProperty(newValue);
 
-                            dispatch(setProperty(simplifiedProperty));
-
-                            if (simplifiedProperty) {
-                                dispatch(fetchReservedDates(simplifiedProperty.id));
+                            if (newValue) {
+                                dispatch(fetchReservedDates(newValue.id));
                             }
                         }}
                         isOptionEqualToValue={(option, value) => option.id === value?.id}
@@ -174,7 +185,7 @@ const Reservation = () => {
                     />
                 </FormControl>
 
-                {selectedOfficeProperty ? (
+                {selectedProperty ? (
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <Box sx={{ flex: "none" }}>
                             <DateCalendar

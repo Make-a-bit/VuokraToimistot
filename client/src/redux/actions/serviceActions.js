@@ -82,13 +82,14 @@ export const editService = (service) => {
     }
 }
 
-export const fetchServices = (id) => {
+export const fetchServices = (officeId) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
         try {
-            const response = await fetch(`${mainURI}/service/?id=${id}`, {
-                method: "GET",
-            });
+            const uri = (officeId != null && officeId > 0)
+                ? `${mainURI}/service/by-office?id=${officeId}`
+                : `${mainURI}/service/all`;
+            const response = await fetch(uri, { method: "GET" });
 
             const data = await response.json();
             dispatch({ type: FETCH_OFFICE_SERVICES_SUCCESS, payload: data })

@@ -14,6 +14,59 @@ namespace API.Repositories
             _dbManager = db;
         }
 
+        public async Task<Reservation> GetReservationById(int id)
+        {
+            var reservation = new Reservation();
+
+            try
+            {
+                using var conn = _dbManager.GetConnection();
+                await conn.OpenAsync();
+
+                using var cmd = new SqlCommand(@"
+                SELECT 
+                    r.reservation_id,
+                    r.property_id,
+                    r.customer_id,
+                    r.reservation_start,
+                    r.reservation_end,
+                    r.invoiced,
+                    c.customer_name,
+                    p.property_name,
+                    o.office_name
+                FROM Reservations r
+                JOIN Customers c ON r.customer_id = c.customer_id
+                JOIN Office_properties p ON r.property_id = p.property_id
+                JOIN Offices o ON p.office_id = o.office_id
+                WHERE reservation_id = @reservationId", conn);
+
+                cmd.Parameters.AddWithValue("@reservationId", id);
+                using var reader = await cmd.ExecuteReaderAsync();
+
+                while (await reader.ReadAsync())
+                {
+                    reservation.Id = reader.GetInt32(reader.GetOrdinal("reservation_id"));
+                    reservation.PropertyId = reader.GetInt32(reader.GetOrdinal("property_id"));
+                    reservation.CustomerId = reader.GetInt32(reader.GetOrdinal("customer_id"));
+                    reservation.StartDate = DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("reservation_start")));
+                    reservation.EndDate = DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("reservation_end")));
+                    reservation.Invoiced = reader.GetBoolean(reader.GetOrdinal("invoiced"));
+                    reservation.CustomerName = reader.GetString(reader.GetOrdinal("customer_name"));
+                    reservation.OfficeName = reader.GetString(reader.GetOrdinal("office_name"));
+                    reservation.PropertyName = reader.GetString(reader.GetOrdinal("property_name"));
+                }
+
+                reservation.Devices = await GetReservationDevices(reservation.Id);
+                reservation.Services = await GetReservationServices(reservation.Id);
+
+                return reservation;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
         public async Task<List<Reservation>> GetReservations()
         {
             var reservations = new List<Reservation>();
@@ -24,20 +77,20 @@ namespace API.Repositories
                 await conn.OpenAsync();
 
                 var query = @"
-            SELECT 
-                r.reservation_id,
-                r.property_id,
-                r.customer_id,
-                r.reservation_start,
-                r.reservation_end,
-                r.invoiced,
-                c.customer_name,
-                p.property_name,
-                o.office_name
-            FROM Reservations r
-            JOIN Customers c ON r.customer_id = c.customer_id
-            JOIN Office_properties p ON r.property_id = p.property_id
-            JOIN Offices o ON p.office_id = o.office_id";
+                SELECT 
+                    r.reservation_id,
+                    r.property_id,
+                    r.customer_id,
+                    r.reservation_start,
+                    r.reservation_end,
+                    r.invoiced,
+                    c.customer_name,
+                    p.property_name,
+                    o.office_name
+                FROM Reservations r
+                JOIN Customers c ON r.customer_id = c.customer_id
+                JOIN Office_properties p ON r.property_id = p.property_id
+                JOIN Offices o ON p.office_id = o.office_id";
 
                 using var cmd = new SqlCommand(query, conn);
                 using var reader = await cmd.ExecuteReaderAsync();
@@ -61,8 +114,8 @@ namespace API.Repositories
 
                 foreach (var reservation in reservations)
                 {
-                    reservation.Devices = await GetReservationDevicesByReservationId(reservation.Id);
-                    reservation.Services = await GetReservationServicesByReservationId(reservation.Id);
+                    reservation.Devices = await GetReservationDevices(reservation.Id);
+                    reservation.Services = await GetReservationServices(reservation.Id);
                 }
 
                 return reservations;
@@ -73,7 +126,7 @@ namespace API.Repositories
             }
         }
 
-        private async Task<List<Device>> GetReservationDevicesByReservationId(int id)
+        private async Task<List<Device>> GetReservationDevices(int reservationId)
         {
             var devices = new List<Device>();
 
@@ -82,13 +135,14 @@ namespace API.Repositories
                 using var conn = _dbManager.GetConnection();
                 await conn.OpenAsync();
 
-                using var cmd = new SqlCommand("SELECT d.device_id, d.device_name, rd.device_price, " +
-                    "rd.device_vat, rd.device_qty, rd.device_discount " +
-                    "FROM Reservation_devices rd " +
-                    "JOIN Office_devices d ON rd.device_id = d.device_id " +
-                    "WHERE rd.reservation_id = @id", conn);
+                using var cmd = new SqlCommand(@"
+                SELECT d.device_id, d.device_name, rd.device_price, 
+                rd.device_vat, rd.device_qty, rd.device_discount
+                FROM Reservation_devices rd
+                JOIN Office_devices d ON rd.device_id = d.device_id
+                WHERE rd.reservation_id = @reservationId", conn);
 
-                cmd.Parameters.AddWithValue("@id", id);
+                cmd.Parameters.AddWithValue("@reservationId", reservationId);
 
                 using var reader = await cmd.ExecuteReaderAsync();
                 while (await reader.ReadAsync())
@@ -112,7 +166,7 @@ namespace API.Repositories
             }
         }
 
-        private async Task<List<Service>> GetReservationServicesByReservationId(int id)
+        private async Task<List<Service>> GetReservationServices(int reservationId)
         {
             var services = new List<Service>();
 
@@ -121,12 +175,13 @@ namespace API.Repositories
                 using var conn = _dbManager.GetConnection();
                 await conn.OpenAsync();
 
-                using var cmd = new SqlCommand("SELECT s.service_id, s.service_name, s.service_unit, " +
-                    "rs.service_price, rs.service_vat, rs.service_qty, rs.service_discount " +
-                    "FROM Reservation_services rs " +
-                    "JOIN Office_services s ON rs.service_id = s.service_id " +
-                    "WHERE rs.reservation_id = @id", conn);
-                cmd.Parameters.AddWithValue("@id", id);
+                using var cmd = new SqlCommand(@"
+                SELECT s.service_id, s.service_name, s.service_unit, 
+                rs.service_price, rs.service_vat, rs.service_qty, rs.service_discount 
+                FROM Reservation_services rs 
+                JOIN Office_services s ON rs.service_id = s.service_id 
+                WHERE rs.reservation_id = @reservationId", conn);
+                cmd.Parameters.AddWithValue("@reservationId", reservationId);
 
                 using var reader = await cmd.ExecuteReaderAsync();
                 while (await reader.ReadAsync())
@@ -151,16 +206,63 @@ namespace API.Repositories
             }
         }
 
+        public async Task<bool> HasDevicesOnReservation(int reservationId)
+        {
+            try
+            {
+                using var conn = _dbManager.GetConnection();
+                await conn.OpenAsync();
+
+                using var cmd = new SqlCommand(@"
+                SELECT COUNT(*) 
+                FROM Reservation_devices 
+                WHERE reservation_id = @rid", conn);
+                cmd.Parameters.AddWithValue("@rid", reservationId);
+
+                int deviceCount = (int)await cmd.ExecuteScalarAsync();
+
+                return deviceCount > 0;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> HasServicesOnReservation(int reservationId)
+        {
+            try
+            {
+                using var conn = _dbManager.GetConnection();
+                await conn.OpenAsync();
+
+                using var cmd = new SqlCommand(@"
+                SELECT COUNT(*) 
+                FROM Reservation_services 
+                WHERE reservation_id = @rid", conn);
+                cmd.Parameters.AddWithValue("@rid", reservationId);
+
+                int serviceCount = (int)await cmd.ExecuteScalarAsync();
+
+                return serviceCount > 0;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
         public async Task<List<DateOnly>> GetReservedDates(int propertyId)
         {
             var dates = new List<DateOnly>();
-            var today = DateOnly.FromDateTime(DateTime.Today);
 
             var conn = _dbManager.GetConnection();
             await conn.OpenAsync();
 
-            var cmd = new SqlCommand("SELECT reservation_start, reservation_end FROM Reservations " +
-                "WHERE property_id = @pId", conn);
+            var cmd = new SqlCommand(@"
+            SELECT reservation_start, reservation_end 
+            FROM Reservations
+            WHERE property_id = @pId", conn);
 
             cmd.Parameters.AddWithValue("@pId", propertyId);
 
@@ -172,10 +274,9 @@ namespace API.Repositories
 
                 for (var date = start; date <= end; date = date.AddDays(1))
                 {
-                    if (date >= today) dates.Add(date);
+                    dates.Add(date);
                 }
             }
-
             return dates;
         }
     }
