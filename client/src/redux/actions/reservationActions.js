@@ -42,7 +42,6 @@ export const fetchReservations = () => {
                 method: "GET"
             });
             const data = await response.json();
-            console.log("Reservations:", data)
             dispatch({ type: FETCH_RESERVATION_SUCCESS, payload: data })
         } catch (error) {
             console.log("Error while fetching reservations:", error)
@@ -65,6 +64,30 @@ export const fetchReservedDates = (propertyId) => async (dispatch) => {
         dispatch({ type: HIDE_LOADING })
     }
 };
+
+export const updateReservation = (reservation) => async (dispatch) => {
+    dispatch({ type: SHOW_LOADING })
+    console.log("Reservation:", reservation)
+    try {
+        const response = await fetch(`${mainURI}/reservation`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(reservation)
+        });
+
+        if (response.ok) {
+            const editedReservation = await response.json();
+            console.log("Edited reservation:", editedReservation)
+            dispatch({ type: EDIT_RESERVATION_SUCCESS, payload: editedReservation })
+            dispatch({ type: SHOW_SUCCESS, payload: "Varauksen päivitys onnistui!" })
+        }
+    } catch (error) {
+        console.log("Error while updating reservation:", error)
+        dispatch({ type: SHOW_ERROR, payload: "Varauksen päivitys epäonnistui!" })
+    } finally {
+        dispatch({ type: HIDE_LOADING })
+    }
+}
 
 export const setOffice = (office) => ({
     type: SELECTED_RESERVATION_OFFICE_SET,

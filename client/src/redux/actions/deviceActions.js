@@ -80,9 +80,10 @@ export const fetchDevices = (officeId) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
         try {
-            const response = await fetch(`${mainURI}/device/?id=${officeId}`, {
-                method: "GET",
-            });
+            const uri = (officeId !== null && officeId > 0)
+                ? `${mainURI}/device/by-office?id=${officeId}`
+                : `${mainURI}/device/all`;
+            const response = await fetch(uri, { method: "GET" });
 
             const data = await response.json();
             dispatch({ type: FETCH_OFFICE_DEVICES_SUCCESS, payload: data })
