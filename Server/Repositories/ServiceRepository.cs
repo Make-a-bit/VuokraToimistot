@@ -13,7 +13,40 @@ namespace API.Repositories
             _dbManager = db;
         }
 
-        public async Task<List<Service>> GetServicesByOfficeId(int id)
+        public async Task<List<Service>> GetServices()
+        {
+            var services = new List<Service>();
+
+            try
+            {
+                using var conn = _dbManager.GetConnection();
+                await conn.OpenAsync();
+
+                using var cmd = new SqlCommand("SELECT * FROM Office_services", conn);
+                using var reader = await cmd.ExecuteReaderAsync();
+
+                while (await reader.ReadAsync())
+                {
+                    var service = new Service
+                    {
+                        Id = reader.GetInt32(reader.GetOrdinal("service_id")),
+                        OfficeId = reader.GetInt32(reader.GetOrdinal("office_id")),
+                        Name = reader.GetString(reader.GetOrdinal("service_name")),
+                        Unit = reader.GetString(reader.GetOrdinal("service_unit")),
+                        Price = reader.GetDecimal(reader.GetOrdinal("service_price")),
+                        Vat = reader.GetDecimal(reader.GetOrdinal("service_vat"))
+                    };
+                    services.Add(service);
+                }
+                return services;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<Service>> GetServices(int officeId)
         {
             var services = new List<Service>();
 
@@ -21,8 +54,8 @@ namespace API.Repositories
             await conn.OpenAsync();
 
             using var cmd = new SqlCommand("SELECT * FROM Office_services " +
-                "WHERE office_id = @id", conn);
-            cmd.Parameters.AddWithValue("@id", id);
+                "WHERE office_id = @officeId", conn);
+            cmd.Parameters.AddWithValue("@officeId", officeId);
 
             using var reader = await cmd.ExecuteReaderAsync();
 
@@ -43,7 +76,7 @@ namespace API.Repositories
             return services;
         }
 
-        public async Task<Service> GetServiceById(int id)
+        public async Task<Service> GetService(int officeId)
         {
             var service = new Service();
 
@@ -51,9 +84,9 @@ namespace API.Repositories
             await conn.OpenAsync();
 
             using var cmd = new SqlCommand("SELECT * FROM Office_services " +
-                "WHERE service_id = @id", conn);
+                "WHERE service_id = @officeId", conn);
 
-            cmd.Parameters.AddWithValue("@id", id);
+            cmd.Parameters.AddWithValue("@officeId", officeId);
             using var reader = await cmd.ExecuteReaderAsync();
 
             while (await reader.ReadAsync())

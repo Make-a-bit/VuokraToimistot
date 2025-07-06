@@ -21,10 +21,24 @@ namespace API.Controllers
             _propertyUpdate = pu;
         }
 
-        [HttpGet]
+        [HttpGet("all")]
+        public async Task<ActionResult<List<Property>>> GetProperties()
+        {
+            try
+            {
+                var properties = await _propertyRepository.GetProperties();
+                return Ok(properties);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpGet("by-office")]
         public async Task<ActionResult<List<Property>>> GetProperties([FromQuery] int id)
         {
-            var properties = await _propertyRepository.GetPropertiesByOfficeId(id);
+            var properties = await _propertyRepository.GetProperties(id);
 
             return Ok(properties);
         }

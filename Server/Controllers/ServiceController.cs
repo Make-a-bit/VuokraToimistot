@@ -21,12 +21,26 @@ namespace API.Controllers
             _serviceUpdate = su;
         }
 
-        [HttpGet]
-        public async Task<ActionResult> GetServices([FromQuery] int id)
+        [HttpGet("all")]
+        public async Task<ActionResult> GetServices()
         {
             try
             {
-                var services = await _serviceRepository.GetServicesByOfficeId(id);
+                var services = await _serviceRepository.GetServices();
+                return Ok(services);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpGet("by-office")]
+        public async Task<ActionResult> GetServices([FromQuery] int officeId)
+        {
+            try
+            {
+                var services = await _serviceRepository.GetServices(officeId);
 
                 return Ok(services);
             }
@@ -70,7 +84,7 @@ namespace API.Controllers
 
                 if (success)
                 {
-                    var updatedService = await _serviceRepository.GetServiceById(service.Id);
+                    var updatedService = await _serviceRepository.GetService(service.Id);
                     return Ok(updatedService);
                 }
             }
@@ -82,7 +96,7 @@ namespace API.Controllers
         }
 
         [HttpDelete]
-        [Route("delete/{id}")]
+        [Route("delete/{officeId}")]
         public async Task<ActionResult> DeleteService([FromRoute] int id)
         {
             try

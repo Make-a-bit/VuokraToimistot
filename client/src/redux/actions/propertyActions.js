@@ -83,9 +83,11 @@ export const fetchProperties = (officeId) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
         try {
-            const response = await fetch(`${mainURI}/property/?id=${officeId}`, {
-                method: "GET",
-            });
+            const uri = (officeId != null && officeId > 0)
+                ? `${mainURI}/property/by-office?id=${officeId}`
+                : `${mainURI}/property/all`;
+            const response = await fetch(uri, { method: "GET" });
+
             const data = await response.json();
             dispatch({ type: FETCH_PROPERTIES_SUCCESS, payload: data });
         } catch (error) {
