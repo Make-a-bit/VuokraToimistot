@@ -163,8 +163,6 @@ export const AddReservation = ({ show, onHide, office, property }) => {
             })
     }
 
-    console.log("Services:", services);
-
     return (
         <Dialog
             open={show}

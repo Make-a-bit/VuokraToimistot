@@ -3,13 +3,11 @@
     EDIT_RESERVATION_SUCCESS, FETCH_RESERVATION_SUCCESS, FETCH_RESERVED_DATES_SUCCESS,
     HIDE_LOADING, SHOW_LOADING, SHOW_ERROR, SHOW_SUCCESS,
     SELECTED_RESERVATION_OFFICE_SET, SELECTED_RESERVATION_OFFICE_PROPERTY_SET,
-    SET_RESERVED_DATES, SET_AVAILABLE_DEVICES, SET_AVAILABLE_SERVICES,
 } from "../actions/actiontypes";
 
 const mainURI = "https://localhost:7017";
 
 export const addReservation = (reservation) => {
-    console.log("Reservation:", reservation);
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
         try {
@@ -21,13 +19,28 @@ export const addReservation = (reservation) => {
 
             if (response.ok) {
                 const createdReservation = await response.json();
-                console.log("Created reservation:", createdReservation)
                 dispatch({ type: ADD_RESERVATION_SUCCESS, payload: createdReservation })
                 dispatch({ type: SHOW_SUCCESS, payload: "Varauksen tallennus onnistui!" })
             }
-        } catch (err) {
+        } catch {
             dispatch({ type: SHOW_ERROR, payload: "Varauksen tallennus epäonnistui!" })
-            console.log("Error while adding a new reservation:", err)
+        } finally {
+            dispatch({ type: HIDE_LOADING })
+        }
+    }
+}
+
+export const deleteReservation = (reservation) => {
+    return async (dispatch) => {
+        dispatch({ type: SHOW_LOADING })
+        try {
+            await fetch(`${mainURI}/reservation/delete/${reservation.id}`, {
+                method: "DELETE"
+            });
+            dispatch({ type: DELETE_RESERVATION_SUCCESS, payload: reservation })
+            dispatch({ type: SHOW_SUCCESS, payload: "Varauksen poisto onnistui!" })
+        } catch {
+            dispatch({ type: SHOW_ERROR, payload: "Varauksen poisto epäonnistui!" })
         } finally {
             dispatch({ type: HIDE_LOADING })
         }
@@ -43,8 +56,7 @@ export const fetchReservations = () => {
             });
             const data = await response.json();
             dispatch({ type: FETCH_RESERVATION_SUCCESS, payload: data })
-        } catch (error) {
-            console.log("Error while fetching reservations:", error)
+        } catch {
             dispatch({ type: SHOW_ERROR, payload: "Varausten nouto epäonnistui!" })
         } finally {
             dispatch({ type: HIDE_LOADING })
@@ -67,9 +79,8 @@ export const fetchReservedDates = (propertyId) => async (dispatch) => {
 
 export const updateReservation = (reservation) => async (dispatch) => {
     dispatch({ type: SHOW_LOADING })
-    console.log("Reservation:", reservation)
     try {
-        const response = await fetch(`${mainURI}/reservation`, {
+        const response = await fetch(`${mainURI}/reservation/update`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(reservation)
@@ -77,12 +88,10 @@ export const updateReservation = (reservation) => async (dispatch) => {
 
         if (response.ok) {
             const editedReservation = await response.json();
-            console.log("Edited reservation:", editedReservation)
             dispatch({ type: EDIT_RESERVATION_SUCCESS, payload: editedReservation })
             dispatch({ type: SHOW_SUCCESS, payload: "Varauksen päivitys onnistui!" })
         }
-    } catch (error) {
-        console.log("Error while updating reservation:", error)
+    } catch {
         dispatch({ type: SHOW_ERROR, payload: "Varauksen päivitys epäonnistui!" })
     } finally {
         dispatch({ type: HIDE_LOADING })

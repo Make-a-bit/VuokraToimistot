@@ -1,16 +1,13 @@
 ﻿import React, { useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-    addReservation, fetchReservedDates,
+    addReservation, deleteReservation, fetchReservations, fetchReservedDates,
     setOffice, setProperty
 } from "../redux/actions/reservationActions";
 import { Autocomplete, Box, Button, FormControl, IconButton, TextField } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import dataGridSx from "../utils/dataGridSx";
 import DeleteIcon from '@mui/icons-material/Delete';
-import { fetchDevices } from "../redux/actions/deviceActions";
-import { fetchProperties } from "../redux/actions/propertyActions";
-import { fetchServices } from "../redux/actions/serviceActions";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
@@ -61,13 +58,8 @@ const Reservation = () => {
     const handleRowClick = (params) => {
         setSelectedReservation(params.row);
         dispatch(fetchReservedDates(params.row.propertyId));
-        setIsEditable(!params.row.invoiced); 
+        setIsEditable(!params.row.invoiced);
         setShowEditModal(true);
-    };
-
-    const handleDelete = (id) => {
-        console.log("CLICK")
-
     };
 
     const disableDates = (date) =>
@@ -212,7 +204,10 @@ const Reservation = () => {
             />
 
             <ConfirmModal
-                onConfirm={handleDelete}
+                onConfirm={async () => {
+                    await dispatch(deleteReservation(selectedReservation))
+                    await dispatch(fetchReservations())
+                }}
                 onHide={() => {
                     setShowConfirm(false);
                     setSelectedReservation(null)

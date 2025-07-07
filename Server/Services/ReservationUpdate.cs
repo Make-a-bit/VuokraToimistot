@@ -19,34 +19,27 @@ namespace API.Services
 
         public async Task<bool> UpdateReservation(Reservation reservation)
         {
-            SqlTransaction? transaction = null;
-            SqlConnection? conn = null;
+            using var conn = _dbManager.GetConnection();
+            await conn.OpenAsync();
+            using var transaction = conn.BeginTransaction();
 
             try
             {
-                var devices = await _reservationRepository.HasDevicesOnReservation(reservation.Id);
-
-                if (devices)
+                if (await _reservationRepository.HasDevicesOnReservation(reservation.Id))
                 {
-                    await _reservationDelete.DeleteReservationDevices(reservation.Id);
+                    await _reservationDelete.DeleteReservationDevices(reservation.Id, conn, transaction);
                 }
 
-                var services = await _reservationRepository.HasServicesOnReservation(reservation.Id);
-
-                if (services)
+                if (await _reservationRepository.HasServicesOnReservation(reservation.Id))
                 {
-                    await _reservationDelete.DeleteReservationServices(reservation.Id);
+                    await _reservationDelete.DeleteReservationServices(reservation.Id, conn, transaction);
                 }
-
-                conn = _dbManager.GetConnection();
-                await conn.OpenAsync();
-                transaction = conn.BeginTransaction();
 
                 using var cmd = new SqlCommand(@"
                 UPDATE Reservations 
                 SET property_id = @pid, customer_id = @cid, 
                 reservation_start = @start, reservation_end = @end, invoiced = @inv 
-                WHERE reservation_id = @rid", 
+                WHERE reservation_id = @rid",
                 conn, transaction);
 
                 cmd.Parameters.AddWithValue("@pid", reservation.PropertyId);
@@ -62,7 +55,7 @@ namespace API.Services
                 INSERT INTO Reservation_devices 
                 (reservation_id, device_id, device_price, device_vat,
                 device_qty, device_discount)
-                VALUES (@rid, @did, @price, @vat, @qty, @discount)", 
+                VALUES (@rid, @did, @price, @vat, @qty, @discount)",
                 conn, transaction);
 
                 foreach (var device in reservation.Devices)
@@ -103,27 +96,10 @@ namespace API.Services
             }
             catch (SqlException error)
             {
-                if (transaction != null)
-                {
-                    try
-                    {
-                        await transaction.RollbackAsync();
-                    }
-                    catch
-                    {
-                        throw;
-                    }
-                }
                 // Log error
+                await transaction.RollbackAsync();
+                return false;
             }
-            finally
-            {
-                if (conn != null)
-                {
-                    await conn.CloseAsync();
-                }
-            }
-            return false;
         }
     }
 }

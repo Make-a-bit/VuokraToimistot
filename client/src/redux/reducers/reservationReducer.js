@@ -24,6 +24,12 @@ export const reservationReducer = (state = initialState, action) => {
                 reservations: [...state.reservations, action.payload]
             }
 
+        case DELETE_RESERVATION_SUCCESS:
+            return {
+                ...state,
+                reservations: state.reservations.filter((r) => r.id !== action.payload.id)
+            }
+
         case FETCH_RESERVATION_SUCCESS:
             return {
                 ...state,
