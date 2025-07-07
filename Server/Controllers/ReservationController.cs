@@ -9,12 +9,14 @@ namespace API.Controllers
     public class ReservationController : Controller
     {
         private readonly ReservationAdd _reservationAdd;
+        private readonly ReservationDelete _reservationDelete;
         private readonly ReservationRepository _reservationRepository;
         private readonly ReservationUpdate _reservationUpdate;
 
-        public ReservationController(ReservationAdd ra, ReservationRepository rr, ReservationUpdate ru)
+        public ReservationController(ReservationAdd ra, ReservationRepository rr, ReservationUpdate ru, ReservationDelete rd)
         {
             _reservationAdd = ra;
+            _reservationDelete = rd;
             _reservationRepository = rr;
             _reservationUpdate = ru;
         }
@@ -26,7 +28,9 @@ namespace API.Controllers
             {
                 var reservations = await _reservationRepository.GetReservations();
 
-                return Ok(reservations);
+                if (reservations.Count > 0)
+                    return Ok(reservations);
+                else return NotFound();
             }
             catch (Exception ex)
             {
@@ -41,7 +45,10 @@ namespace API.Controllers
             try
             {
                 var dates = await _reservationRepository.GetReservedDates(propertyId);
-                return Ok(dates);
+
+                if (dates.Count > 0) 
+                    return Ok(dates);
+                else return NotFound();
             }
             catch
             {
@@ -67,23 +74,39 @@ namespace API.Controllers
         }
 
         [HttpPut]
+        [Route("update")]
         public async Task<ActionResult> UpdateReservation([FromBody] Reservation reservation)
         {
             try
             {
-                var success = await _reservationUpdate.UpdateReservation(reservation);
-
-                if (success)
+                if (await _reservationUpdate.UpdateReservation(reservation))
                 {
                     var updatedReservation = await _reservationRepository.GetReservationById(reservation.Id);
                     return Ok(updatedReservation);
                 }
+                else NotFound();
             }
             catch
             {
                 // logger
             }
             return BadRequest();
+        }
+
+        [HttpDelete]
+        [Route("delete/{reservationId}")]
+        public async Task<ActionResult> DeleteReservation([FromRoute] int reservationId)
+        {
+            try
+            {
+                if (await _reservationDelete.DeleteReservationCascade(reservationId)) 
+                    return Ok();
+                else return NotFound();
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
     }
 }
