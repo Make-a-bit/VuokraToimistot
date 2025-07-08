@@ -27,7 +27,11 @@ namespace API.Controllers
             try
             {
                 var properties = await _propertyRepository.GetProperties();
-                return Ok(properties);
+
+                if (properties.Count > 0)
+                    return Ok(properties);
+
+                else return NotFound();
             }
             catch
             {
@@ -38,9 +42,19 @@ namespace API.Controllers
         [HttpGet("by-office")]
         public async Task<ActionResult<List<Property>>> GetProperties([FromQuery] int id)
         {
-            var properties = await _propertyRepository.GetProperties(id);
+            try
+            {
+                var properties = await _propertyRepository.GetProperties(id);
 
-            return Ok(properties);
+                if (properties.Count > 0)
+                    return Ok(properties);
+
+                else return NotFound();
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
 
         [HttpPost]
@@ -50,11 +64,13 @@ namespace API.Controllers
             {
                 var propertyId = await _propertyAdd.AddProperty(property);
 
-                property.Id = propertyId.Value;
+                if (!propertyId.HasValue)
+                    return BadRequest();
 
+                property.Id = propertyId.Value;
                 return Ok(property);
             }
-            catch 
+            catch
             {
                 return BadRequest();
             }
@@ -64,26 +80,37 @@ namespace API.Controllers
         [Route("update")]
         public async Task<ActionResult> UpdateProperty([FromBody] Property property)
         {
-            var success = await _propertyUpdate.UpdateProperty(property);
-
-            if (success)
+            try
             {
-                var updatedProperty = await _propertyRepository.GetPropertyById(property.Id);
-                return Ok(updatedProperty);
-            }
+                if (await _propertyUpdate.UpdateProperty(property))
+                {
+                    var updatedProperty = await _propertyRepository.GetProperty(property.Id);
+                    return Ok(updatedProperty);
+                }
 
-            else return BadRequest();
+                else return NotFound();
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
 
         [HttpDelete]
         [Route("delete/{id}")]
         public async Task<ActionResult> DeleteProperty([FromRoute] int id)
         {
-            var success = await _propertyDelete.DeleteProperty(id);
+            try
+            {
+                if (await _propertyDelete.DeleteProperty(id))
+                    return Ok();
 
-            if (success) return Ok();
-
-            else return BadRequest();
+                else return NotFound();
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
+using System.Transactions;
 
 namespace API.Services
 {
@@ -13,25 +14,29 @@ namespace API.Services
 
         public async Task<bool> DeleteCustomer(int id)
         {
+            using var conn = _dbManager.GetConnection();
+            await conn.OpenAsync();
+            using var transaction = (SqlTransaction)await conn.BeginTransactionAsync();
+
             try
             {
-                var conn = _dbManager.GetConnection();
-                await conn.OpenAsync();
-
-                using var cmd = new SqlCommand("DELETE FROM Customers " +
-                    "WHERE customer_id = @id", conn);
+                using var cmd = new SqlCommand(@"
+                DELETE FROM Customers
+                WHERE customer_id = @id",
+                conn, transaction);
 
                 cmd.Parameters.AddWithValue("@id", id);
-
                 int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                await transaction.CommitAsync();
 
                 return rowsAffected > 0;
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                // logger
+                await transaction.RollbackAsync();
+                return false;
             }
-            return false;
         }
     }
 }

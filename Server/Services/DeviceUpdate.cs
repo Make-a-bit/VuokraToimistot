@@ -16,19 +16,35 @@ namespace API.Services
         {
             using var conn = _dbManager.GetConnection();
             await conn.OpenAsync();
+            using var transaction = (SqlTransaction)await conn.BeginTransactionAsync();
 
-            using var cmd = new SqlCommand("UPDATE Office_devices " +
-                "SET device_name = @name, device_price = @price, device_vat = @vat " +
-                "WHERE device_id = @id", conn);
+            try
+            {
+                using var cmd = new SqlCommand(@"
+                UPDATE Office_devices
+                SET 
+                    device_name = @name, 
+                    device_price = @price, 
+                    device_vat = @vat
+                WHERE device_id = @id",
+                conn, transaction);
 
-            cmd.Parameters.AddWithValue("@id", device.Id);
-            cmd.Parameters.AddWithValue("@name", device.Name);
-            cmd.Parameters.AddWithValue("@price", device.Price);
-            cmd.Parameters.AddWithValue("@vat", device.Vat);
+                cmd.Parameters.AddWithValue("@id", device.Id);
+                cmd.Parameters.AddWithValue("@name", device.Name);
+                cmd.Parameters.AddWithValue("@price", device.Price);
+                cmd.Parameters.AddWithValue("@vat", device.Vat);
 
-            int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                await transaction.CommitAsync();
 
-            return rowsAffected > 0;
+                return rowsAffected > 0;
+            }
+            catch
+            {
+                // logger
+                await transaction.RollbackAsync();
+                return false;
+            }
         }
     }
 }

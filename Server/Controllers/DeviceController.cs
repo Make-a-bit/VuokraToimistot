@@ -27,7 +27,11 @@ namespace API.Controllers
             try
             {
                 var properties = await _deviceRepository.GetDevices();
-                return Ok(properties);
+
+                if (properties.Count > 0)
+                    return Ok(properties);
+
+                else return NotFound();
             }
             catch
             {
@@ -43,9 +47,12 @@ namespace API.Controllers
             {
                 var devices = await _deviceRepository.GetDevices(id);
 
-                return Ok(devices);
+                if (devices.Count > 0)
+                    return Ok(devices);
+
+                else return NotFound();
             }
-            catch (Exception ex)
+            catch 
             {
                 // Logger
                 return BadRequest();
@@ -58,11 +65,14 @@ namespace API.Controllers
             try
             {
                 var deviceId = await _deviceAdd.AddDevice(device);
-                device.Id = deviceId.Value;
+                
+                if (!deviceId.HasValue) 
+                    return BadRequest();
 
+                device.Id = deviceId.Value;
                 return Ok(device);
             }
-            catch (Exception ex)
+            catch 
             {
                 // logger
                 return BadRequest();
@@ -75,20 +85,19 @@ namespace API.Controllers
         {
             try
             {
-                var success = await _deviceUpdate.UpdateDevice(device);
-
-                if (success)
+                if (await _deviceUpdate.UpdateDevice(device))
                 {
-                    var updatedDevice = await _deviceRepository.GetDeviceById(device.Id);
+                    var updatedDevice = await _deviceRepository.GetDevice(device.Id);
                     return Ok(updatedDevice);
                 }
+
+                else return NotFound();
             }
-            catch (Exception ex) 
+            catch 
             {
                 // logger
+                return BadRequest();
             }
-            
-            return BadRequest();
         }
 
         [HttpDelete]
@@ -97,16 +106,16 @@ namespace API.Controllers
         {
             try
             {
-                var success = await _deviceDelete.DeleteDevice(id);
+                if (await _deviceDelete.DeleteDevice(id)) 
+                    return Ok();
 
-                if (success) return Ok();
+                else return NotFound();
             }
-            catch (Exception ex)
+            catch 
             {
                 // Logger
+                return BadRequest();
             }
-            
-            return BadRequest();
         }
     }
 }

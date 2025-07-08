@@ -14,16 +14,24 @@ namespace API.Services
 
         public async Task<bool> UpdateOffice(Office office)
         {
+            using var conn = _dbManager.GetConnection();
+            await conn.OpenAsync();
+            using var transaction = (SqlTransaction)await conn.BeginTransactionAsync();
+
             try
             {
-                var conn = _dbManager.GetConnection();
-                await conn.OpenAsync();
-
-                using var cmd = new SqlCommand("UPDATE Offices " +
-                    "SET office_name = @name, office_email = @email, office_phone = @phone, " +
-                    "office_address = @address, office_postalcode = @postal, office_city = @city, " +
-                    "office_country = @country " +
-                    "WHERE office_id = @id", conn);
+                using var cmd = new SqlCommand(@"
+                UPDATE Offices 
+                SET 
+                    office_name = @name, 
+                    office_email = @email, 
+                    office_phone = @phone,
+                    office_address = @address, 
+                    office_postalcode = @postal, 
+                    office_city = @city, 
+                    office_country = @country  
+                WHERE office_id = @id",
+                conn, transaction);
 
                 cmd.Parameters.AddWithValue("@name", office.Name);
                 cmd.Parameters.AddWithValue("@email", office.Email);
@@ -35,12 +43,14 @@ namespace API.Services
                 cmd.Parameters.AddWithValue("@id", office.Id);
 
                 int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                await transaction.CommitAsync();
 
                 return rowsAffected > 0;
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: ", ex);
+                // logger
+                await transaction.RollbackAsync();
             }
             return false;
         }

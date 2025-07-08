@@ -10,7 +10,7 @@ namespace API.Controllers
     {
         private readonly OfficeAdd _officeAdd;
         private readonly OfficeDelete _officeDelete;
-        private readonly OfficeRepository _officeRepo; 
+        private readonly OfficeRepository _officeRepo;
         private readonly OfficeUpdate _officeUpdate;
 
         public OfficeController(OfficeAdd add, OfficeDelete delete, OfficeRepository repo, OfficeUpdate update)
@@ -24,9 +24,19 @@ namespace API.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Office>>> GetOffices()
         {
-            var offices = await _officeRepo.GetOffices();
+            try
+            {
+                var offices = await _officeRepo.GetOffices();
 
-            return Ok(offices);
+                if (offices.Count > 0)
+                    return Ok(offices);
+
+                else return NotFound();
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
 
         [HttpPost]
@@ -36,13 +46,15 @@ namespace API.Controllers
             {
                 var officeID = await _officeAdd.AddOffice(office);
 
-                office.Id = officeID.Value;
+                if (!officeID.HasValue)
+                    return BadRequest();
 
+                office.Id = officeID.Value;
                 return Ok(office);
             }
-            catch (Exception ex)
+            catch
             {
-                return BadRequest(ex.Message);
+                return BadRequest();
             }
         }
 
@@ -50,26 +62,37 @@ namespace API.Controllers
         [Route("update")]
         public async Task<ActionResult> UpdateOffice([FromBody] Office office)
         {
-            var success = await _officeUpdate.UpdateOffice(office);
-
-            if (success)
+            try
             {
-                var updatedOffice = await _officeRepo.GetOfficeById(office.Id);
-                return Ok(updatedOffice);
-            }
+                if (await _officeUpdate.UpdateOffice(office))
+                {
+                    var updatedOffice = await _officeRepo.GetOffice(office.Id);
+                    return Ok(updatedOffice);
+                }
 
-            else return BadRequest();
+                else return NotFound();
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
 
         [HttpDelete]
         [Route("delete/{id}")]
         public async Task<ActionResult> DeleteOffice([FromRoute] int id)
         {
-            var success = await _officeDelete.DeleteOffice(id);
+            try
+            {
+                if (await _officeDelete.DeleteOffice(id))
+                    return Ok();
 
-            if (success) return Ok();
-
-            else return BadRequest();
+                else return NotFound();
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
     }
 }

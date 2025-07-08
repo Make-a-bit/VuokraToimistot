@@ -14,16 +14,24 @@ namespace API.Services
 
         public async Task<bool> UpdateCustomer(Customer customer)
         {
+            using var conn = _dbManager.GetConnection();
+            await conn.OpenAsync();
+            using var transaction = (SqlTransaction)await conn.BeginTransactionAsync();
+
             try
             {
-                var conn = _dbManager.GetConnection();
-                await conn.OpenAsync();
-
-                using var cmd = new SqlCommand("UPDATE Customers " +
-                    "SET customer_name = @name, customer_email = @email, customer_phone = @phone, " +
-                    "customer_address = @address, customer_postalcode = @postal, customer_city = @city, " +
-                    "customer_country = @country " +
-                    "WHERE customer_id = @id", conn);
+                using var cmd = new SqlCommand(@"
+                UPDATE Customers
+                SET 
+                    customer_name = @name, 
+                    customer_email = @email, 
+                    customer_phone = @phone, 
+                    customer_address = @address, 
+                    customer_postalcode = @postal, 
+                    customer_city = @city, 
+                    customer_country = @country 
+                WHERE customer_id = @id",
+                conn, transaction);
 
                 cmd.Parameters.AddWithValue("@name", customer.Name);
                 cmd.Parameters.AddWithValue("@email", customer.Email);
@@ -35,15 +43,16 @@ namespace API.Services
                 cmd.Parameters.AddWithValue("@id", customer.Id);
 
                 int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                await transaction.CommitAsync();
 
                 return rowsAffected > 0;
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: ", ex);
+                // logger
+                await transaction.RollbackAsync();
+                return false;
             }
-
-            return false;
         }
     }
 }

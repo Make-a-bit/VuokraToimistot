@@ -27,49 +27,72 @@ namespace API.Controllers
             try
             {
                 var customerID = await _customerAdd.AddCustomer(customer);
+                
+                if (!customerID.HasValue)
+                    return BadRequest();
 
                 customer.Id = customerID.Value;
-
-                return Ok(customer);    
+                return Ok(customer);
             }
-            catch (Exception ex)
+            catch
             {
-                return BadRequest(ex.Message);
+                return BadRequest();
             }
         }
 
         [HttpGet]
         public async Task<ActionResult<List<Customer>>> GetCustomers()
         {
-            var customers = await _customerRepo.GetCustomers();
+            try
+            {
+                var customers = await _customerRepo.GetCustomers();
 
-            return Ok(customers);
+                if (customers.Count > 0)
+                    return Ok(customers);
+
+                else return NotFound();
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
 
         [HttpPut]
         [Route("update")]
         public async Task<ActionResult> UpdateCustomer([FromBody] Customer customer)
         {
-            var success = await _customerUpdate.UpdateCustomer(customer);
-
-            if (success)
+            try
             {
-                var updatedCustomer = await _customerRepo.GetCustomerById(customer.Id);
-                return Ok(updatedCustomer);
-            }
+                if (await _customerUpdate.UpdateCustomer(customer))
+                {
+                    var updatedCustomer = await _customerRepo.GetCustomer(customer.Id);
+                    return Ok(updatedCustomer);
+                }
 
-            else return BadRequest();
+                else return NotFound();
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
 
         [HttpDelete]
         [Route("delete/{id}")]
         public async Task<ActionResult> DeleteCustomer([FromRoute] int id)
         {
-            var success = await _customerDel.DeleteCustomer(id);
+            try
+            {
+                if (await _customerDel.DeleteCustomer(id))
+                    return Ok();
 
-            if (success) return Ok();
-
-            else return BadRequest();
+                else return NotFound();
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
     }
 }

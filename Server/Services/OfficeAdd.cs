@@ -14,16 +14,31 @@ namespace API.Services
 
         public async Task<int?> AddOffice(Office office)
         {
+            using var conn = _dbManager.GetConnection();
+            await conn.OpenAsync();
+            using var transaction = (SqlTransaction)await conn.BeginTransactionAsync();
+
             try
             {
-                var conn = _dbManager.GetConnection();
-                await conn.OpenAsync();
-
-                using var cmd = new SqlCommand("INSERT INTO Offices " +
-                    "(office_name, office_address, office_postalcode, office_city, " +
-                    "office_country, office_phone, office_email) " +
-                    "OUTPUT INSERTED.office_id " +
-                    "VALUES (@name, @address, @postal, @city, @country, @phone, @email)", conn);
+                using var cmd = new SqlCommand(@"
+                INSERT INTO Offices (
+                    office_name, 
+                    office_address, 
+                    office_postalcode, 
+                    office_city, 
+                    office_country, 
+                    office_phone, 
+                    office_email)
+                OUTPUT INSERTED.office_id
+                VALUES (
+                    @name, 
+                    @address, 
+                    @postal, 
+                    @city, 
+                    @country, 
+                    @phone, 
+                    @email)",
+                conn, transaction);
 
                 cmd.Parameters.AddWithValue("@name", office.Name);
                 cmd.Parameters.AddWithValue("@address", office.Address);
@@ -34,6 +49,7 @@ namespace API.Services
                 cmd.Parameters.AddWithValue("@email", office.Email);
 
                 var result = await cmd.ExecuteScalarAsync();
+                await transaction.CommitAsync();
 
                 if (result != null && int.TryParse(result.ToString(), out int newId))
                 {
@@ -42,7 +58,8 @@ namespace API.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error while creating a new office: ", ex.ToString());
+                // logger
+                await transaction.RollbackAsync();
             }
 
             return null;

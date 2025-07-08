@@ -27,7 +27,11 @@ namespace API.Controllers
             try
             {
                 var services = await _serviceRepository.GetServices();
-                return Ok(services);
+
+                if (services.Count > 0)
+                    return Ok(services);
+
+                else return NotFound();
             }
             catch
             {
@@ -42,9 +46,12 @@ namespace API.Controllers
             {
                 var services = await _serviceRepository.GetServices(officeId);
 
-                return Ok(services);
+                if (services.Count > 0)
+                    return Ok(services);
+
+                else return NotFound();
             }
-            catch (Exception ex) 
+            catch
             {
                 // Logger
                 return BadRequest();
@@ -58,19 +65,16 @@ namespace API.Controllers
             {
                 var serviceId = await _serviceAdd.AddService(service);
 
-                if (serviceId == null)
-                {
-                    return StatusCode(500);
-                }
+                if (!serviceId.HasValue)
+                    return BadRequest();
 
                 service.Id = serviceId.Value;
-
                 return Ok(service);
             }
-            catch (Exception ex)
+            catch
             {
                 // logger
-                return StatusCode(500);
+                return BadRequest();
             }
         }
 
@@ -80,19 +84,18 @@ namespace API.Controllers
         {
             try
             {
-                var success = await _serviceUpdate.UpdateService(service);
-
-                if (success)
+                if (await _serviceUpdate.UpdateService(service))
                 {
                     var updatedService = await _serviceRepository.GetService(service.Id);
                     return Ok(updatedService);
                 }
+
+                else return NotFound();
             }
             catch
             {
-                // logger
+                return BadRequest();
             }
-            return BadRequest();
         }
 
         [HttpDelete]
@@ -101,15 +104,16 @@ namespace API.Controllers
         {
             try
             {
-                var success = await _serviceDelete.DeleteService(id);
+                if (await _serviceDelete.DeleteService(id))
+                    return Ok();
 
-                if (success) return Ok();
+                else return NotFound();
             }
             catch
             {
                 // logger
+                return BadRequest();
             }
-            return BadRequest();
         }
     }
 }

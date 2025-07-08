@@ -13,23 +13,28 @@ namespace API.Services
 
         public async Task<bool> DeleteService(int id)
         {
+            using var conn = _dbManager.GetConnection();
+            await conn.OpenAsync();
+            using var transaction = (SqlTransaction)await conn.BeginTransactionAsync();
+
             try
             {
-                var conn = _dbManager.GetConnection();
-                await conn.OpenAsync();
-
-                using var cmd = new SqlCommand("DELETE FROM Office_services " +
-                    "WHERE service_id = @id", conn);
+                using var cmd = new SqlCommand(@"
+                DELETE FROM Office_services
+                WHERE service_id = @id", 
+                conn, transaction);
 
                 cmd.Parameters.AddWithValue("@id", id);
-
                 int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                await transaction.CommitAsync();
 
                 return rowsAffected > 0;
             }
             catch (SqlException ex)
             {
-                throw;
+                // logger
+                await transaction.RollbackAsync();
+                return false;
             }
         }
     }
