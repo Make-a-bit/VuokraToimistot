@@ -21,7 +21,7 @@ namespace API.Services
         {
             using var conn = _dbManager.GetConnection();
             await conn.OpenAsync();
-            using var transaction = conn.BeginTransaction();
+            using var transaction = (SqlTransaction)await conn.BeginTransactionAsync();
 
             try
             {
@@ -37,8 +37,12 @@ namespace API.Services
 
                 using var cmd = new SqlCommand(@"
                 UPDATE Reservations 
-                SET property_id = @pid, customer_id = @cid, 
-                reservation_start = @start, reservation_end = @end, invoiced = @inv 
+                SET 
+                    property_id = @pid, 
+                    customer_id = @cid, 
+                    reservation_start = @start, 
+                    reservation_end = @end, 
+                    invoiced = @inv 
                 WHERE reservation_id = @rid",
                 conn, transaction);
 
@@ -52,10 +56,20 @@ namespace API.Services
                 int rowsAffected = await cmd.ExecuteNonQueryAsync();
 
                 using var deviceCmd = new SqlCommand(@"
-                INSERT INTO Reservation_devices 
-                (reservation_id, device_id, device_price, device_vat,
-                device_qty, device_discount)
-                VALUES (@rid, @did, @price, @vat, @qty, @discount)",
+                INSERT INTO Reservation_devices (
+                    reservation_id, 
+                    device_id, 
+                    device_price, 
+                    device_vat,
+                    device_qty, 
+                    device_discount)
+                VALUES (
+                    @rid, 
+                    @did, 
+                    @price, 
+                    @vat, 
+                    @qty, 
+                    @discount)",
                 conn, transaction);
 
                 foreach (var device in reservation.Devices)
@@ -72,10 +86,20 @@ namespace API.Services
                 }
 
                 using var serviceCmd = new SqlCommand(@"
-                INSERT INTO Reservation_services
-                (reservation_id, service_id, service_price, service_vat,
-                service_qty, service_discount)
-                VALUES (@rid, @sid, @price, @vat, @qty, @discount)",
+                INSERT INTO Reservation_services (
+                    reservation_id, 
+                    service_id, 
+                    service_price, 
+                    service_vat,
+                    service_qty, 
+                    service_discount)
+                VALUES (
+                    @rid, 
+                    @sid, 
+                    @price, 
+                    @vat, 
+                    @qty, 
+                    @discount)",
                 conn, transaction);
 
                 foreach (var service in reservation.Services)

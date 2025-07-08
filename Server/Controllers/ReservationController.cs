@@ -30,9 +30,10 @@ namespace API.Controllers
 
                 if (reservations.Count > 0)
                     return Ok(reservations);
+
                 else return NotFound();
             }
-            catch (Exception ex)
+            catch 
             {
                 return BadRequest();
             }
@@ -48,6 +49,7 @@ namespace API.Controllers
 
                 if (dates.Count > 0) 
                     return Ok(dates);
+
                 else return NotFound();
             }
             catch
@@ -63,8 +65,10 @@ namespace API.Controllers
             {
                 var reservationID = await _reservationAdd.AddReservation(reservation);
 
-                reservation.Id = reservationID.Value;
+                if (!reservationID.HasValue)
+                    return BadRequest();
 
+                reservation.Id = reservationID.Value;
                 return Ok(reservation);
             }
             catch
@@ -81,16 +85,17 @@ namespace API.Controllers
             {
                 if (await _reservationUpdate.UpdateReservation(reservation))
                 {
-                    var updatedReservation = await _reservationRepository.GetReservationById(reservation.Id);
+                    var updatedReservation = await _reservationRepository.GetReservation(reservation.Id);
                     return Ok(updatedReservation);
                 }
-                else NotFound();
+
+                else return NotFound();
             }
             catch
             {
                 // logger
+                return BadRequest();
             }
-            return BadRequest();
         }
 
         [HttpDelete]
@@ -101,6 +106,7 @@ namespace API.Controllers
             {
                 if (await _reservationDelete.DeleteReservationCascade(reservationId)) 
                     return Ok();
+
                 else return NotFound();
             }
             catch

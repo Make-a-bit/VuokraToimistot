@@ -14,17 +14,31 @@ namespace API.Services
 
         public async Task<int?> AddCustomer(Customer customer)
         {
+            using var conn = _dbManager.GetConnection();
+            await conn.OpenAsync();
+            using var transaction = (SqlTransaction)await conn.BeginTransactionAsync();
+
             try
             {
-                var conn = _dbManager.GetConnection();
-                await conn.OpenAsync();
-
-                using var cmd = new SqlCommand("INSERT INTO Customers " +
-                    "(customer_name, customer_email, customer_phone, customer_address, " +
-                    "customer_postalcode, customer_city, customer_country) " +
-                    "OUTPUT INSERTED.customer_id " + 
-                    "VALUES " +
-                    "(@name, @email, @phone, @address, @postal, @city, @country)", conn);
+                using var cmd = new SqlCommand(@"
+                INSERT INTO Customers (
+                    customer_name, 
+                    customer_email, 
+                    customer_phone, 
+                    customer_address, 
+                    customer_postalcode, 
+                    customer_city, 
+                    customer_country)
+                OUTPUT INSERTED.customer_id 
+                VALUES (
+                    @name, 
+                    @email, 
+                    @phone, 
+                    @address, 
+                    @postal, 
+                    @city, 
+                    @country)",
+                conn, transaction);
 
                 cmd.Parameters.AddWithValue("@name", customer.Name);
                 cmd.Parameters.AddWithValue("@email", customer.Email);
@@ -35,6 +49,7 @@ namespace API.Services
                 cmd.Parameters.AddWithValue("@country", customer.Country);
 
                 var result = await cmd.ExecuteScalarAsync();
+                await transaction.CommitAsync();
 
                 if (result != null && int.TryParse(result.ToString(), out int newId))
                 {
@@ -43,7 +58,8 @@ namespace API.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error while creating a new customer: ", ex.ToString());
+                // logger
+                await transaction.RollbackAsync();
             }
 
             return null;

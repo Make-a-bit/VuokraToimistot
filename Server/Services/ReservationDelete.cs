@@ -14,7 +14,7 @@ namespace API.Services
         {
             using var conn = _dbManager.GetConnection();
             await conn.OpenAsync();
-            using var transaction = conn.BeginTransaction();
+            using var transaction = (SqlTransaction)await conn.BeginTransactionAsync();
 
             try
             {

@@ -16,16 +16,25 @@ namespace API.Services
         {
             int reservationID = 0;
 
+            using var conn = _dbManager.GetConnection();
+            await conn.OpenAsync();
+            using var transaction = (SqlTransaction)await conn.BeginTransactionAsync();
+
             try
             {
-                var conn = _dbManager.GetConnection();
-                await conn.OpenAsync();
-                using var transaction = conn.BeginTransaction();
-
-                using var cmd = new SqlCommand("INSERT INTO Reservations " +
-                    "(property_id, customer_id, reservation_start, reservation_end) " +
-                    "OUTPUT INSERTED.reservation_id " +
-                    "VALUES (@pId, @cId, @start, @end)", conn, transaction);
+                using var cmd = new SqlCommand(@"
+                INSERT INTO Reservations (
+                    property_id, 
+                    customer_id, 
+                    reservation_start, 
+                    reservation_end) 
+                OUTPUT INSERTED.reservation_id
+                VALUES (
+                    @pId, 
+                    @cId, 
+                    @start, 
+                    @end)",
+                conn, transaction);
 
                 cmd.Parameters.AddWithValue("@pId", reservation.PropertyId);
                 cmd.Parameters.AddWithValue("@cId", reservation.CustomerId);
@@ -42,9 +51,22 @@ namespace API.Services
 
                 foreach (var device in reservation.Devices)
                 {
-                    using var deviceCmd = new SqlCommand("INSERT INTO Reservation_devices " +
-                        "(reservation_id, device_id, device_price, device_vat, device_qty, device_discount) " +
-                        "VALUES (@rId, @dId, @price, @vat, @qty, @discount)", conn, transaction);
+                    using var deviceCmd = new SqlCommand(@"
+                    INSERT INTO Reservation_devices (
+                        reservation_id, 
+                        device_id, 
+                        device_price, 
+                        device_vat, 
+                        device_qty, 
+                        device_discount) 
+                    VALUES (
+                        @rId, 
+                        @dId, 
+                        @price, 
+                        @vat, 
+                        @qty, 
+                        @discount)",
+                    conn, transaction);
 
                     deviceCmd.Parameters.AddWithValue("@rId", reservationID);
                     deviceCmd.Parameters.AddWithValue("@dId", device.Id);
@@ -58,11 +80,24 @@ namespace API.Services
 
                 foreach (var service in reservation.Services)
                 {
-                    using var serviceCmd = new SqlCommand("INSERT INTO Reservation_services " +
-                        "(reservation_id, service_id, service_price, service_vat, service_qty, service_discount) " +
-                        "VALUES (@rId, @sId, @price, @vat, @qty, @discount) ", conn, transaction);
+                    using var serviceCmd = new SqlCommand(@"
+                    INSERT INTO Reservation_services (
+                        reservation_id, 
+                        service_id, 
+                        service_price, 
+                        service_vat, 
+                        service_qty, 
+                        service_discount) 
+                    VALUES (
+                        @rId, 
+                        @sId, 
+                        @price, 
+                        @vat, 
+                        @qty, 
+                        @discount)",
+                    conn, transaction);
 
-                    serviceCmd.Parameters.AddWithValue("@rId", reservationID );
+                    serviceCmd.Parameters.AddWithValue("@rId", reservationID);
                     serviceCmd.Parameters.AddWithValue("@sId", service.Id);
                     serviceCmd.Parameters.AddWithValue("@price", service.Price);
                     serviceCmd.Parameters.AddWithValue("@vat", service.Vat);
@@ -77,7 +112,8 @@ namespace API.Services
             }
             catch (SqlException error)
             {
-                // Log error
+                // Logger
+                await transaction.RollbackAsync();
             }
             return null;
         }

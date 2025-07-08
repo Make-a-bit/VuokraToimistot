@@ -13,7 +13,7 @@ namespace API.Services
 
         public UserAccessManager(DBManager dbManager)
         {
-            _dbManager = dbManager;        
+            _dbManager = dbManager;
         }
 
 
@@ -24,21 +24,28 @@ namespace API.Services
         /// <returns>True if user exists, otherwise false</returns>
         public bool GetUser(Credentials credentials)
         {
-            using var connection = _dbManager.GetConnection();
-            connection.Open();
+            try
+            {
+                using var connection = _dbManager.GetConnection();
+                connection.Open();
 
-            var command = new SqlCommand("SELECT * FROM Users " +
-                "WHERE userID = @userID AND userPassword = @password", connection);
+                using var command = new SqlCommand(@"
+                SELECT * FROM Users
+                WHERE userID = @userID AND userPassword = @password", connection);
 
-            command.Parameters.Clear();
-            command.Parameters.AddWithValue("@userID", credentials.UserName);
-            command.Parameters.AddWithValue("@password", credentials.Password);
+                command.Parameters.AddWithValue("@userID", credentials.UserName);
+                command.Parameters.AddWithValue("@password", credentials.Password);
 
-            using SqlDataReader reader = command.ExecuteReader();
+                using var reader = command.ExecuteReader();
 
-            Debug.WriteLine(reader);
+                Debug.WriteLine(reader);
 
-            return reader.HasRows;
+                return reader.HasRows;
+            }
+            catch
+            {
+                throw;
+            }
         }
     }
 }

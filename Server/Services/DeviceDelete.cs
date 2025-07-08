@@ -15,15 +15,27 @@ namespace API.Services
         {
             using var conn = _dbManager.GetConnection();
             await conn.OpenAsync();
+            using var transaction = (SqlTransaction)await conn.BeginTransactionAsync();
 
-            using var cmd = new SqlCommand("DELETE FROM Office_devices " +
-                "WHERE device_id = @id", conn);
+            try
+            {
+                using var cmd = new SqlCommand(@"
+                DELETE FROM Office_devices
+                WHERE device_id = @id",
+                conn, transaction);
 
-            cmd.Parameters.AddWithValue("@id", id);
+                cmd.Parameters.AddWithValue("@id", id);
+                int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                await transaction.CommitAsync();
 
-            int rowsAffected = await cmd.ExecuteNonQueryAsync();
-
-            return rowsAffected > 0;
+                return rowsAffected > 0;
+            }
+            catch
+            {
+                // logger
+                await transaction.RollbackAsync();
+                return false;
+            }
         }
     }
 }

@@ -14,7 +14,12 @@ namespace API.Repositories
             _dbManager = db;
         }
 
-        public async Task<Reservation> GetReservationById(int id)
+        /// <summary>
+        /// Get reservation by reservation id from the database
+        /// </summary>
+        /// <param name="reservationId"></param>
+        /// <returns></returns>
+        public async Task<Reservation> GetReservation(int reservationId)
         {
             var reservation = new Reservation();
 
@@ -40,7 +45,7 @@ namespace API.Repositories
                 JOIN Offices o ON p.office_id = o.office_id
                 WHERE reservation_id = @reservationId", conn);
 
-                cmd.Parameters.AddWithValue("@reservationId", id);
+                cmd.Parameters.AddWithValue("@reservationId", reservationId);
                 using var reader = await cmd.ExecuteReaderAsync();
 
                 while (await reader.ReadAsync())
@@ -67,6 +72,10 @@ namespace API.Repositories
             }
         }
 
+        /// <summary>
+        /// Get all reservations from the database
+        /// </summary>
+        /// <returns></returns>
         public async Task<List<Reservation>> GetReservations()
         {
             var reservations = new List<Reservation>();
@@ -126,6 +135,11 @@ namespace API.Repositories
             }
         }
 
+        /// <summary>
+        /// Get reservation devices by reservation id from the database
+        /// </summary>
+        /// <param name="reservationId"></param>
+        /// <returns></returns>
         private async Task<List<Device>> GetReservationDevices(int reservationId)
         {
             var devices = new List<Device>();
@@ -136,15 +150,20 @@ namespace API.Repositories
                 await conn.OpenAsync();
 
                 using var cmd = new SqlCommand(@"
-                SELECT d.device_id, d.device_name, rd.device_price, 
-                rd.device_vat, rd.device_qty, rd.device_discount
+                SELECT 
+                    d.device_id, 
+                    d.device_name, 
+                    rd.device_price, 
+                    rd.device_vat, 
+                    rd.device_qty, 
+                    rd.device_discount
                 FROM Reservation_devices rd
                 JOIN Office_devices d ON rd.device_id = d.device_id
                 WHERE rd.reservation_id = @reservationId", conn);
 
                 cmd.Parameters.AddWithValue("@reservationId", reservationId);
-
                 using var reader = await cmd.ExecuteReaderAsync();
+
                 while (await reader.ReadAsync())
                 {
                     var device = new Device
@@ -166,6 +185,11 @@ namespace API.Repositories
             }
         }
 
+        /// <summary>
+        /// Get reservation services by reservation id from the database
+        /// </summary>
+        /// <param name="reservationId"></param>
+        /// <returns></returns>
         private async Task<List<Service>> GetReservationServices(int reservationId)
         {
             var services = new List<Service>();
@@ -176,14 +200,21 @@ namespace API.Repositories
                 await conn.OpenAsync();
 
                 using var cmd = new SqlCommand(@"
-                SELECT s.service_id, s.service_name, s.service_unit, 
-                rs.service_price, rs.service_vat, rs.service_qty, rs.service_discount 
+                SELECT 
+                    s.service_id, 
+                    s.service_name, 
+                    s.service_unit, 
+                    rs.service_price, 
+                    rs.service_vat, 
+                    rs.service_qty, 
+                    rs.service_discount 
                 FROM Reservation_services rs 
                 JOIN Office_services s ON rs.service_id = s.service_id 
                 WHERE rs.reservation_id = @reservationId", conn);
-                cmd.Parameters.AddWithValue("@reservationId", reservationId);
 
+                cmd.Parameters.AddWithValue("@reservationId", reservationId);
                 using var reader = await cmd.ExecuteReaderAsync();
+
                 while (await reader.ReadAsync())
                 {
                     var service = new Service
@@ -206,6 +237,11 @@ namespace API.Repositories
             }
         }
 
+        /// <summary>
+        /// Cehck if a reservation has devices
+        /// </summary>
+        /// <param name="reservationId"></param>
+        /// <returns></returns>
         public async Task<bool> HasDevicesOnReservation(int reservationId)
         {
             try
@@ -229,6 +265,11 @@ namespace API.Repositories
             }
         }
 
+        /// <summary>
+        /// Check if a reservation has services
+        /// </summary>
+        /// <param name="reservationId"></param>
+        /// <returns></returns>
         public async Task<bool> HasServicesOnReservation(int reservationId)
         {
             try
@@ -252,32 +293,44 @@ namespace API.Repositories
             }
         }
 
+        /// <summary>
+        /// Get reserved dates by property from the database
+        /// </summary>
+        /// <param name="propertyId"></param>
+        /// <returns></returns>
         public async Task<List<DateOnly>> GetReservedDates(int propertyId)
         {
             var dates = new List<DateOnly>();
 
-            var conn = _dbManager.GetConnection();
-            await conn.OpenAsync();
-
-            var cmd = new SqlCommand(@"
-            SELECT reservation_start, reservation_end 
-            FROM Reservations
-            WHERE property_id = @pId", conn);
-
-            cmd.Parameters.AddWithValue("@pId", propertyId);
-
-            using var reader = await cmd.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
+            try
             {
-                var start = DateOnly.FromDateTime(reader.GetDateTime(0));
-                var end = DateOnly.FromDateTime(reader.GetDateTime(1));
+                using var conn = _dbManager.GetConnection();
+                await conn.OpenAsync();
 
-                for (var date = start; date <= end; date = date.AddDays(1))
+                using var cmd = new SqlCommand(@"
+                SELECT reservation_start, reservation_end 
+                FROM Reservations
+                WHERE property_id = @pId", conn);
+
+                cmd.Parameters.AddWithValue("@pId", propertyId);
+                using var reader = await cmd.ExecuteReaderAsync();
+
+                while (await reader.ReadAsync())
                 {
-                    dates.Add(date);
+                    var start = DateOnly.FromDateTime(reader.GetDateTime(0));
+                    var end = DateOnly.FromDateTime(reader.GetDateTime(1));
+
+                    for (var date = start; date <= end; date = date.AddDays(1))
+                    {
+                        dates.Add(date);
+                    }
                 }
+                return dates;
             }
-            return dates;
+            catch
+            {
+                throw;
+            }
         }
     }
 }

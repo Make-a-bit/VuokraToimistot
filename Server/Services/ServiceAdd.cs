@@ -14,15 +14,27 @@ namespace API.Services
 
         public async Task<int?> AddService(Service service)
         {
+            using var conn = _dbManager.GetConnection();
+            await conn.OpenAsync();
+            using var transaction = (SqlTransaction)await conn.BeginTransactionAsync();
+
             try
             {
-                using var conn = _dbManager.GetConnection();
-                await conn.OpenAsync();
-
-                using var cmd = new SqlCommand("INSERT INTO Office_services " +
-                    "(office_id, service_name, service_unit, service_price, service_vat) " +
-                    "OUTPUT INSERTED.service_id " +
-                    "VALUES (@id, @name, @unit, @price, @vat)", conn);
+                using var cmd = new SqlCommand(@"
+                INSERT INTO Office_services (
+                    office_id, 
+                    service_name, 
+                    service_unit, 
+                    service_price, 
+                    service_vat) 
+                OUTPUT INSERTED.service_id
+                VALUES (
+                    @id, 
+                    @name, 
+                    @unit, 
+                    @price, 
+                    @vat)", 
+                conn, transaction);
 
                 cmd.Parameters.AddWithValue("@id", service.OfficeId);
                 cmd.Parameters.AddWithValue("@name", service.Name);
@@ -31,15 +43,17 @@ namespace API.Services
                 cmd.Parameters.AddWithValue("@vat", service.Vat);
 
                 var result = await cmd.ExecuteScalarAsync();
+                await transaction.CommitAsync();
 
                 if (result != null && int.TryParse(result.ToString(), out int newId))
                 {
                     return newId;
                 }
             }
-            catch (SqlException)
+            catch 
             {
-                throw;
+                // logger
+                await transaction.RollbackAsync();
             }
 
             return null;
