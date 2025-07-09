@@ -25,6 +25,7 @@ const Devices = () => {
     const devices = useSelector(state => state.devices.devices);
     const selectedOffice = useSelector(state => state.devices.selectedDeviceOffice);
     const { errorMessage, successMessage } = useSelector(state => state.ui);
+    const [selectedOfficeLocal, setSelectedOfficeLocal] = useState(selectedOffice)
     const [showAddDevice, setShowAddDevice] = useState(false)
     const [showConfirm, setShowConfirm] = useState(false)
     const [selectedDevice, setSelectedDevice] = useState({})
@@ -34,8 +35,11 @@ const Devices = () => {
     const handleOfficeChange = (e) => {
         const office = offices.find(o => o.id === e.target.value);
         dispatch(setDeviceOffice(office));
-        dispatch(fetchDevices(office.id));
     };
+
+    const filteredDevices = selectedOffice
+        ? devices.filter(d => d.officeId === selectedOffice.id)
+        : devices;
 
     const saveEdits = async (updatedRow, originalRow) => {
         console.log("Edit device:", originalRow)
@@ -140,7 +144,7 @@ const Devices = () => {
 
             <div style={{ height: "auto", width: "100%" }}>
                 <DataGrid
-                    rows={devices}
+                    rows={filteredDevices}
                     columns={columns}
                     disableRowSelectionOnClick
                     loading={loading}

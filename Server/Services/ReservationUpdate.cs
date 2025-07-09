@@ -46,8 +46,8 @@ namespace API.Services
                 WHERE reservation_id = @rid",
                 conn, transaction);
 
-                cmd.Parameters.AddWithValue("@pid", reservation.PropertyId);
-                cmd.Parameters.AddWithValue("@cid", reservation.CustomerId);
+                cmd.Parameters.AddWithValue("@pid", reservation.Property.Id);
+                cmd.Parameters.AddWithValue("@cid", reservation.Customer.Id);
                 cmd.Parameters.AddWithValue("@start", reservation.StartDate);
                 cmd.Parameters.AddWithValue("@end", reservation.EndDate);
                 cmd.Parameters.AddWithValue("@inv", reservation.Invoiced);

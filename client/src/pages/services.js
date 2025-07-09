@@ -32,9 +32,12 @@ const Services = () => {
 
     const handleOfficeChange = (e) => {
         const office = offices.find(o => o.id === e.target.value);
-        dispatch(setOffice(office));
-        dispatch(fetchServices(office.id));
+        dispatch(setOffice(office))
     };
+
+    const filteredServices = selectedOffice
+        ? services.filter(s => s.officeId === selectedOffice.id)
+        : services;
 
     const saveEdits = async (updatedRow, originalRow) => {
         console.log("Edit property:", originalRow)
@@ -138,7 +141,7 @@ const Services = () => {
 
             <div style={{ height: "auto", width: "100%" }}>
                 <DataGrid
-                    rows={services}
+                    rows={filteredServices}
                     columns={columns}
                     disableRowSelectionOnClick
                     loading={loading}

@@ -25,7 +25,7 @@ const App = () => {
                     <Route path="/tilahallinta/vuokratilat/" element={<Properties />} />
                     <Route path="/tilahallinta/palvelut/" element={<Services />} />
                     <Route path="/tilahallinta/laitteet/" element={<Devices />} />
-                    <Route path="/varaushallinta/varaus/" element={<Reservation />} />
+                    <Route path="/varaushallinta/" element={<Reservation />} />
                     <Route path="*" element={<ErrorPage />} />
                 </Route>
             </Routes>

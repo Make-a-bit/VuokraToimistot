@@ -92,6 +92,7 @@ export const fetchServices = (officeId) => {
             const response = await fetch(uri, { method: "GET" });
 
             const data = await response.json();
+            console.log(data)
             dispatch({ type: FETCH_OFFICE_SERVICES_SUCCESS, payload: data })
         } catch (error) {
             console.log("Error while fetching office services:", error);

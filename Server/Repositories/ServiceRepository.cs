@@ -26,7 +26,18 @@ namespace API.Repositories
                 using var conn = _dbManager.GetConnection();
                 await conn.OpenAsync();
 
-                using var cmd = new SqlCommand("SELECT * FROM Office_services", conn);
+                using var cmd = new SqlCommand(@"
+                SELECT 
+                    s.service_id,
+                    s.office_id,
+                    s.service_name,
+                    s.service_unit,
+                    s.service_price,
+                    v.vat_value,
+                    o.office_name
+                FROM Office_services s
+                JOIN VAT v ON s.service_vat = v.vat_id
+                JOIN Offices o ON s.office_id = o.office_id", conn);
                 using var reader = await cmd.ExecuteReaderAsync();
 
                 while (await reader.ReadAsync())
@@ -35,10 +46,11 @@ namespace API.Repositories
                     {
                         Id = reader.GetInt32(reader.GetOrdinal("service_id")),
                         OfficeId = reader.GetInt32(reader.GetOrdinal("office_id")),
+                        OfficeName = reader.GetString(reader.GetOrdinal("office_name")),
                         Name = reader.GetString(reader.GetOrdinal("service_name")),
                         Unit = reader.GetString(reader.GetOrdinal("service_unit")),
                         Price = reader.GetDecimal(reader.GetOrdinal("service_price")),
-                        Vat = reader.GetDecimal(reader.GetOrdinal("service_vat"))
+                        Vat = reader.GetDecimal(reader.GetOrdinal("vat_value"))
                     };
                     services.Add(service);
                 }
@@ -65,10 +77,18 @@ namespace API.Repositories
                 await conn.OpenAsync();
 
                 using var cmd = new SqlCommand(@"
-                SELECT * FROM Office_services
-                WHERE office_id = @serviceId", conn);
+                SELECT 
+                    o.service_id,
+                    o.office_id,
+                    o.service_name,
+                    o.service_unit,
+                    o.service_price,
+                    v.vat_value
+                FROM Office_services o
+                JOIN VAT v ON o.service_vat = v.vat_id
+                WHERE o.office_id = @officeId", conn);
 
-                cmd.Parameters.AddWithValue("@serviceId", officeId);
+                cmd.Parameters.AddWithValue("@officeId", officeId);
                 using var reader = await cmd.ExecuteReaderAsync();
 
                 while (await reader.ReadAsync())
@@ -77,10 +97,11 @@ namespace API.Repositories
                     {
                         Id = reader.GetInt32(reader.GetOrdinal("service_id")),
                         OfficeId = reader.GetInt32(reader.GetOrdinal("office_id")),
+                        OfficeName = reader.GetString(reader.GetOrdinal("office_name")),
                         Name = reader.GetString(reader.GetOrdinal("service_name")),
                         Unit = reader.GetString(reader.GetOrdinal("service_unit")),
                         Price = reader.GetDecimal(reader.GetOrdinal("service_price")),
-                        Vat = reader.GetDecimal(reader.GetOrdinal("service_vat"))
+                        Vat = reader.GetDecimal(reader.GetOrdinal("vat_value"))
                     };
 
                     services.Add(service);

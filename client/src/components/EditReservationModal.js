@@ -55,6 +55,51 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
         dispatch(fetchServices());
     }, [dispatch]);
 
+    useEffect(() => {
+        if (selectedOfficeProperty) {
+            const property = properties.find(p => p.id === selectedOfficeProperty.id);
+            if (property) {
+                setItemRows(prev => {
+                    const hasPropertyRow = prev.some(row => row.type === "property");
+                    if (hasPropertyRow) {
+                        // Update the property row if property changes
+                        return prev.map(row =>
+                            row.type === "property"
+                                ? {
+                                    ...row,
+                                    name: property.name,
+                                    price: property.price || 0,
+                                    vat: property.vat || 0,
+                                    qty: getDuration(startDate, endDate) || 1,
+                                    discount: 0
+                                }
+                                : row
+                        );
+                    } else {
+                        // Add new property row
+                        return [
+                            {
+                                id: `property-${property.id}`,
+                                type: "property",
+                                itemId: property.id,
+                                name: property.name,
+                                price: property.price || 0,
+                                vat: property.vat || 0,
+                                qty: getDuration(startDate, endDate) || 1,
+                                discount: 0
+                            },
+                            ...prev
+                        ];
+                    }
+                });
+            }
+        } else {
+            // Remove property row if property is deselected
+            setItemRows(prev => prev.filter(row => row.type !== "property"));
+        }
+        // eslint-disable-next-line
+    }, [selectedOfficeProperty, startDate, endDate, properties]);
+
     // Add device row when selectedDevice changes
     useEffect(() => {
         if (selectedDevice && selectedDevice.id !== undefined) {
@@ -118,7 +163,7 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
             setInvoiced(!!reservation.invoiced);
 
             // Set selected customer
-            const foundCustomer = customers.find(c => c.id === reservation.customerId);
+            const foundCustomer = customers.find(c => c.id === reservation.customer.id);
             setSelectedCustomer(foundCustomer || null);
 
             // Map devices and services to DataGrid rows

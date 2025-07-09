@@ -36,8 +36,8 @@ namespace API.Services
                     @end)",
                 conn, transaction);
 
-                cmd.Parameters.AddWithValue("@pId", reservation.PropertyId);
-                cmd.Parameters.AddWithValue("@cId", reservation.CustomerId);
+                cmd.Parameters.AddWithValue("@pId", reservation.Property.Id);
+                cmd.Parameters.AddWithValue("@cId", reservation.Customer.Id);
                 cmd.Parameters.AddWithValue("@start", reservation.StartDate);
                 cmd.Parameters.AddWithValue("@end", reservation.EndDate);
 

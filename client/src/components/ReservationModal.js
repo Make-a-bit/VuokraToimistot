@@ -90,6 +90,54 @@ export const AddReservation = ({ show, onHide, office, property }) => {
         }
     }, [show, office, property, dispatch]);
 
+    useEffect(() => {
+        if (selectedPropertyLocal) {
+            // Find the property details
+            const property = properties.find(p => p.id === selectedPropertyLocal.id);
+            if (property) {
+                // Check if property row already exists
+                setItemRows(prev => {
+                    const hasPropertyRow = prev.some(row => row.type === "property");
+                    if (hasPropertyRow) {
+                        // Update the property row if property changes
+                        return prev.map(row =>
+                            row.type === "property"
+                                ? {
+                                    ...row,
+                                    name: property.name,
+                                    price: property.price || 0,
+                                    vat: property.vat || 0,
+                                    qty: getDuration(startDate, endDate) || 1,
+                                    discount: 0
+                                }
+                                : row
+                        );
+                    } else {
+                        // Add new property row
+                        return [
+                            {
+                                id: `property-${property.id}`,
+                                type: "property",
+                                itemId: property.id,
+                                name: property.name,
+                                price: property.price || 0,
+                                vat: property.vat || 0,
+                                qty: getDuration(startDate, endDate) || 1,
+                                discount: 0
+                            },
+                            ...prev
+                        ];
+                    }
+                });
+            }
+        } else {
+            // Remove property row if property is deselected
+            setItemRows(prev => prev.filter(row => row.type !== "property"));
+        }
+        // eslint-disable-next-line
+    }, [selectedPropertyLocal, startDate, endDate, properties]);
+
+
     const deviceOptions = useMemo(() =>
         devices.filter(
             d => !itemRows.some(row => row.type === "device" && row.itemId === d.id)

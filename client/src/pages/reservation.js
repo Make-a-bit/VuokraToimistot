@@ -46,7 +46,20 @@ const Reservation = () => {
         ? properties.filter(p => p.officeId === selectedOffice.id).map(p => p.id)
         : [];
 
-    const reservations = allReservations.filter(r => {
+    // Map nested objects to flat fields for DataGrid
+    const mappedReservations = allReservations.map(r => ({
+        ...r,
+        customerName: r.customer?.name || "",
+        officeName: r.office?.name || "",
+        propertyName: r.property?.name || "",
+        propertyId: r.property?.id || r.propertyId, // fallback if needed
+        startDate: r.startDate,
+        endDate: r.endDate,
+        invoiced: r.invoiced,
+        id: r.id // DataGrid requires a unique 'id' field
+    }));
+
+    const reservations = mappedReservations.filter(r => {
         if (selectedProperty) {
             return r.propertyId === selectedProperty.id;
         } else if (selectedOffice) {
