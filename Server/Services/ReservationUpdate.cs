@@ -42,7 +42,8 @@ namespace API.Services
                     customer_id = @cid, 
                     reservation_start = @start, 
                     reservation_end = @end, 
-                    invoiced = @inv 
+                    invoiced = @inv,
+                    reservation_description = @descr
                 WHERE reservation_id = @rid",
                 conn, transaction);
 
@@ -51,6 +52,7 @@ namespace API.Services
                 cmd.Parameters.AddWithValue("@start", reservation.StartDate);
                 cmd.Parameters.AddWithValue("@end", reservation.EndDate);
                 cmd.Parameters.AddWithValue("@inv", reservation.Invoiced);
+                cmd.Parameters.AddWithValue("@descr", reservation.Description);
                 cmd.Parameters.AddWithValue("@rid", reservation.Id);
 
                 int rowsAffected = await cmd.ExecuteNonQueryAsync();
@@ -123,6 +125,35 @@ namespace API.Services
                 // Log error
                 await transaction.RollbackAsync();
                 return false;
+            }
+        }
+
+        public async Task<bool> SetInvoiced(int reservationId)
+        {
+            using var conn = _dbManager.GetConnection();
+            await conn.OpenAsync();
+            using var transaction = (SqlTransaction)await conn.BeginTransactionAsync();
+
+            try
+            {
+                using var cmd = new SqlCommand(@"
+                UPDATE Reservations
+                SET invoiced = @status
+                WHERE reservation_id = @id",
+                conn, transaction);
+
+                cmd.Parameters.AddWithValue("@status", true);
+                cmd.Parameters.AddWithValue("@id", reservationId);
+
+                int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                await transaction.CommitAsync();
+
+                return rowsAffected > 0;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
             }
         }
     }

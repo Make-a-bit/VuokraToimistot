@@ -3,8 +3,8 @@
     public class Invoice
     {
         public int Id { get; set; }
-        public Reservation Reservation { get; set; }
-        public Customer Customer { get; set; }
+        public int ReservationId { get; set; }
+        public int CustomerId { get; set; }
         public DateOnly InvoiceDate { get; set; }
         public DateOnly DueDate { get; set; }
         public decimal SubTotal { get; set; }

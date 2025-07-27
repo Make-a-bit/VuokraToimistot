@@ -45,10 +45,8 @@ export const updateRowsQty = (itemRows, qty) => {
 /**
  * Updates a specific row in the rows array with newRow data.
  */
-export function updateRow(rows, newRow) {
-    return rows.map(row =>
-        row.id === newRow.id ? { ...row, ...newRow } : row
-    );
+export const updateRow = (rows, newRow) => {
+    return rows.map(row => row.id === newRow.id ? { ...row, ...newRow } : row);
 }
 
 /**

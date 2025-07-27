@@ -21,12 +21,14 @@ export const addReservation = (reservation) => {
                 const createdReservation = await response.json();
                 dispatch({ type: ADD_RESERVATION_SUCCESS, payload: createdReservation })
                 dispatch({ type: SHOW_SUCCESS, payload: "Varauksen tallennus onnistui!" })
+                return createdReservation;
             }
         } catch {
             dispatch({ type: SHOW_ERROR, payload: "Varauksen tallennus epäonnistui!" })
         } finally {
             dispatch({ type: HIDE_LOADING })
         }
+        return null;
     }
 }
 

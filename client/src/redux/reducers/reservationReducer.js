@@ -30,6 +30,14 @@ export const reservationReducer = (state = initialState, action) => {
                 reservations: state.reservations.filter((r) => r.id !== action.payload.id)
             }
 
+        case EDIT_RESERVATION_SUCCESS:
+            return {
+                ...state,
+                reservations: state.reservations.map(r => 
+                    r.id === action.payload.id ? action.payload : r
+                ),
+            }
+
         case FETCH_RESERVATION_SUCCESS:
             return {
                 ...state,

@@ -129,6 +129,7 @@ BEGIN
         customer_id INT NOT NULL,
         reservation_start DATE NOT NULL,
         reservation_end DATE NOT NULL,
+        reservation_description VARCHAR(255),
         invoiced BIT DEFAULT(0),
         FOREIGN KEY (property_id) REFERENCES Office_properties (property_id)
         ON DELETE NO ACTION
@@ -155,7 +156,6 @@ BEGIN
         invoice_discounts DECIMAL(10, 2) NOT NULL,
         invoice_vattotal DECIMAL(10, 2) NOT NULL,
         invoice_totalsum DECIMAL(10, 2) NOT NULL,
-        invoice_description VARCHAR(255) NOT NULL,
         invoice_paid BIT DEFAULT 0 NOT NULL,
         FOREIGN KEY (customer_id) REFERENCES Customers (customer_id)
         ON DELETE NO ACTION

@@ -11,6 +11,9 @@
         public List<Device> Devices { get; set; }
         public List<Service> Services { get; set; }
         public bool Invoiced { get; set; }
+        public DateOnly DueDate { get; set; }
+        public DateOnly DateInvoiced { get; set; }
+        public string Description { get; set; }
 
         public Reservation()
         {

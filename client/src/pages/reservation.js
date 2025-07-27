@@ -1,10 +1,9 @@
 ﻿import React, { useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-    addReservation, deleteReservation, fetchReservations, fetchReservedDates,
-    setOffice, setProperty
+    addReservation, deleteReservation, fetchReservations, fetchReservedDates
 } from "../redux/actions/reservationActions";
-import { Autocomplete, Box, Button, FormControl, IconButton, TextField } from "@mui/material";
+import { Alert, Autocomplete, Box, Button, FormControl, IconButton, Snackbar, TextField } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import dataGridSx from "../utils/dataGridSx";
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -15,6 +14,7 @@ import { AddReservation } from "../components/ReservationModal";
 import { EditReservationModal } from "../components/EditReservationModal";
 import ConfirmModal from "../components/ConfirmModal";
 import dayjs from "../../src/dayjs-setup";
+import useAutoClearMessages from "../hooks/autoClearMessages";
 
 const Reservation = () => {
     const dispatch = useDispatch();
@@ -104,8 +104,40 @@ const Reservation = () => {
         }
     ];
 
+    useAutoClearMessages(errorMessage, successMessage);
+
     return (
         <>
+            {errorMessage &&
+                <Snackbar
+                    anchorOrigin={{ horizontal: "right", vertical: "top" }}
+                    open={Boolean(errorMessage)}
+                    autoHideDuration={6000}>
+                    <Alert
+                        color="warning"
+                        severity="warning"
+                        variant="filled"
+                        sx={{ border: "1px solid #000", width: "100%" }}>
+                        {errorMessage}
+                    </Alert>
+                </Snackbar>
+            }
+
+            {successMessage &&
+                <Snackbar
+                    anchorOrigin={{ horizontal: "right", vertical: "top" }}
+                    open={Boolean(successMessage)}
+                    autoHideDuration={6000}>
+                    <Alert
+                        color="success"
+                        severity="success"
+                        variant="filled"
+                        sx={{ border: "1px solid #000", width: "100%" }}>
+                        {successMessage}
+                    </Alert>
+                </Snackbar>
+            }
+
             <Button
                 variant="contained"
                 onClick={() => {

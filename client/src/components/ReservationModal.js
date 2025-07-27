@@ -4,17 +4,17 @@ import {
     addReservation, fetchReservations, fetchReservedDates,
     setOffice, setProperty
 } from "../redux/actions/reservationActions";
-import { fetchDevices } from "../redux/actions/deviceActions";
-import { fetchProperties } from "../redux/actions/propertyActions";
-import { fetchServices } from "../redux/actions/serviceActions";
+import { createInvoice } from "../redux/actions/invoiceActions";
 import {
     Autocomplete, Box, Button, Dialog, DialogTitle, DialogActions,
     DialogContent, Divider, FormControl, InputLabel, MenuItem, Select,
     TextField, Typography,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
+import ClearAllIcon from '@mui/icons-material/ClearAll';
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from '@mui/icons-material/Delete';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import SaveIcon from "@mui/icons-material/Save";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -43,6 +43,8 @@ export const AddReservation = ({ show, onHide, office, property }) => {
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
     const [itemRows, setItemRows] = useState([]);
+    const [description, setDescription] = useState("");
+
     const reservation = {
         startDate: startDate,
         endDate: endDate
@@ -137,6 +139,20 @@ export const AddReservation = ({ show, onHide, office, property }) => {
         // eslint-disable-next-line
     }, [selectedPropertyLocal, startDate, endDate, properties]);
 
+    const totalSum = useMemo(() => {
+        return itemRows.reduce((acc, row) => {
+            const price = parseFloat(row.price) || 0;
+            const qty = parseFloat(row.qty) || 0;
+            const discount = parseFloat(row.discount) || 0;
+            const vat = parseFloat(row.vat) || 0;
+
+            const subtotal = price * qty;
+            const discountedSubtotal = subtotal - ((discount / 100) * subtotal);
+            const total = discountedSubtotal + ((vat / 100) * discountedSubtotal);
+
+            return acc + total;
+        }, 0);
+    }, [itemRows]);
 
     const deviceOptions = useMemo(() =>
         devices.filter(
@@ -165,8 +181,8 @@ export const AddReservation = ({ show, onHide, office, property }) => {
         setItemRows(prev => deleteRow(prev, id));
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const handleSubmit = async (e) => {
+        if (e) e.preventDefault();
 
         // Separate devices and services
         const devices = itemRows
@@ -190,25 +206,82 @@ export const AddReservation = ({ show, onHide, office, property }) => {
             }));
 
         const reservation = {
-            propertyId: selectedPropertyLocal.id,
-            customerId: selectedCustomer.id,
+            property: { id: selectedPropertyLocal.id },
+            customer: { id: selectedCustomer.id },
             startDate: startDate.format("YYYY-MM-DD"),
             endDate: endDate.format("YYYY-MM-DD"),
+            description: description,
             devices,
             services,
             invoiced: false
         };
 
-        dispatch(addReservation(reservation))
-            .then(() => {
-                setSelectedCustomer(null);
-                setStartDate(null);
-                setEndDate(null);
-                setItemRows([]);
-                dispatch(fetchReservedDates(selectedPropertyLocal.id));
-                dispatch(fetchReservations());
-                onHide();
-            })
+        const result = await dispatch(addReservation(reservation))
+        setSelectedOfficeLocal(null)
+        setSelectedPropertyLocal(null)
+        setSelectedCustomer(null);
+        setStartDate(null);
+        setEndDate(null);
+        setDescription("");
+        setItemRows([]);
+        dispatch(fetchReservations());
+        onHide();
+
+        return result;
+    }
+
+    const handleInvoicing = async (e) => {
+        e.preventDefault();
+
+        const result = await handleSubmit();
+
+        console.log("Reservation:", result)
+
+        const services = itemRows
+            .filter(row => row.type === "service" || row.type === "property")
+            .map(s => ({
+                id: s.itemId,
+                price: s.price,
+                vat: s.vat,
+                qty: s.qty,
+                discount: s.discount
+            }));
+
+        const devices = itemRows
+            .filter(row => row.type === "device")
+            .map(d => ({
+                id: d.itemId,
+                price: d.price,
+                vat: d.vat,
+                qty: d.qty,
+                discount: d.discount
+            }));
+
+        const dateInvoiced = dayjs();
+
+        const invoiceReservation = {
+            id: result.id,
+            property: { id: selectedPropertyLocal.id },
+            customer: { id: selectedCustomer.id },
+            startDate: startDate.format("YYYY-MM-DD"),
+            endDate: endDate.format("YYYY-MM-DD"),
+            devices,
+            services,
+            invoiced: true,
+            dateInvoiced: dateInvoiced.format("YYYY-MM-DD"),
+            dueDate: dateInvoiced.add(14, "day").format("YYYY-MM-DD")
+        };
+
+        dispatch(createInvoice(invoiceReservation))
+        setSelectedOfficeLocal(null)
+        setSelectedPropertyLocal(null)
+        setSelectedCustomer(null);
+        setStartDate(null);
+        setEndDate(null);
+        setDescription("");
+        setItemRows([]);
+        dispatch(fetchReservations());
+        onHide();
     }
 
     return (
@@ -230,7 +303,6 @@ export const AddReservation = ({ show, onHide, office, property }) => {
                         onChange={(event, newValue) => {
                             setSelectedOfficeLocal(newValue);
                             setSelectedPropertyLocal(null);
-                            console.log("Value:", newValue.id)
                         }}
                         renderInput={params => (
                             <TextField
@@ -355,6 +427,15 @@ export const AddReservation = ({ show, onHide, office, property }) => {
                     />
                 </FormControl>
 
+                <FormControl>
+                    <TextField
+                        label="Lisätiedot"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        sx={{ ...autoCompleteFieldMargins, width: "710px" }}
+                    />
+                </FormControl>
+
                 <Divider sx={{ my: 2 }} />
 
                 <Typography variant="h6" sx={{ mb: 1 }}>
@@ -367,8 +448,13 @@ export const AddReservation = ({ show, onHide, office, property }) => {
                         {
                             field: "type",
                             headerName: "Tyyppi",
-                            width: 80,
-                            renderCell: (params) => params.row.type === "device" ? "Laite" : "Palvelu"
+                            width: 90,
+                            renderCell: (params) => {
+                                if (params.row.type === "device") return "Laite";
+                                if (params.row.type === "service") return "Palvelu";
+                                if (params.row.type === "property") return "Vuokratila";
+                                return "";
+                            }
                         },
                         { field: "name", headerName: "Nimi", flex: 1 },
                         { field: "price", headerName: "Hinta", width: 80, editable: true },
@@ -423,13 +509,52 @@ export const AddReservation = ({ show, onHide, office, property }) => {
                         minHeight: "175px",
                     }}
                 />
+
+                <Box sx={{ textAlign: "right", fontWeight: "bold" }}>
+                    Laskutettavat yhteensä: {totalSum.toLocaleString("fi-FI", {
+                        minimumFractionDigits: 2, maximumFractionDigits: 2
+                    })} €
+                </Box>
+
             </DialogContent>
 
-            <DialogActions sx={{ display: "flex" }}>
+            <DialogActions sx={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "flex-start"
+            }}>
+                <Box sx={{ display: "flex", flexDirection: "column" }}>
+                    <Button
+                        size="small"
+                        startIcon={<SaveIcon />}
+                        color="success"
+                        loading={loading}
+                        variant="contained"
+                        onClick={handleSubmit}
+                        disabled={loading || !endDate}
+                        sx={{ ...leftButton }}>
+                        Tallenna
+                    </Button>
+                    <Button
+                        size="small"
+                        startIcon={<ReceiptLongIcon />}
+                        color="success"
+                        loading={loading}
+                        variant="contained"
+                        onClick={handleInvoicing}
+                        disabled={loading || !endDate}
+                        sx={{ ...leftButton }}>
+                        Tallenna ja laskuta
+                    </Button>
+                </Box>
+
+                <Box sx={{ display: "flex", flexDirection: "column" }}>
                 <Button
                     size="small"
-                    color="error"
-                    variant="outlined"
+                    startIcon={<ClearAllIcon />}
+                    color="warning"
+                    variant="contained"
                     disabled={loading}
                     onClick={() => {
                         setSelectedOfficeLocal(null)
@@ -438,38 +563,24 @@ export const AddReservation = ({ show, onHide, office, property }) => {
                         setStartDate(null)
                         setEndDate(null)
                         setItemRows([])
-                    }}
-                    sx={{ ...leftButton }}>
+                        setDescription("")
+                        }}
+                        sx={{ ...rightButton }}>
                     Tyhjennä kentät
                 </Button>
-
-                <Box sx={{ flexGrow: 1 }} />
-
                 <Button
                     size="small"
                     startIcon={<CloseIcon />}
-                    color="secondary"
-                    variant="outlined"
+                    color="error"
+                    variant="contained"
                     disabled={loading}
                     onClick={() => {
-
                         onHide();
                     }}
-                    sx={{ ...middleButton }}>
-                    Peruuta
-                </Button>
-
-                <Button
-                    size="small"
-                    startIcon={<SaveIcon />}
-                    color="success"
-                    loading={loading}
-                    variant="contained"
-                    onClick={handleSubmit}
-                    disabled={loading || !endDate}
-                    sx={{ ...rightButton }}>
-                    Tallenna
-                </Button>
+                    sx={{ ...rightButton, alignSelf: "flex-end" }}>
+                    Sulje
+                    </Button>
+                </Box>
             </DialogActions>
         </Dialog>
     )

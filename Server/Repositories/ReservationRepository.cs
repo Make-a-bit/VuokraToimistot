@@ -93,6 +93,7 @@ namespace API.Repositories
                     r.reservation_start,
                     r.reservation_end,
                     r.invoiced,
+                    r.reservation_description,
                     c.customer_name,
                     p.property_name,
                     o.office_name
@@ -117,6 +118,9 @@ namespace API.Repositories
                     reservation.StartDate = DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("reservation_start")));
                     reservation.EndDate = DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("reservation_end")));
                     reservation.Invoiced = reader.GetBoolean(reader.GetOrdinal("invoiced"));
+                    reservation.Description = reader.IsDBNull(reader.GetOrdinal("reservation_description"))
+                        ? null
+                        : reader.GetString(reader.GetOrdinal("reservation_description"));
 
                     reservations.Add(reservation);
                 }

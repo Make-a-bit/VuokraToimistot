@@ -27,19 +27,25 @@ namespace API.Services
                     property_id, 
                     customer_id, 
                     reservation_start, 
-                    reservation_end) 
+                    reservation_end,
+                    reservation_description,
+                    invoiced) 
                 OUTPUT INSERTED.reservation_id
                 VALUES (
                     @pId, 
                     @cId, 
                     @start, 
-                    @end)",
+                    @end,
+                    @desc,
+                    @invoiced)",
                 conn, transaction);
 
                 cmd.Parameters.AddWithValue("@pId", reservation.Property.Id);
                 cmd.Parameters.AddWithValue("@cId", reservation.Customer.Id);
                 cmd.Parameters.AddWithValue("@start", reservation.StartDate);
                 cmd.Parameters.AddWithValue("@end", reservation.EndDate);
+                cmd.Parameters.AddWithValue("@desc", reservation.Description);
+                cmd.Parameters.AddWithValue("@invoiced", reservation.Invoiced);
 
                 var result = await cmd.ExecuteScalarAsync();
 
