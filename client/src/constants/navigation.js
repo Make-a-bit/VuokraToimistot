@@ -2,7 +2,7 @@
     { path: "/", label: "Etusivu" },
     { path: "/asiakkaat/", label: "Asiakkaat" },
     {
-        label: "Tilahallinta",
+        label: "Vuokrakohteet",
         dropdownParent: true,
         dropdown: [
             { path: "/tilahallinta/kohteet", label: "Kohteet" },
@@ -12,7 +12,11 @@
         ]
     },
     {
-         path: "/varaushallinta", label: "Varaushallinta" },            
+        path: "/varaushallinta", label: "Varaushallinta"
+    },
+    {
+        path: "/laskutus", label: "Laskutus"
+    },
     {
         label: "Muut",
         dropdownParent: true,

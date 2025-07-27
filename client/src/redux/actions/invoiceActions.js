@@ -28,3 +28,21 @@ export const createInvoice = (reservation) => {
         }
     }
 }
+
+export const fetchInvoices = () => {
+    return async (dispatch) => {
+        dispatch({ type: SHOW_LOADING })
+        try {
+            const response = await fetch(`${mainURI}/invoice`, {
+                method: "GET"
+            });
+            const data = await response.json();
+            console.log("Invoice:", data)
+            dispatch({ type: FETCH_INVOICES_SUCCESS, payload: data })
+        } catch {
+            dispatch({ type: SHOW_ERROR, payload: "Laskujen nouto epäonnistui!" })
+        } finally {
+            dispatch({ type: HIDE_LOADING })
+        }
+    }
+}

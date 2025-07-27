@@ -28,10 +28,7 @@ namespace API.Controllers
             {
                 var services = await _serviceRepository.GetServices();
 
-                if (services.Count > 0)
-                    return Ok(services);
-
-                else return NotFound();
+                return Ok(services);
             }
             catch
             {
