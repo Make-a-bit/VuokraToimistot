@@ -32,7 +32,7 @@ namespace API.Repositories
                 while (await reader.ReadAsync())
                 {
                     invoice.Id = reader.GetInt32(reader.GetOrdinal("invoice_id"));
-                    invoice.CustomerId = reader.GetInt32(reader.GetOrdinal("customer_id"));
+                    invoice.Customer.Id = reader.GetInt32(reader.GetOrdinal("customer_id"));
                     invoice.ReservationId = reader.GetInt32(reader.GetOrdinal("reservation_id"));
                     invoice.InvoiceDate = DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("invoice_date")));
                     invoice.DueDate = DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("invoice_duedate")));
@@ -83,8 +83,8 @@ namespace API.Repositories
 
                     invoice.Id = reader.GetInt32(reader.GetOrdinal("invoice_id"));
                     invoice.ReservationId = reader.GetInt32(reader.GetOrdinal("reservation_id"));
-                    invoice.CustomerId = reader.GetInt32(reader.GetOrdinal("customer_id"));
-                    invoice.CustomerName = reader.GetString(reader.GetOrdinal("customer_name"));
+                    invoice.Customer.Id = reader.GetInt32(reader.GetOrdinal("customer_id"));
+                    invoice.Customer.Name = reader.GetString(reader.GetOrdinal("customer_name"));
                     invoice.InvoiceDate = DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("invoice_date")));
                     invoice.DueDate = DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("invoice_duedate")));
                     invoice.SubTotal = reader.GetDecimal(reader.GetOrdinal("invoice_subtotal"));

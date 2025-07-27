@@ -13,6 +13,12 @@ const Invoices = () => {
     const [selectedInvoice, setSelectedInvoice] = useState(null);
     const [showConfirm, setShowConfirm] = useState(false);
 
+    // Map nested customer name to top-level property
+    const mappedInvoices = invoices.map(inv => ({
+        ...inv,
+        customerName: inv.customer?.name || ""
+    }));
+
     const invoiceColumns = [
         {
             field: "customerName",
@@ -69,7 +75,7 @@ const Invoices = () => {
 
     return <>
         <DataGrid
-            rows={invoices}
+            rows={mappedInvoices}
             columns={invoiceColumns}
             getRowId={row => row.id}
             autoHeight

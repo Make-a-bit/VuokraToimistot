@@ -52,11 +52,11 @@ const Reservation = () => {
         customerName: r.customer?.name || "",
         officeName: r.office?.name || "",
         propertyName: r.property?.name || "",
-        propertyId: r.property?.id || r.propertyId, // fallback if needed
+        propertyId: r.property?.id || r.propertyId, 
         startDate: r.startDate,
         endDate: r.endDate,
         invoiced: r.invoiced,
-        id: r.id // DataGrid requires a unique 'id' field
+        id: r.id 
     }));
 
     const reservations = mappedReservations.filter(r => {
