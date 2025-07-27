@@ -57,7 +57,6 @@ export const fetchReservations = () => {
                 method: "GET"
             });
             const data = await response.json();
-            console.log(data)
             dispatch({ type: FETCH_RESERVATION_SUCCESS, payload: data })
         } catch {
             dispatch({ type: SHOW_ERROR, payload: "Varausten nouto epäonnistui!" })

@@ -35,6 +35,8 @@ const Reservation = () => {
     const [modalProperty, setModalProperty] = useState(null);
     const [isEditable, setIsEditable] = useState(false);
 
+    console.log(allReservations)
+
     const propertyOptions = useMemo(() =>
         properties.filter(
             p => selectedOffice && p.officeId === selectedOffice.id
@@ -79,6 +81,7 @@ const Reservation = () => {
         reservedDates.some((d) => dayjs(d).isSame(date, "day"));
 
     const reservationColumns = [
+        { field: "id", headerName: "Varaus #", width: 75 },
         { field: "customerName", headerName: "Asiakas", flex: 1 },
         { field: "officeName", headerName: "Kohde", flex: 1 },
         { field: "propertyName", headerName: "Vuokratila", flex: 1 },

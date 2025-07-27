@@ -1,7 +1,7 @@
 ﻿import React from 'react';
 
 import {
-    Button, Dialog, DialogTitle, DialogContent, DialogActions
+    Box, Button, Dialog, DialogTitle, DialogContent, DialogActions
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -39,24 +39,30 @@ const ConfirmModal = ({
             <DialogContent dividers>
                 {message}
             </DialogContent>
-            <DialogActions>
-                <Button
-                    size="small"
-                    color="secondary"
-                    variant="outlined"
-                    startIcon={<CloseIcon /> }
-                    onClick={onHide}
-                    disabled={loading}>
-                    {cancelText}
-                </Button>
+            <DialogActions sx={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                padding: "20px"
+
+            }}>
                 <Button
                     size="small"
                     variant="contained"
-                    color="error"
+                    color="success"
                     startIcon={<DeleteIcon />}
                     onClick={handleConfirm}
                     disabled={loading}>
                     {confirmText}
+                </Button>
+                <Button
+                    size="small"
+                    color="error"
+                    variant="contained"
+                    startIcon={<CloseIcon />}
+                    onClick={onHide}
+                    disabled={loading}>
+                    {cancelText}
                 </Button>
             </DialogActions>
         </Dialog>

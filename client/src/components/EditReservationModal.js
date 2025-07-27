@@ -6,7 +6,7 @@ import {
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { updateReservation, fetchReservations, fetchReservedDates } from "../redux/actions/reservationActions";
-import { createInvoice } from "../redux/actions/invoiceActions";
+import { createInvoice, fetchInvoices } from "../redux/actions/invoiceActions";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from '@mui/icons-material/Delete';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
@@ -39,7 +39,7 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
     const [itemRows, setItemRows] = useState([]);
     const [description, setDescription] = useState(reservation?.description || "");
 
-  //  console.log(reservation)
+    //console.log(reservation)
 
     const {
         shouldDisableStartDate,
@@ -392,6 +392,7 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
             .then(() => {
                 dispatch(fetchReservations());
                 dispatch(fetchReservedDates(reservation.propertyId));
+                dispatch(fetchInvoices());
                 onHide();
             });
     };
@@ -564,7 +565,7 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
                     control={
                         <Checkbox
                             checked={invoiced}
-                            disabled={isDisabled}
+                            disabled={true}
                             onChange={(event) => setInvoiced(event.target.checked)}
                         />
                     }
@@ -678,40 +679,47 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
 
             </DialogContent>
 
-            <DialogActions sx={{ display: "flex" }}>
-                <Button
-                    color="success"
-                    disabled={isDisabled}
-                    onClick={handleInvoicing}
-                    variant="contained"
-                    size="small"
-                    startIcon={<ReceiptLongIcon />}
-                    sx={{ ...leftButton }}>
-                    Laskuta varaus
-                </Button>
+            <DialogActions sx={{
+                display: "flex",
+                alignItems: "flex-end",
+                justifyContent: "space-between",
+                padding: "20px"
+            }}>
+                <Box sx={{ display: "flex", flexDirection: "column" }}>
+                    <Button
+                        size="small"
+                        disabled={isDisabled}
+                        startIcon={<SaveIcon />}
+                        onClick={handleSave}
+                        color="success"
+                        variant="contained"
+                        sx={{ marginBottom: "10px" }}
+                    >Tallenna muutokset</Button>
+                    <Button
+                        color="success"
+                        disabled={isDisabled}
+                        onClick={handleInvoicing}
+                        variant="contained"
+                        size="small"
+                        startIcon={<ReceiptLongIcon />}
+                    >
+                        Laskuta varaus
+                    </Button>
+                </Box>
 
-                <Button
-                    size="small"
-                    disabled={isDisabled}
-                    startIcon={<SaveIcon />}
-                    onClick={handleSave}
-                    color="primary"
-                    variant="contained"
-                    sx={{ ...middleButton }}
-                >Tallenna muutokset</Button>
+                <Box sx={{ alignItems: "flex-end" }}>
 
-                <Box sx={{ flexGrow: 1 }} />
-
-                <Button
-                    size="small"
-                    onClick={() => {
-                        onHide();
-                    }}
-                    color="error"
-                    variant="contained"
-                    startIcon={<CloseIcon />}
-                    sx={{ ...rightButton }}
-                >Sulje</Button>
+                    <Button
+                        size="small"
+                        onClick={() => {
+                            onHide();
+                        }}
+                        color="error"
+                        variant="contained"
+                        startIcon={<CloseIcon />}
+                        sx={{  }}
+                    >Sulje</Button>
+                </Box>
             </DialogActions>
         </Dialog>
     );
