@@ -28,10 +28,7 @@ namespace API.Controllers
             {
                 var properties = await _propertyRepository.GetProperties();
 
-                if (properties.Count > 0)
-                    return Ok(properties);
-
-                else return NotFound();
+                return Ok(properties);
             }
             catch
             {

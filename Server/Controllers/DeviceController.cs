@@ -28,10 +28,7 @@ namespace API.Controllers
             {
                 var properties = await _deviceRepository.GetDevices();
 
-                if (properties.Count > 0)
-                    return Ok(properties);
-
-                else return NotFound();
+                return Ok(properties);
             }
             catch
             {
@@ -52,7 +49,7 @@ namespace API.Controllers
 
                 else return NotFound();
             }
-            catch 
+            catch
             {
                 // Logger
                 return BadRequest();
@@ -65,14 +62,14 @@ namespace API.Controllers
             try
             {
                 var deviceId = await _deviceAdd.AddDevice(device);
-                
-                if (!deviceId.HasValue) 
+
+                if (!deviceId.HasValue)
                     return BadRequest();
 
                 device.Id = deviceId.Value;
                 return Ok(device);
             }
-            catch 
+            catch
             {
                 // logger
                 return BadRequest();
@@ -93,7 +90,7 @@ namespace API.Controllers
 
                 else return NotFound();
             }
-            catch 
+            catch
             {
                 // logger
                 return BadRequest();
@@ -106,12 +103,12 @@ namespace API.Controllers
         {
             try
             {
-                if (await _deviceDelete.DeleteDevice(id)) 
+                if (await _deviceDelete.DeleteDevice(id))
                     return Ok();
 
                 else return NotFound();
             }
-            catch 
+            catch
             {
                 // Logger
                 return BadRequest();

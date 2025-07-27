@@ -27,7 +27,7 @@ namespace API.Controllers
             try
             {
                 var customerID = await _customerAdd.AddCustomer(customer);
-                
+
                 if (!customerID.HasValue)
                     return BadRequest();
 
@@ -47,10 +47,7 @@ namespace API.Controllers
             {
                 var customers = await _customerRepo.GetCustomers();
 
-                if (customers.Count > 0)
-                    return Ok(customers);
-
-                else return NotFound();
+                return Ok(customers);
             }
             catch
             {

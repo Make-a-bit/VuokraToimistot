@@ -19,6 +19,21 @@ namespace API.Controllers
             _reservationUpdate = ru;
         }
 
+        [HttpGet]
+        public async Task<ActionResult<List<Invoice>>> GetInvoices()
+        {
+            try
+            {
+                var invoices = await _invoices.GetInvoicesAsync();
+
+                return Ok(invoices);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
         [HttpPost]
         public async Task<ActionResult> CreateInvoice([FromBody] Reservation reservation)
         {
@@ -32,7 +47,7 @@ namespace API.Controllers
                 // set invoiced status true into respective reservation
                 await _reservationUpdate.SetInvoiced(reservation.Id);
 
-                var invoice = await _invoices.GetInvoice(invoiceId.Value);
+                var invoice = await _invoices.GetInvoiceAsync(invoiceId.Value);
                 return Ok(invoice);
             }
             catch

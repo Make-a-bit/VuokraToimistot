@@ -28,10 +28,7 @@ namespace API.Controllers
             {
                 var offices = await _officeRepo.GetOffices();
 
-                if (offices.Count > 0)
-                    return Ok(offices);
-
-                else return NotFound();
+                return Ok(offices);
             }
             catch
             {
