@@ -40,13 +40,13 @@ namespace API.Services
                             var discounted = rowPrice - (rowPrice * item.Discount);
                             subTotal += discounted;
                             discounts += rowPrice * item.Discount;
-                            VAT += subTotal * item.Vat;
+                            VAT += (rowPrice / 100) * item.Vat;
 
                             continue;
                         }
 
                         subTotal += rowPrice;
-                        VAT += subTotal / 100 * item.Vat;
+                        VAT += (rowPrice / 100) * item.Vat;
                     }
                 }
 
@@ -62,13 +62,13 @@ namespace API.Services
                             var discounted = rowPrice - (rowPrice * item.Discount);
                             subTotal += discounted;
                             discounts += rowPrice * item.Discount;
-                            VAT += subTotal * item.Vat;
+                            VAT += (rowPrice / 100) * item.Vat;
 
                             continue;
                         }
 
                         subTotal += rowPrice;
-                        VAT += subTotal * item.Vat;
+                        VAT += (rowPrice / 100) * item.Vat;
                     }
                 }
 

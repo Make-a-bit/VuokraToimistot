@@ -51,7 +51,7 @@ namespace API.Repositories
             }
         }
 
-        public async Task<List<Invoice>> GetInvoicesAsync()
+        public async Task<List<Invoice>> GetAllInvoicesAsync()
         {
             var invoices = new List<Invoice>();
 

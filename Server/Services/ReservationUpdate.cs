@@ -128,7 +128,7 @@ namespace API.Services
             }
         }
 
-        public async Task<bool> SetInvoiced(int reservationId)
+        public async Task<bool> SetInvoiced(int reservationId, bool status)
         {
             using var conn = _dbManager.GetConnection();
             await conn.OpenAsync();
@@ -142,7 +142,7 @@ namespace API.Services
                 WHERE reservation_id = @id",
                 conn, transaction);
 
-                cmd.Parameters.AddWithValue("@status", true);
+                cmd.Parameters.AddWithValue("@status", status);
                 cmd.Parameters.AddWithValue("@id", reservationId);
 
                 int rowsAffected = await cmd.ExecuteNonQueryAsync();

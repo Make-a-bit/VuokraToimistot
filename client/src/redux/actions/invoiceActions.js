@@ -29,6 +29,25 @@ export const createInvoice = (reservation) => {
     }
 }
 
+export const deleteInvoice = (invoice) => {
+    return async (dispatch) => {
+        dispatch({ type: SHOW_LOADING })
+        try {
+            await fetch(`${mainURI}/invoice`, {
+                method: "DELETE",
+                headers: { "Content-type": "application/json" },
+                body: JSON.stringify(invoice)
+            });
+            dispatch({ type: DELETE_INVOICE_SUCCESS, payload: invoice })
+            dispatch({ type: SHOW_SUCCESS, payload: "Laskun poisto onnistui!" })
+        } catch {
+            dispatch({ type: SHOW_ERROR, payload: "Laskun poisto epäonnistui!" })
+        } finally {
+            dispatch({ type: HIDE_LOADING })
+        }
+    }
+}
+
 export const fetchInvoices = () => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
@@ -37,7 +56,6 @@ export const fetchInvoices = () => {
                 method: "GET"
             });
             const data = await response.json();
-            console.log("Invoice:", data)
             dispatch({ type: FETCH_INVOICES_SUCCESS, payload: data })
         } catch {
             dispatch({ type: SHOW_ERROR, payload: "Laskujen nouto epäonnistui!" })

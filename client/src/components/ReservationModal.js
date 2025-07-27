@@ -522,7 +522,8 @@ export const AddReservation = ({ show, onHide, office, property }) => {
                 display: "flex",
                 flexDirection: "row",
                 justifyContent: "space-between",
-                alignItems: "flex-start"
+                alignItems: "flex-end",
+                padding: "20px"
             }}>
                 <Box sx={{ display: "flex", flexDirection: "column" }}>
                     <Button
@@ -533,7 +534,8 @@ export const AddReservation = ({ show, onHide, office, property }) => {
                         variant="contained"
                         onClick={handleSubmit}
                         disabled={loading || !endDate}
-                        sx={{ ...leftButton }}>
+                        sx={{ marginBottom: "10px" }}
+                        >
                         Tallenna
                     </Button>
                     <Button
@@ -544,7 +546,8 @@ export const AddReservation = ({ show, onHide, office, property }) => {
                         variant="contained"
                         onClick={handleInvoicing}
                         disabled={loading || !endDate}
-                        sx={{ ...leftButton }}>
+                        sx={{  }}
+                    >
                         Tallenna ja laskuta
                     </Button>
                 </Box>
@@ -565,7 +568,7 @@ export const AddReservation = ({ show, onHide, office, property }) => {
                         setItemRows([])
                         setDescription("")
                         }}
-                        sx={{ ...rightButton }}>
+                        sx={{ marginBottom: "10px" }}>
                     Tyhjennä kentät
                 </Button>
                 <Button
@@ -577,7 +580,7 @@ export const AddReservation = ({ show, onHide, office, property }) => {
                     onClick={() => {
                         onHide();
                     }}
-                    sx={{ ...rightButton, alignSelf: "flex-end" }}>
+                    sx={{ alignSelf: "flex-end" }}>
                     Sulje
                     </Button>
                 </Box>
