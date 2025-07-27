@@ -28,12 +28,9 @@ namespace API.Controllers
             {
                 var reservations = await _reservationRepository.GetReservations();
 
-                if (reservations.Count > 0)
-                    return Ok(reservations);
-
-                else return NotFound();
+                return Ok(reservations);
             }
-            catch 
+            catch
             {
                 return BadRequest();
             }
@@ -47,7 +44,7 @@ namespace API.Controllers
             {
                 var dates = await _reservationRepository.GetReservedDates(propertyId);
 
-                if (dates.Count > 0) 
+                if (dates.Count > 0)
                     return Ok(dates);
 
                 else return NotFound();
@@ -104,7 +101,7 @@ namespace API.Controllers
         {
             try
             {
-                if (await _reservationDelete.DeleteReservationCascade(reservationId)) 
+                if (await _reservationDelete.DeleteReservationCascade(reservationId))
                     return Ok();
 
                 else return NotFound();

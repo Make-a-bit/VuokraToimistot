@@ -51,14 +51,14 @@ namespace API.Repositories
                 while (await reader.ReadAsync())
                 {
                     reservation.Id = reader.GetInt32(reader.GetOrdinal("reservation_id"));
-                    reservation.PropertyId = reader.GetInt32(reader.GetOrdinal("property_id"));
-                    reservation.CustomerId = reader.GetInt32(reader.GetOrdinal("customer_id"));
+                    reservation.Office.Name = reader.GetString(reader.GetOrdinal("office_name"));
+                    reservation.Property.Id = reader.GetInt32(reader.GetOrdinal("property_id"));
+                    reservation.Property.Name = reader.GetString(reader.GetOrdinal("property_name"));
+                    reservation.Customer.Id = reader.GetInt32(reader.GetOrdinal("customer_id"));
+                    reservation.Customer.Name = reader.GetString(reader.GetOrdinal("customer_name"));
                     reservation.StartDate = DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("reservation_start")));
                     reservation.EndDate = DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("reservation_end")));
                     reservation.Invoiced = reader.GetBoolean(reader.GetOrdinal("invoiced"));
-                    reservation.CustomerName = reader.GetString(reader.GetOrdinal("customer_name"));
-                    reservation.OfficeName = reader.GetString(reader.GetOrdinal("office_name"));
-                    reservation.PropertyName = reader.GetString(reader.GetOrdinal("property_name"));
                 }
 
                 reservation.Devices = await GetReservationDevices(reservation.Id);
@@ -93,6 +93,7 @@ namespace API.Repositories
                     r.reservation_start,
                     r.reservation_end,
                     r.invoiced,
+                    r.reservation_description,
                     c.customer_name,
                     p.property_name,
                     o.office_name
@@ -109,14 +110,17 @@ namespace API.Repositories
                     var reservation = new Reservation();
 
                     reservation.Id = reader.GetInt32(reader.GetOrdinal("reservation_id"));
-                    reservation.OfficeName = reader.GetString(reader.GetOrdinal("office_name"));
-                    reservation.PropertyName = reader.GetString(reader.GetOrdinal("property_name"));
-                    reservation.PropertyId = reader.GetInt32(reader.GetOrdinal("property_id"));
-                    reservation.CustomerId = reader.GetInt32(reader.GetOrdinal("customer_id"));
-                    reservation.CustomerName = reader.GetString(reader.GetOrdinal("customer_name"));
+                    reservation.Office.Name = reader.GetString(reader.GetOrdinal("office_name"));
+                    reservation.Property.Id = reader.GetInt32(reader.GetOrdinal("property_id"));
+                    reservation.Property.Name = reader.GetString(reader.GetOrdinal("property_name"));
+                    reservation.Customer.Id = reader.GetInt32(reader.GetOrdinal("customer_id"));
+                    reservation.Customer.Name = reader.GetString(reader.GetOrdinal("customer_name"));
                     reservation.StartDate = DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("reservation_start")));
                     reservation.EndDate = DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("reservation_end")));
                     reservation.Invoiced = reader.GetBoolean(reader.GetOrdinal("invoiced"));
+                    reservation.Description = reader.IsDBNull(reader.GetOrdinal("reservation_description"))
+                        ? null
+                        : reader.GetString(reader.GetOrdinal("reservation_description"));
 
                     reservations.Add(reservation);
                 }

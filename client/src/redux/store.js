@@ -2,6 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { combineReducers } from "redux";
 import { customerReducer } from "./reducers/customerReducer";
 import { deviceReducer } from "./reducers/deviceReducer";
+import { invoiceReducer } from "./reducers/invoiceReducer";
 import { officeReducer } from "./reducers/officeReducer";
 import { propertyReducer } from "./reducers/propertyReducer";
 import { reservationReducer } from "./reducers/reservationReducer";
@@ -11,6 +12,7 @@ import { uiReducer } from "./reducers/uiReducer";
 const rootReducer = combineReducers({
     customers: customerReducer,
     devices: deviceReducer,
+    invoices: invoiceReducer,
     offices: officeReducer,
     properties: propertyReducer,
     reservations: reservationReducer,

@@ -45,6 +45,8 @@ namespace API
             builder.Services.AddScoped<DeviceDelete>();
             builder.Services.AddScoped<DeviceRepository>();
             builder.Services.AddScoped<DeviceUpdate>();
+            builder.Services.AddScoped<InvoiceAdd>();
+            builder.Services.AddScoped<InvoiceRepository>();
             builder.Services.AddScoped<OfficeAdd>();
             builder.Services.AddScoped<OfficeDelete>();
             builder.Services.AddScoped<OfficeRepository>();

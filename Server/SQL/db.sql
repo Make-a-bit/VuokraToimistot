@@ -41,24 +41,14 @@ END;
 
 IF NOT EXISTS (
 SELECT * FROM INFORMATION_SCHEMA.TABLES 
-WHERE TABLE_NAME = 'Invoices'
+WHERE TABLE_NAME = 'Vat'
 AND TABLE_SCHEMA = 'dbo'
 )
 BEGIN
-    CREATE TABLE Invoices (
-        invoice_id INT IDENTITY PRIMARY KEY,
-        customer_id INT NOT NULL,
-        invoice_date DATE NOT NULL,
-        invoice_due_date DATE NOT NULL,
-        invoice_subtotal DECIMAL(10, 2) NOT NULL,
-        invoice_discounts DECIMAL(10, 2) NOT NULL,
-        invoice_vattotal DECIMAL(10, 2) NOT NULL,
-        invoice_totalsum DECIMAL(10, 2) NOT NULL,
-        invoice_description VARCHAR(255) NOT NULL,
-        invoice_paid BIT DEFAULT 0 NOT NULL,
-        FOREIGN KEY (customer_id) REFERENCES Customers (customer_id)
-        ON DELETE NO ACTION
-        ON UPDATE CASCADE
+    CREATE TABLE Vat (
+        vat_id INT IDENTITY PRIMARY KEY,
+        vat_value DECIMAL(4, 2) NOT NULL,
+        vat_description VARCHAR(255) NOT NULL,
     );
 END;
 
@@ -73,8 +63,12 @@ BEGIN
         office_id INT NOT NULL,
         property_name VARCHAR(255) NOT NULL,
         property_area DECIMAL(10, 2) NOT NULL,
-        property_price DECIMAL(10, 2) NOT NULL
+        property_price DECIMAL(10, 2) NOT NULL,
+        property_vat INT NOT NULL,
         FOREIGN KEY (office_id) REFERENCES Offices (office_id)
+        ON DELETE NO ACTION
+        ON UPDATE CASCADE,
+        FOREIGN KEY (property_vat) REFERENCES VAT (vat_id)
         ON DELETE NO ACTION
         ON UPDATE CASCADE
     );
@@ -92,8 +86,11 @@ BEGIN
         service_name VARCHAR(255) NOT NULL,
         service_unit VARCHAR(255) NOT NULL,
         service_price DECIMAL(10, 2) NOT NULL,
-        service_vat DECIMAL(10,2) NOT NULL,
+        service_vat INT NOT NULL,
         FOREIGN KEY (office_id) REFERENCES Offices (office_id)
+        ON DELETE NO ACTION
+        ON UPDATE CASCADE,
+        FOREIGN KEY (service_vat) REFERENCES VAT (vat_id)
         ON DELETE NO ACTION
         ON UPDATE CASCADE
     );
@@ -110,8 +107,11 @@ BEGIN
         office_id INT NOT NULL,
         device_name VARCHAR(255) NOT NULL,
         device_price DECIMAL(10, 2) NOT NULL,
-        device_vat DECIMAL(10,2) NOT NULL,
+        device_vat INT NOT NULL,
         FOREIGN KEY (office_id) REFERENCES Offices (office_id)
+        ON DELETE NO ACTION
+        ON UPDATE CASCADE,
+        FOREIGN KEY (device_vat) REFERENCES VAT (vat_id)
         ON DELETE NO ACTION
         ON UPDATE CASCADE
     );
@@ -129,6 +129,7 @@ BEGIN
         customer_id INT NOT NULL,
         reservation_start DATE NOT NULL,
         reservation_end DATE NOT NULL,
+        reservation_description VARCHAR(255),
         invoiced BIT DEFAULT(0),
         FOREIGN KEY (property_id) REFERENCES Office_properties (property_id)
         ON DELETE NO ACTION
@@ -141,20 +142,27 @@ END;
 
 IF NOT EXISTS (
 SELECT * FROM INFORMATION_SCHEMA.TABLES 
-WHERE TABLE_NAME = 'Invoice_reservations'
+WHERE TABLE_NAME = 'Invoices'
 AND TABLE_SCHEMA = 'dbo'
 )
 BEGIN
-    CREATE TABLE Invoice_reservations (
-        invoice_reservation_id INT IDENTITY PRIMARY KEY,
-        invoice_id INT NOT NULL,
+    CREATE TABLE Invoices (
+        invoice_id INT IDENTITY PRIMARY KEY,
         reservation_id INT NOT NULL,
-        FOREIGN KEY (invoice_id) REFERENCES Invoices (invoice_id)
+        customer_id INT NOT NULL,
+        invoice_date DATE NOT NULL,
+        invoice_due_date DATE NOT NULL,
+        invoice_subtotal DECIMAL(10, 2) NOT NULL,
+        invoice_discounts DECIMAL(10, 2) NOT NULL,
+        invoice_vattotal DECIMAL(10, 2) NOT NULL,
+        invoice_totalsum DECIMAL(10, 2) NOT NULL,
+        invoice_paid BIT DEFAULT 0 NOT NULL,
+        FOREIGN KEY (customer_id) REFERENCES Customers (customer_id)
         ON DELETE NO ACTION
-        ON UPDATE NO ACTION,
+        ON UPDATE CASCADE,
         FOREIGN KEY (reservation_id) REFERENCES Reservations (reservation_id)
         ON DELETE NO ACTION
-        ON UPDATE NO ACTION
+        ON UPDATE CASCADE
     );
 END;
 
@@ -169,7 +177,7 @@ BEGIN
         reservation_id INT NOT NULL,
         device_id INT NOT NULL,
         device_price DECIMAL(10, 2) NOT NULL,
-        device_vat DECIMAL(10, 2) NOT NULL,
+        device_vat DECIMAL(4, 2) NOT NULL,
         device_qty INT NOT NULL,
         device_discount DECIMAL(10, 2) NOT NULL,
         FOREIGN KEY (reservation_id) REFERENCES Reservations (reservation_id)
@@ -192,7 +200,7 @@ BEGIN
         reservation_id INT NOT NULL,
         service_id INT NOT NULL,
         service_price DECIMAL(10, 2) NOT NULL,
-        service_vat DECIMAL(10, 2) NOT NULL,
+        service_vat DECIMAL(4, 2) NOT NULL,
         service_qty INT NOT NULL,
         service_discount DECIMAL(10, 2) NOT NULL,
         FOREIGN KEY (reservation_id) REFERENCES Reservations (reservation_id)

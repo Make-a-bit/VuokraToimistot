@@ -12,13 +12,7 @@
         ]
     },
     {
-        label: "Varaushallinta",
-        dropdownParent: true,
-        dropdown: [
-            { path: "/varaushallinta/varaus", label: "Uusi varaus" },
-            { path: "/varaushallinta/varaukset", label: "Varaukset" },
-        ]
-    },
+         path: "/varaushallinta", label: "Varaushallinta" },            
     {
         label: "Muut",
         dropdownParent: true,

@@ -1,4 +1,5 @@
 ﻿const serviceSchema = [
+    { field: "officeName", header: "Kohde", type: "string" },
     { field: "name", header: "Nimi", type: "string" },
     { field: "unit", header: "Yksikkö", type: "string" },
     { field: "price", header: "Hinta", type: "decimal" },

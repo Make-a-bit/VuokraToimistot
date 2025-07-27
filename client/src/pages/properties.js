@@ -21,8 +21,8 @@ const Properties = () => {
     const dispatch = useDispatch();
     const loading = useSelector(state => state.ui.loadingState);
     const offices = useSelector(state => state.offices.offices);
-    const selectedOffice = useSelector(state => state.properties.selectedPropertyOffice);
     const properties = useSelector(state => state.properties.properties);
+    const selectedOffice = useSelector(state => state.properties.selectedPropertyOffice);
     const { errorMessage, successMessage } = useSelector(state => state.ui);
     const [showAddProperty, setShowAddProperty] = useState(false)
     const [showConfirm, setShowConfirm] = useState(false);
@@ -39,8 +39,11 @@ const Properties = () => {
     const handleOfficeChange = (e) => {
         const office = offices.find(o => o.id === e.target.value);
         dispatch(setPropertyOffice(office));
-        dispatch(fetchProperties(office.id));
     };
+
+    const filteredProperties = selectedOffice
+        ? properties.filter(s => s.officeId === selectedOffice.id)
+        : properties;
 
     const btnDeleteProperty = (property) => {
         setSelectedProperty(property)
@@ -51,8 +54,8 @@ const Properties = () => {
 
     const saveEdits = async (updatedRow, originalRow) => {
         console.log("Edit property:", originalRow)
-        const requiredFields = ["name", "area", "price"]
-        const decimalFields = ["price"]
+        const requiredFields = ["name", "area", "price", "vat"]
+        const decimalFields = ["price", "vat"]
         const isValid = inputValidation(updatedRow, requiredFields, decimalFields);
 
         if (!isValid) {
@@ -144,7 +147,7 @@ const Properties = () => {
 
             <div style={{ height: "auto", width: "100%" }}>
                 <DataGrid
-                    rows={properties}
+                    rows={filteredProperties}
                     columns={columns}
                     disableRowSelectionOnClick
                     loading={loading}

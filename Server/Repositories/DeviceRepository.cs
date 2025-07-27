@@ -26,7 +26,17 @@ namespace API.Repositories
                 using var conn = _dbManager.GetConnection();
                 await conn.OpenAsync();
 
-                using var cmd = new SqlCommand("SELECT * FROM Office_devices", conn);
+                using var cmd = new SqlCommand(@"
+                SELECT 
+                    d.device_id,
+                    d.office_id,
+                    d.device_name,
+                    d.device_price,
+                    v.vat_value,
+                    o.office_name
+                FROM Office_devices d
+                JOIN VAT v ON d.device_vat = v.vat_id
+                JOIN Offices o ON d.office_id = o.office_id", conn);
                 using var reader = await cmd.ExecuteReaderAsync();
 
                 while (await reader.ReadAsync())
@@ -35,9 +45,10 @@ namespace API.Repositories
                     {
                         Id = reader.GetInt32(reader.GetOrdinal("device_id")),
                         OfficeId = reader.GetInt32(reader.GetOrdinal("office_id")),
+                        OfficeName = reader.GetString(reader.GetOrdinal("office_name")),
                         Name = reader.GetString(reader.GetOrdinal("device_name")),
                         Price = reader.GetDecimal(reader.GetOrdinal("device_price")),
-                        Vat = reader.GetDecimal(reader.GetOrdinal("device_vat"))
+                        Vat = reader.GetDecimal(reader.GetOrdinal("vat_value"))
                     };
                     devices.Add(device);
                 }
@@ -64,8 +75,17 @@ namespace API.Repositories
                 await conn.OpenAsync();
 
                 using var cmd = new SqlCommand(@"
-                SELECT * FROM Office_devices
-                WHERE office_id = @officeId", conn);
+                SELECT 
+                    d.device_id,
+                    d.office_id,
+                    d.device_name,
+                    d.device_price,
+                    v.vat_value,
+                    o.office_name
+                FROM Office_devices d
+                JOIN VAT v ON d.device_vat = v.vat_id
+                JOIN Offices o ON d.office_id = o.office_id
+                WHERE d.office_id = @officeId", conn);
 
                 cmd.Parameters.AddWithValue("@officeId", officeId);
                 using var reader = await cmd.ExecuteReaderAsync();
@@ -76,9 +96,10 @@ namespace API.Repositories
                     {
                         Id = reader.GetInt32(reader.GetOrdinal("device_id")),
                         OfficeId = reader.GetInt32(reader.GetOrdinal("office_id")),
+                        OfficeName = reader.GetString(reader.GetOrdinal("office_name")),
                         Name = reader.GetString(reader.GetOrdinal("device_name")),
                         Price = reader.GetDecimal(reader.GetOrdinal("device_price")),
-                        Vat = reader.GetDecimal(reader.GetOrdinal("device_vat"))
+                        Vat = reader.GetDecimal(reader.GetOrdinal("vat_value"))
                     };
 
                     devices.Add(device);
