@@ -26,7 +26,7 @@ namespace API.Controllers
         {
             try
             {
-                var reservations = await _reservationRepository.GetReservations();
+                var reservations = await _reservationRepository.GetAllReservationsAsync();
 
                 return Ok(reservations);
             }
@@ -42,7 +42,7 @@ namespace API.Controllers
         {
             try
             {
-                var dates = await _reservationRepository.GetReservedDates(propertyId);
+                var dates = await _reservationRepository.GetReservedDatesAsync(propertyId);
 
                 if (dates.Count > 0)
                     return Ok(dates);
@@ -60,7 +60,7 @@ namespace API.Controllers
         {
             try
             {
-                var reservationID = await _reservationAdd.AddReservation(reservation);
+                var reservationID = await _reservationAdd.AddReservationAsync(reservation);
 
                 if (!reservationID.HasValue)
                     return BadRequest();
@@ -80,9 +80,9 @@ namespace API.Controllers
         {
             try
             {
-                if (await _reservationUpdate.UpdateReservation(reservation))
+                if (await _reservationUpdate.UpdateReservationAsync(reservation))
                 {
-                    var updatedReservation = await _reservationRepository.GetReservation(reservation.Id);
+                    var updatedReservation = await _reservationRepository.GetReservationAsync(reservation.Id);
                     return Ok(updatedReservation);
                 }
 
@@ -101,7 +101,7 @@ namespace API.Controllers
         {
             try
             {
-                if (await _reservationDelete.DeleteReservationCascade(reservationId))
+                if (await _reservationDelete.DeleteReservationCascadeAsync(reservationId))
                     return Ok();
 
                 else return NotFound();

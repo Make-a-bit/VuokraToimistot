@@ -14,10 +14,14 @@ namespace API.Repositories
         }
 
         /// <summary>
-        /// Get all customers from the database
+        /// Asynchronously retrieves a list of all customers from the database.
         /// </summary>
-        /// <returns></returns>
-        public async Task<List<Customer>> GetCustomers()
+        /// <remarks>This method establishes a connection to the database, executes a query to select all
+        /// customer records, and returns them as a list of <see cref="Customer"/> objects. Ensure that the database
+        /// connection is properly configured before calling this method.</remarks>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a list of <see cref="Customer"/>
+        /// objects representing all customers in the database. The list will be empty if no customers are found.</returns>
+        public async Task<List<Customer>> GetAllCustomersAsync()
         {
             var customers = new List<Customer>();
 
@@ -54,11 +58,15 @@ namespace API.Repositories
         }
 
         /// <summary>
-        /// Get customer by customer id from the database 
+        /// Asynchronously retrieves a customer by their unique identifier.
         /// </summary>
-        /// <param name="customerId"></param>
-        /// <returns></returns>
-        public async Task<Customer> GetCustomer(int customerId)
+        /// <remarks>This method opens a connection to the database and executes a query to retrieve the
+        /// customer details. Ensure that the database connection is properly configured before calling this
+        /// method.</remarks>
+        /// <param name="customerId">The unique identifier of the customer to retrieve.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the <see cref="Customer"/>
+        /// object with the specified identifier, or a default <see cref="Customer"/> object if no customer is found.</returns>
+        public async Task<Customer> GetCustomerAsync(int customerId)
         {
             var customer = new Customer();
 

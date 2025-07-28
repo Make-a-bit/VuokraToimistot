@@ -12,6 +12,15 @@ namespace API.Services
             _dbManager = db;
         }
 
+        /// <summary>
+        /// Asynchronously updates the specified invoice in the database.
+        /// </summary>
+        /// <remarks>This method updates the invoice's date, due date, and payment status in the database.
+        /// It uses a transaction to ensure that the update is atomic. If the update fails, the transaction is rolled
+        /// back.</remarks>
+        /// <param name="invoice">The invoice object containing updated information. The <paramref name="invoice"/> parameter must not be null
+        /// and must have a valid <c>Id</c>.</param>
+        /// <returns><see langword="true"/> if the invoice was successfully updated; otherwise, <see langword="false"/>.</returns>
         public async Task<bool> UpdateInvoiceAsync(Invoice invoice)
         {
             using var conn = _dbManager.GetConnection();

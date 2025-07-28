@@ -12,7 +12,15 @@ namespace API.Services
             _dbManager = db;
         }
 
-        public async Task<int?> AddReservation(Reservation reservation)
+        /// <summary>
+        /// Adds a new reservation to the database and returns the reservation ID.
+        /// </summary>
+        /// <remarks>This method performs an asynchronous operation to insert a reservation and its
+        /// associated devices and services into the database. It uses a transaction to ensure that all related data is
+        /// committed together. If any part of the operation fails, the transaction is rolled back.</remarks>
+        /// <param name="reservation">The reservation details to be added, including property, customer, devices, and services.</param>
+        /// <returns>The ID of the newly created reservation if the operation is successful; otherwise, <see langword="null"/>.</returns>
+        public async Task<int?> AddReservationAsync(Reservation reservation)
         {
             int reservationID = 0;
 

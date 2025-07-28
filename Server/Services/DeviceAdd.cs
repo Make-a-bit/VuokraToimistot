@@ -13,7 +13,16 @@ namespace API.Services
             _dbManager = db;
         }
 
-        public async Task<int?> AddDevice(Device device)
+        /// <summary>
+        /// Adds a new device to the database and returns the generated device ID.
+        /// </summary>
+        /// <remarks>This method opens a database connection and executes an SQL command to insert a new
+        /// device record. It uses a transaction to ensure that the operation is atomic. If an exception occurs during
+        /// the operation, the transaction is rolled back, and the method returns <see langword="null"/>.</remarks>
+        /// <param name="device">The <see cref="Device"/> object containing the details of the device to be added. The <paramref
+        /// name="device"/> cannot be null.</param>
+        /// <returns>The ID of the newly inserted device if the operation is successful; otherwise, <see langword="null"/>.</returns>
+        public async Task<int?> AddDeviceAsync(Device device)
         {
             using var conn = _dbManager.GetConnection();
             await conn.OpenAsync();

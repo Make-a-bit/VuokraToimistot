@@ -26,7 +26,7 @@ namespace API.Controllers
         {
             try
             {
-                var properties = await _propertyRepository.GetProperties();
+                var properties = await _propertyRepository.GetAllPropertiesAsync();
 
                 return Ok(properties);
             }
@@ -41,7 +41,7 @@ namespace API.Controllers
         {
             try
             {
-                var properties = await _propertyRepository.GetProperties(id);
+                var properties = await _propertyRepository.GetAllPropertiesAsync(id);
 
                 if (properties.Count > 0)
                     return Ok(properties);
@@ -59,7 +59,7 @@ namespace API.Controllers
         {
             try
             {
-                var propertyId = await _propertyAdd.AddProperty(property);
+                var propertyId = await _propertyAdd.AddPropertyAsync(property);
 
                 if (!propertyId.HasValue)
                     return BadRequest();
@@ -79,9 +79,9 @@ namespace API.Controllers
         {
             try
             {
-                if (await _propertyUpdate.UpdateProperty(property))
+                if (await _propertyUpdate.UpdatePropertyAsync(property))
                 {
-                    var updatedProperty = await _propertyRepository.GetProperty(property.Id);
+                    var updatedProperty = await _propertyRepository.GetPropertyAsync(property.Id);
                     return Ok(updatedProperty);
                 }
 
@@ -99,7 +99,7 @@ namespace API.Controllers
         {
             try
             {
-                if (await _propertyDelete.DeleteProperty(id))
+                if (await _propertyDelete.DeletePropertyAsync(id))
                     return Ok();
 
                 else return NotFound();

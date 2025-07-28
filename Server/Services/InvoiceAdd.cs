@@ -13,7 +13,16 @@ namespace API.Services
             _dbManager = db;
         }
 
-        public async Task<int?> CreateInvoice(Reservation reservation)
+        /// <summary>
+        /// Creates an invoice for the specified reservation and returns the generated invoice ID.
+        /// </summary>
+        /// <remarks>This method calculates the subtotal, discounts, VAT, and total sum based on the
+        /// services and devices associated with the reservation. It then inserts a new invoice record into the
+        /// database. The operation is performed within a transaction to ensure data integrity.</remarks>
+        /// <param name="reservation">The reservation for which the invoice is to be created. Must not be null and should contain valid services
+        /// and devices.</param>
+        /// <returns>The ID of the created invoice if successful; otherwise, <see langword="null"/> if the operation fails.</returns>
+        public async Task<int?> CreateInvoiceAsync(Reservation reservation)
         {
             int? invoiceId = null;
 

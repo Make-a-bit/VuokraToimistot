@@ -17,7 +17,16 @@ namespace API.Services
             _reservationRepository = rr;
         }
 
-        public async Task<bool> UpdateReservation(Reservation reservation)
+        /// <summary>
+        /// Updates an existing reservation in the database with the provided details.
+        /// </summary>
+        /// <remarks>This method updates the reservation's basic details, as well as associated devices
+        /// and services. It uses a database transaction to ensure that all updates are applied atomically. If the
+        /// reservation has associated devices or services, they are first removed and then re-added with the updated
+        /// details.</remarks>
+        /// <param name="reservation">The reservation object containing updated details. Must not be null and must have a valid reservation ID.</param>
+        /// <returns><see langword="true"/> if the reservation was successfully updated; otherwise, <see langword="false"/>.</returns>
+        public async Task<bool> UpdateReservationAsync(Reservation reservation)
         {
             using var conn = _dbManager.GetConnection();
             await conn.OpenAsync();
@@ -25,14 +34,14 @@ namespace API.Services
 
             try
             {
-                if (await _reservationRepository.HasDevicesOnReservation(reservation.Id))
+                if (await _reservationRepository.HasDevicesOnReservationAsync(reservation.Id))
                 {
-                    await _reservationDelete.DeleteReservationDevices(reservation.Id, conn, transaction);
+                    await _reservationDelete.DeleteReservationDevicesAsync(reservation.Id, conn, transaction);
                 }
 
-                if (await _reservationRepository.HasServicesOnReservation(reservation.Id))
+                if (await _reservationRepository.HasServicesOnReservationAsync(reservation.Id))
                 {
-                    await _reservationDelete.DeleteReservationServices(reservation.Id, conn, transaction);
+                    await _reservationDelete.DeleteReservationServicesAsync(reservation.Id, conn, transaction);
                 }
 
                 using var cmd = new SqlCommand(@"
@@ -128,7 +137,18 @@ namespace API.Services
             }
         }
 
-        public async Task<bool> SetInvoiced(int reservationId, bool status)
+
+        /// <summary>
+        /// Asynchronously updates the invoiced status of a reservation.
+        /// </summary>
+        /// <remarks>This method uses a database transaction to ensure that the update is atomic. If the
+        /// transaction fails, it will be rolled back.</remarks>
+        /// <param name="reservationId">The unique identifier of the reservation to update.</param>
+        /// <param name="status">The new invoiced status to set for the reservation. <see langword="true"/> if invoiced; otherwise, <see
+        /// langword="false"/>.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains <see langword="true"/> if the
+        /// update was successful; otherwise, <see langword="false"/>.</returns>
+        public async Task<bool> SetInvoicedAsync(int reservationId, bool status)
         {
             using var conn = _dbManager.GetConnection();
             await conn.OpenAsync();

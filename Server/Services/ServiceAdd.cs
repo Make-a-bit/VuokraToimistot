@@ -12,7 +12,16 @@ namespace API.Services
             _dbManager = db;
         }
 
-        public async Task<int?> AddService(Service service)
+        /// <summary>
+        /// Asynchronously adds a new service to the database and returns the generated service ID.
+        /// </summary>
+        /// <remarks>This method opens a database connection and begins a transaction to insert a new
+        /// service record. If the insertion is successful, the transaction is committed and the new service ID is
+        /// returned. In case of an error, the transaction is rolled back, and <see langword="null"/> is
+        /// returned.</remarks>
+        /// <param name="service">The service to be added, containing details such as office ID, name, unit, price, and VAT.</param>
+        /// <returns>The ID of the newly inserted service if the operation is successful; otherwise, <see langword="null"/>.</returns>
+        public async Task<int?> AddServiceAsync(Service service)
         {
             using var conn = _dbManager.GetConnection();
             await conn.OpenAsync();

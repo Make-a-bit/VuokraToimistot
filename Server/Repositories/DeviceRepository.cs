@@ -14,10 +14,15 @@ namespace API.Repositories
         }
 
         /// <summary>
-        /// Get all devices from the database
+        /// Asynchronously retrieves a list of all devices from the database.
         /// </summary>
-        /// <returns></returns>
-        public async Task<List<Device>> GetDevices()
+        /// <remarks>This method connects to the database to fetch device information, including device
+        /// ID, office ID, device name, price, VAT value, and office name. It returns a list of <see cref="Device"/>
+        /// objects representing each device.</remarks>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a list of <see cref="Device"/>
+        /// objects, where each object includes details such as the device ID, office ID, office name, device name,
+        /// price, and VAT value.</returns>
+        public async Task<List<Device>> GetAllDevicesAsync()
         {
             var devices = new List<Device>();
 
@@ -60,12 +65,14 @@ namespace API.Repositories
             }
         }
 
+
         /// <summary>
-        /// Get all devices by office from the database
+        /// Asynchronously retrieves a list of all devices associated with a specified office.
         /// </summary>
-        /// <param name="officeId"></param>
-        /// <returns></returns>
-        public async Task<List<Device>> GetDevices(int officeId)
+        /// <param name="officeId">The unique identifier of the office for which to retrieve devices. Must be a valid office ID.</param>
+        /// <returns>A task representing the asynchronous operation. The task result contains a list of <see cref="Device"/>
+        /// objects associated with the specified office. The list will be empty if no devices are found.</returns>
+        public async Task<List<Device>> GetAllDevicesAsync(int officeId)
         {
             var devices = new List<Device>();
 
@@ -112,12 +119,17 @@ namespace API.Repositories
             }
         }
 
+
         /// <summary>
-        /// Get device by device id from the database
+        /// Asynchronously retrieves a device by its identifier from the database.
         /// </summary>
-        /// <param name="deviceId"></param>
-        /// <returns></returns>
-        public async Task<Device> GetDevice(int deviceId)
+        /// <remarks>This method establishes a connection to the database, executes a query to find the
+        /// device with the specified identifier, and populates a <see cref="Device"/> object with the retrieved
+        /// data.</remarks>
+        /// <param name="deviceId">The unique identifier of the device to retrieve. Must be a positive integer.</param>
+        /// <returns>A <see cref="Device"/> object representing the device with the specified identifier. If no device is found,
+        /// the returned object will have default values.</returns>
+        public async Task<Device> GetDeviceAsync(int deviceId)
         {
             var device = new Device();
 

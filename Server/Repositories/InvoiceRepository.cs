@@ -13,6 +13,16 @@ namespace API.Repositories
             _dbManager = db;
         }
 
+        /// <summary>
+        /// Asynchronously retrieves an invoice by its unique identifier.
+        /// </summary>
+        /// <remarks>This method opens a database connection to retrieve the invoice details. Ensure that
+        /// the database connection is properly configured before calling this method. The method will throw an
+        /// exception if the connection fails or if the query execution encounters an error.</remarks>
+        /// <param name="invoiceId">The unique identifier of the invoice to retrieve.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the <see cref="Invoice"/> object
+        /// corresponding to the specified <paramref name="invoiceId"/>. If no invoice is found, the returned object
+        /// will have default values.</returns>
         public async Task<Invoice> GetInvoiceAsync(int invoiceId)
         {
             var invoice = new Invoice();
@@ -51,6 +61,15 @@ namespace API.Repositories
             }
         }
 
+
+        /// <summary>
+        /// Asynchronously retrieves a list of all invoices from the database.
+        /// </summary>
+        /// <remarks>This method fetches invoice details including customer information and financial
+        /// data. It returns a list of <see cref="Invoice"/> objects, each representing an invoice with its associated
+        /// details.</remarks>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a list of <see cref="Invoice"/>
+        /// objects.</returns>
         public async Task<List<Invoice>> GetAllInvoicesAsync()
         {
             var invoices = new List<Invoice>();

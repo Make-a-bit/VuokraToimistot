@@ -12,7 +12,15 @@ namespace API.Services
             _dbManager = db;
         }
 
-        public async Task<bool> UpdateDevice(Device device)
+        /// <summary>
+        /// Updates the specified device in the database with new values.
+        /// </summary>
+        /// <remarks>This method updates the device's name, price, and VAT in the database. It uses a
+        /// transaction to ensure that the update is atomic. If the update fails, the transaction is rolled back, and
+        /// the method returns <see langword="false"/>.</remarks>
+        /// <param name="device">The <see cref="Device"/> object containing updated information to be saved.</param>
+        /// <returns><see langword="true"/> if the device was successfully updated; otherwise, <see langword="false"/>.</returns>
+        public async Task<bool> UpdateDeviceAsync(Device device)
         {
             using var conn = _dbManager.GetConnection();
             await conn.OpenAsync();

@@ -26,7 +26,7 @@ namespace API.Controllers
         {
             try
             {
-                var services = await _serviceRepository.GetServices();
+                var services = await _serviceRepository.GetAllServicesAsync();
 
                 return Ok(services);
             }
@@ -41,7 +41,7 @@ namespace API.Controllers
         {
             try
             {
-                var services = await _serviceRepository.GetServices(officeId);
+                var services = await _serviceRepository.GetAllServicesAsync(officeId);
 
                 if (services.Count > 0)
                     return Ok(services);
@@ -60,7 +60,7 @@ namespace API.Controllers
         {
             try
             {
-                var serviceId = await _serviceAdd.AddService(service);
+                var serviceId = await _serviceAdd.AddServiceAsync(service);
 
                 if (!serviceId.HasValue)
                     return BadRequest();
@@ -81,9 +81,9 @@ namespace API.Controllers
         {
             try
             {
-                if (await _serviceUpdate.UpdateService(service))
+                if (await _serviceUpdate.UpdateServiceAsync(service))
                 {
-                    var updatedService = await _serviceRepository.GetService(service.Id);
+                    var updatedService = await _serviceRepository.GetServiceAsync(service.Id);
                     return Ok(updatedService);
                 }
 
@@ -101,7 +101,7 @@ namespace API.Controllers
         {
             try
             {
-                if (await _serviceDelete.DeleteService(id))
+                if (await _serviceDelete.DeleteServiceAsync(id))
                     return Ok();
 
                 else return NotFound();
