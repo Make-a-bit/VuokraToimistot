@@ -48,6 +48,7 @@ namespace API
             builder.Services.AddScoped<InvoiceAdd>();
             builder.Services.AddScoped<InvoiceDelete>();
             builder.Services.AddScoped<InvoiceRepository>();
+            builder.Services.AddScoped<InvoiceUpdate>();
             builder.Services.AddScoped<OfficeAdd>();
             builder.Services.AddScoped<OfficeDelete>();
             builder.Services.AddScoped<OfficeRepository>();

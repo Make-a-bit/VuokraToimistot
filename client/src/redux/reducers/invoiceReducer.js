@@ -21,6 +21,20 @@ export const invoiceReducer = (state = initialState, action) => {
                 invoices: action.payload
             }
 
+        case EDIT_INVOICE_SUCCESS:
+            return {
+                ...state,
+                invoices: state.invoices.map(i =>
+                    i.id === action.payload.id ? action.payload : i
+                ),
+            }
+
+        case DELETE_INVOICE_SUCCESS:
+            return {
+                ...state,
+                invoices: state.invoices.filter((i) => i.id !== action.payload.id)
+            }
+
         default: return state;
     }
 }

@@ -3,18 +3,19 @@ import { useDispatch, useSelector } from "react-redux";
 import { Alert, Autocomplete, Box, Button, FormControl, IconButton, Snackbar, TextField } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import dataGridSx from "../utils/dataGridSx";
-import ConfirmModal from "../components/ConfirmModal";
 import { deleteInvoice, fetchInvoices } from "../redux/actions/invoiceActions";
 import { fetchReservations } from "../redux/actions/reservationActions";
 import DeleteIcon from '@mui/icons-material/Delete';
+
+import ConfirmModal from "../components/ConfirmModal";
+import EditInvoice from "../components/EditInvoiceModal";
 
 const Invoices = () => {
     const dispatch = useDispatch();
     const invoices = useSelector(state => state.invoices.invoices);
     const [selectedInvoice, setSelectedInvoice] = useState(null);
     const [showConfirm, setShowConfirm] = useState(false);
-
-        console.log(invoices)
+    const [showEditInvoice, setShowEditInvoice] = useState(false);
 
     // Map nested customer name to top-level property
     const mappedInvoices = invoices.map(inv => ({
@@ -78,6 +79,11 @@ const Invoices = () => {
         }
     ];
 
+    const handleRowClick = (params) => {
+        setSelectedInvoice(params.row);
+        setShowEditInvoice(true);
+    };
+
     return <>
         <DataGrid
             rows={mappedInvoices}
@@ -85,6 +91,7 @@ const Invoices = () => {
             getRowId={row => row.id}
             autoHeight
             disableSelectionOnClick
+            onRowClick={handleRowClick}
             sx={{
                 ...dataGridSx,
                 marginBottom: "20px",
@@ -119,6 +126,12 @@ const Invoices = () => {
                 ) : "Haluatko varmasti poistaa tämän varauksen?"
             }
             title={"Poista varaus"}
+        />
+
+        <EditInvoice
+            show={showEditInvoice}
+            onHide={() => setShowEditInvoice(false)}
+            invoice={selectedInvoice}
         />
 
     </>

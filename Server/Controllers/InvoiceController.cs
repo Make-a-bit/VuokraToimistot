@@ -11,14 +11,16 @@ namespace API.Controllers
         private readonly InvoiceAdd _invoiceAdd;
         private readonly InvoiceDelete _invoiceDelete;
         private readonly InvoiceRepository _invoices;
+        private readonly InvoiceUpdate _invoiceUpdate;
         private readonly ReservationUpdate _reservationUpdate;
 
-        public InvoiceController(InvoiceAdd ia, InvoiceRepository ir, ReservationUpdate ru, InvoiceDelete id)
+        public InvoiceController(InvoiceAdd ia, InvoiceRepository ir, ReservationUpdate ru, InvoiceDelete id, InvoiceUpdate iu)
         {
             _invoiceAdd = ia;
             _invoices = ir;
             _reservationUpdate = ru;
             _invoiceDelete = id;
+            _invoiceUpdate = iu;
         }
 
         [HttpGet]
@@ -51,6 +53,25 @@ namespace API.Controllers
 
                 var invoice = await _invoices.GetInvoiceAsync(invoiceId.Value);
                 return Ok(invoice);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpPut]
+        [Route("update")]
+        public async Task<ActionResult> UpdateInvoice([FromBody] Invoice invoice)
+        {
+            try
+            {
+                if (await _invoiceUpdate.UpdateInvoiceAsync(invoice))
+                {
+                    var updatedInvoice = await _invoices.GetInvoiceAsync(invoice.Id);
+                    return Ok(updatedInvoice);
+                }
+                else return NotFound();
             }
             catch
             {
