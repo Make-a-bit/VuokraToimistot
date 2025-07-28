@@ -407,7 +407,7 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
                 sx: { width: "900px", maxWidth: "100%" }
             }}
         >
-            <DialogTitle>Muokkaa varausta</DialogTitle>
+            <DialogTitle>Muokkaa varausta #{reservation.id} / {reservation.customer.name}</DialogTitle>
             <DialogContent dividers>
                 <FormControl>
                     <Autocomplete
@@ -483,6 +483,7 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
                         <DatePicker
                             key={reservedDates.length}
                             disabled={!selectedCustomer || !selectedOffice || !selectedOfficeProperty || isDisabled}
+                            format="YYYY-MM-DD"
                             label="Varauksen alku"
                             onChange={(newValue) => {
                                 setStartDate(newValue);
@@ -501,6 +502,7 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
                         <DatePicker
                             key={reservedDates.length}
                             defaultValue={startDate}
+                            format="YYYY-MM-DD"
                             label="Varauksen loppu"
                             disabled={!startDate || isDisabled}
                             onChange={setEndDate}
@@ -552,6 +554,7 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
 
                 <FormControl>
                     <TextField
+                        disabled={isDisabled}
                         label="Lisätiedot"
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}

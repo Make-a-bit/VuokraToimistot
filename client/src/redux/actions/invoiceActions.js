@@ -64,3 +64,24 @@ export const fetchInvoices = () => {
         }
     }
 }
+
+export const updateInvoice = (invoice) => async (dispatch) => {
+    dispatch({ type: SHOW_LOADING })
+    try {
+        const response = await fetch(`${mainURI}/invoice/update`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(invoice)
+        });
+
+        if (response.ok) {
+            const updatedInvoice = await response.json();
+            dispatch({ type: EDIT_INVOICE_SUCCESS, payload: updatedInvoice })
+            dispatch({ type: SHOW_SUCCESS, payload: "Laskun päivitys onnistui!" })
+        }
+    } catch {
+        dispatch({ type: SHOW_ERROR, payload: "Laskun päivitys epäonnistui!" })
+    } finally {
+        dispatch({ type: HIDE_LOADING })
+    }
+}
