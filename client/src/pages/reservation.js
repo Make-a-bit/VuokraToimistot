@@ -35,8 +35,6 @@ const Reservation = () => {
     const [modalProperty, setModalProperty] = useState(null);
     const [isEditable, setIsEditable] = useState(false);
 
-    console.log(allReservations)
-
     const propertyOptions = useMemo(() =>
         properties.filter(
             p => selectedOffice && p.officeId === selectedOffice.id

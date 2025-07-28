@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState } from "react";
+﻿import React, { useEffect, useMemo, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
     Autocomplete, Box, Checkbox, Dialog, DialogTitle, DialogContent, DialogActions,
@@ -38,8 +38,6 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
     const [invoiced, setInvoiced] = useState(false);
     const [itemRows, setItemRows] = useState([]);
     const [description, setDescription] = useState(reservation?.description || "");
-
-    //console.log(reservation)
 
     const {
         shouldDisableStartDate,
@@ -219,6 +217,28 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
     useEffect(() => {
         setDescription(reservation?.description || "");
     }, [reservation]);
+
+    const firstFieldRef = useRef(null);
+
+    useEffect(() => {
+        if (show && firstFieldRef.current) {
+            firstFieldRef.current.focus();
+        }
+    }, [show]);
+
+    useEffect(() => {
+        const root = document.getElementById('root');
+        if (show) {
+            root.setAttribute('inert', '');
+        } else {
+            root.removeAttribute('inert');
+        }
+        return () => {
+            root.removeAttribute('inert');
+        };
+    }, [show]);
+
+
 
     const deviceOptions = useMemo(() =>
         devices.filter(
@@ -482,6 +502,7 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             key={reservedDates.length}
+                            enableAccessibleFieldDOMStructure={false}
                             disabled={!selectedCustomer || !selectedOffice || !selectedOfficeProperty || isDisabled}
                             format="YYYY-MM-DD"
                             label="Varauksen alku"
@@ -491,8 +512,16 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
                             }}
                             shouldDisableDate={shouldDisableStartDate}
                             value={startDate}
-                            renderInput={(params) => <TextField {...params} />}
-                            sx={{ ...autoCompleteFieldMargins, marginRight: "10px" }}
+                            slots={{ textField: TextField }}
+                            slotProps={{
+                                textField: {
+                                    disabled: !selectedCustomer || !selectedOffice || !selectedOfficeProperty || isDisabled,
+                                    label: "Varauksen alku",
+                                    variant: "outlined",
+                                    fullWidth: true,
+                                    sx: { ...autoCompleteFieldMargins, marginRight: "10px" }
+                                }
+                            }}
                         />
                     </LocalizationProvider>
                 </FormControl>
@@ -501,6 +530,7 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             key={reservedDates.length}
+                            enableAccessibleFieldDOMStructure={false}
                             defaultValue={startDate}
                             format="YYYY-MM-DD"
                             label="Varauksen loppu"
@@ -508,8 +538,16 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
                             onChange={setEndDate}
                             shouldDisableDate={shouldDisableEndDate}
                             value={endDate}
-                            renderInput={(params) => <TextField {...params} />}
-                            sx={{ ...autoCompleteFieldMargins }}
+                            slots={{ textField: TextField }}
+                            slotProps={{
+                                textField: {
+                                    disabled: !startDate || isDisabled,
+                                    label: "Varauksen loppu",
+                                    variant: "outlined",
+                                    fullWidth: true,
+                                    sx: { ...autoCompleteFieldMargins }
+                                }
+                            }}
                         />
                     </LocalizationProvider>
                 </FormControl>

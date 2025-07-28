@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
     Alert, Box, Checkbox, Dialog, DialogTitle, DialogContent, DialogActions,
@@ -12,10 +12,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import SaveIcon from "@mui/icons-material/Save";
 
 import { fetchInvoices, updateInvoice } from "../redux/actions/invoiceActions";
-import { autoCompleteFieldMargins, leftButton, middleButton, rightButton } from "../utils/fieldMarginals"
+import { autoCompleteFieldMargins } from "../utils/fieldMarginals"
 import useAutoClearMessages from "../hooks/autoClearMessages";
-
-dayjs.locale("fi");
 
 const EditInvoice = ({ show, onHide, invoice }) => {
     const dispatch = useDispatch();
@@ -32,6 +30,26 @@ const EditInvoice = ({ show, onHide, invoice }) => {
     const isDisabled = invoice ? invoice.paid : false;
 
     useAutoClearMessages(errorMessage, successMessage);
+
+    const firstFieldRef = useRef(null);
+
+    useEffect(() => {
+        if (show && firstFieldRef.current) {
+            firstFieldRef.current.focus();
+        }
+    }, [show]);
+
+    useEffect(() => {
+        const root = document.getElementById('root');
+        if (show) {
+            root.setAttribute('inert', '');
+        } else {
+            root.removeAttribute('inert');
+        }
+        return () => {
+            root.removeAttribute('inert');
+        };
+    }, [show]);
 
     // Assign values into formcontrol fields when opening the modal
     useEffect(() => {
