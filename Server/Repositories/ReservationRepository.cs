@@ -15,11 +15,16 @@ namespace API.Repositories
         }
 
         /// <summary>
-        /// Get reservation by reservation id from the database
+        /// Asynchronously retrieves a reservation by its unique identifier.
         /// </summary>
-        /// <param name="reservationId"></param>
-        /// <returns></returns>
-        public async Task<Reservation> GetReservation(int reservationId)
+        /// <remarks>This method retrieves detailed information about a reservation, including its
+        /// associated customer, property, and office. It also populates the reservation with related devices and
+        /// services.</remarks>
+        /// <param name="reservationId">The unique identifier of the reservation to retrieve. Must be a positive integer.</param>
+        /// <returns>A <see cref="Reservation"/> object containing the details of the reservation, including associated customer,
+        /// property, and office information. Returns <see langword="null"/> if no reservation is found with the
+        /// specified identifier.</returns>
+        public async Task<Reservation> GetReservationAsync(int reservationId)
         {
             var reservation = new Reservation();
 
@@ -61,8 +66,8 @@ namespace API.Repositories
                     reservation.Invoiced = reader.GetBoolean(reader.GetOrdinal("invoiced"));
                 }
 
-                reservation.Devices = await GetReservationDevices(reservation.Id);
-                reservation.Services = await GetReservationServices(reservation.Id);
+                reservation.Devices = await GetReservationDevicesAsync(reservation.Id);
+                reservation.Services = await GetReservationServicesAsync(reservation.Id);
 
                 return reservation;
             }
@@ -72,11 +77,15 @@ namespace API.Repositories
             }
         }
 
+
         /// <summary>
-        /// Get all reservations from the database
+        /// Asynchronously retrieves all reservations from the database.
         /// </summary>
-        /// <returns></returns>
-        public async Task<List<Reservation>> GetReservations()
+        /// <remarks>This method fetches reservation details including associated customer, property, and
+        /// office information. It also populates each reservation with related devices and services.</remarks>
+        /// <returns>A task representing the asynchronous operation. The task result contains a list of <see cref="Reservation"/>
+        /// objects, each representing a reservation with its associated details.</returns>
+        public async Task<List<Reservation>> GetAllReservationsAsync()
         {
             var reservations = new List<Reservation>();
 
@@ -127,8 +136,8 @@ namespace API.Repositories
 
                 foreach (var reservation in reservations)
                 {
-                    reservation.Devices = await GetReservationDevices(reservation.Id);
-                    reservation.Services = await GetReservationServices(reservation.Id);
+                    reservation.Devices = await GetReservationDevicesAsync(reservation.Id);
+                    reservation.Services = await GetReservationServicesAsync(reservation.Id);
                 }
 
                 return reservations;
@@ -139,12 +148,16 @@ namespace API.Repositories
             }
         }
 
+
         /// <summary>
-        /// Get reservation devices by reservation id from the database
+        /// Asynchronously retrieves a list of devices associated with a specified reservation.
         /// </summary>
-        /// <param name="reservationId"></param>
-        /// <returns></returns>
-        private async Task<List<Device>> GetReservationDevices(int reservationId)
+        /// <remarks>This method queries the database to obtain details about devices linked to a given
+        /// reservation, including their ID, name, price, VAT, quantity, and discount.</remarks>
+        /// <param name="reservationId">The unique identifier of the reservation for which to retrieve devices.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a list of <see cref="Device"/>
+        /// objects associated with the specified reservation.</returns>
+        private async Task<List<Device>> GetReservationDevicesAsync(int reservationId)
         {
             var devices = new List<Device>();
 
@@ -189,12 +202,14 @@ namespace API.Repositories
             }
         }
 
+
         /// <summary>
-        /// Get reservation services by reservation id from the database
+        /// Asynchronously retrieves a list of services associated with a specified reservation.
         /// </summary>
-        /// <param name="reservationId"></param>
-        /// <returns></returns>
-        private async Task<List<Service>> GetReservationServices(int reservationId)
+        /// <param name="reservationId">The unique identifier of the reservation for which to retrieve services. Must be a valid reservation ID.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a list of <see cref="Service"/>
+        /// objects associated with the specified reservation.</returns>
+        private async Task<List<Service>> GetReservationServicesAsync(int reservationId)
         {
             var services = new List<Service>();
 
@@ -241,12 +256,17 @@ namespace API.Repositories
             }
         }
 
+
         /// <summary>
-        /// Cehck if a reservation has devices
+        /// Asynchronously determines whether there are any devices associated with a specified reservation.
         /// </summary>
-        /// <param name="reservationId"></param>
-        /// <returns></returns>
-        public async Task<bool> HasDevicesOnReservation(int reservationId)
+        /// <remarks>This method connects to the database to check for devices linked to the given
+        /// reservation ID. Ensure that the database connection is properly configured before calling this
+        /// method.</remarks>
+        /// <param name="reservationId">The unique identifier of the reservation to check for associated devices.</param>
+        /// <returns><see langword="true"/> if there are one or more devices associated with the reservation;  otherwise, <see
+        /// langword="false"/>.</returns>
+        public async Task<bool> HasDevicesOnReservationAsync(int reservationId)
         {
             try
             {
@@ -269,12 +289,17 @@ namespace API.Repositories
             }
         }
 
+
         /// <summary>
-        /// Check if a reservation has services
+        /// Asynchronously determines whether there are any services associated with a specified reservation.
         /// </summary>
-        /// <param name="reservationId"></param>
-        /// <returns></returns>
-        public async Task<bool> HasServicesOnReservation(int reservationId)
+        /// <remarks>This method connects to the database to check for services linked to the given
+        /// reservation ID. Ensure that the database connection is properly configured before calling this
+        /// method.</remarks>
+        /// <param name="reservationId">The unique identifier of the reservation to check for associated services.</param>
+        /// <returns><see langword="true"/> if there are one or more services associated with the reservation; otherwise, <see
+        /// langword="false"/>.</returns>
+        public async Task<bool> HasServicesOnReservationAsync(int reservationId)
         {
             try
             {
@@ -297,12 +322,16 @@ namespace API.Repositories
             }
         }
 
+
         /// <summary>
-        /// Get reserved dates by property from the database
+        /// Asynchronously retrieves a list of reserved dates for a specified property.
         /// </summary>
-        /// <param name="propertyId"></param>
-        /// <returns></returns>
-        public async Task<List<DateOnly>> GetReservedDates(int propertyId)
+        /// <remarks>This method queries the database for reservations associated with the given property
+        /// ID and returns all dates within each reservation period.</remarks>
+        /// <param name="propertyId">The unique identifier of the property for which to retrieve reserved dates.</param>
+        /// <returns>A task representing the asynchronous operation. The task result contains a list of <see cref="DateOnly"/>
+        /// objects representing each reserved date for the specified property.</returns>
+        public async Task<List<DateOnly>> GetReservedDatesAsync(int propertyId)
         {
             var dates = new List<DateOnly>();
 

@@ -11,7 +11,14 @@ namespace API.Services
             _dbManager = db;
         }
 
-        public async Task<bool> DeleteDevice(int id)
+        /// <summary>
+        /// Deletes a device from the database based on the specified device ID.
+        /// </summary>
+        /// <remarks>This method performs the deletion within a database transaction. If the operation
+        /// fails, the transaction is rolled back.</remarks>
+        /// <param name="id">The unique identifier of the device to be deleted. Must be a positive integer.</param>
+        /// <returns><see langword="true"/> if the device was successfully deleted; otherwise, <see langword="false"/>.</returns>
+        public async Task<bool> DeleteDeviceAsync(int id)
         {
             using var conn = _dbManager.GetConnection();
             await conn.OpenAsync();

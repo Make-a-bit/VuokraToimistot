@@ -10,8 +10,15 @@ namespace API.Services
         {
             _dbManager = db;
         }
-
-        public async Task<bool> DeleteService(int id)
+        /// <summary>
+        /// Asynchronously deletes a service from the database based on the specified service ID.
+        /// </summary>
+        /// <remarks>This method performs the deletion within a database transaction. If an error occurs
+        /// during the operation, the transaction is rolled back, and the method returns <see
+        /// langword="false"/>.</remarks>
+        /// <param name="id">The unique identifier of the service to be deleted. Must be a valid service ID.</param>
+        /// <returns><see langword="true"/> if the service was successfully deleted; otherwise, <see langword="false"/>.</returns>
+        public async Task<bool> DeleteServiceAsync(int id)
         {
             using var conn = _dbManager.GetConnection();
             await conn.OpenAsync();

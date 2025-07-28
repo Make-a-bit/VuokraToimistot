@@ -12,7 +12,15 @@ namespace API.Services
             _dbManager = dBManager;
         }
 
-        public async Task<int?> AddOffice(Office office)
+        /// <summary>
+        /// Adds a new office to the database and returns the unique identifier of the newly inserted office.
+        /// </summary>
+        /// <remarks>This method opens a database connection and begins a transaction to insert a new
+        /// office record. The transaction is committed if the insertion is successful, or rolled back if an exception
+        /// occurs.</remarks>
+        /// <param name="office">The <see cref="Office"/> object containing the details of the office to be added. Cannot be null.</param>
+        /// <returns>The unique identifier of the newly inserted office.</returns>
+        public async Task<int?> AddOfficeAsync(Office office)
         {
             using var conn = _dbManager.GetConnection();
             await conn.OpenAsync();

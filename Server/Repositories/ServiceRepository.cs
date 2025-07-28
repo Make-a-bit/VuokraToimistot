@@ -14,10 +14,14 @@ namespace API.Repositories
         }
 
         /// <summary>
-        /// Get all services from the database
+        /// Asynchronously retrieves a list of all services from the database.
         /// </summary>
-        /// <returns></returns>
-        public async Task<List<Service>> GetServices()
+        /// <remarks>This method connects to the database, executes a query to retrieve service details,
+        /// and returns a list of <see cref="Service"/> objects. Each service includes information such as the service
+        /// ID, office ID, office name, service name, unit, price, and VAT value.</remarks>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a list of <see cref="Service"/>
+        /// objects representing all services available in the database.</returns>
+        public async Task<List<Service>> GetAllServicesAsync()
         {
             var services = new List<Service>();
 
@@ -62,12 +66,14 @@ namespace API.Repositories
             }
         }
 
+
         /// <summary>
-        /// Get services by office id from the database
+        /// Asynchronously retrieves a list of services for a specified office.
         /// </summary>
-        /// <param name="officeId"></param>
-        /// <returns></returns>
-        public async Task<List<Service>> GetServices(int officeId)
+        /// <param name="officeId">The identifier of the office for which to retrieve services. Must be a valid office ID.</param>
+        /// <returns>A task representing the asynchronous operation. The task result contains a list of <see cref="Service"/>
+        /// objects associated with the specified office.</returns>
+        public async Task<List<Service>> GetAllServicesAsync(int officeId)
         {
             var services = new List<Service>();
 
@@ -114,12 +120,17 @@ namespace API.Repositories
             }
         }
 
+
         /// <summary>
-        /// Get service by service id from the database
+        /// Asynchronously retrieves a service by its identifier from the database.
         /// </summary>
-        /// <param name="serviceId"></param>
-        /// <returns></returns>
-        public async Task<Service> GetService(int serviceId)
+        /// <remarks>This method establishes a connection to the database, executes a query to retrieve
+        /// the service details, and populates a <see cref="Service"/> object with the retrieved data. Ensure that the
+        /// database connection is properly configured before calling this method.</remarks>
+        /// <param name="serviceId">The unique identifier of the service to retrieve. Must be a positive integer.</param>
+        /// <returns>A <see cref="Service"/> object representing the service with the specified identifier. If no service is
+        /// found, returns a default <see cref="Service"/> object with uninitialized properties.</returns>
+        public async Task<Service> GetServiceAsync(int serviceId)
         {
             var service = new Service();
 

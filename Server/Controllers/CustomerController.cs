@@ -26,7 +26,7 @@ namespace API.Controllers
         {
             try
             {
-                var customerID = await _customerAdd.AddCustomer(customer);
+                var customerID = await _customerAdd.AddCustomerAsync(customer);
 
                 if (!customerID.HasValue)
                     return BadRequest();
@@ -45,7 +45,7 @@ namespace API.Controllers
         {
             try
             {
-                var customers = await _customerRepo.GetCustomers();
+                var customers = await _customerRepo.GetAllCustomersAsync();
 
                 return Ok(customers);
             }
@@ -61,9 +61,9 @@ namespace API.Controllers
         {
             try
             {
-                if (await _customerUpdate.UpdateCustomer(customer))
+                if (await _customerUpdate.UpdateCustomerAsync(customer))
                 {
-                    var updatedCustomer = await _customerRepo.GetCustomer(customer.Id);
+                    var updatedCustomer = await _customerRepo.GetCustomerAsync(customer.Id);
                     return Ok(updatedCustomer);
                 }
 
@@ -81,7 +81,7 @@ namespace API.Controllers
         {
             try
             {
-                if (await _customerDel.DeleteCustomer(id))
+                if (await _customerDel.DeleteCustomerAsync(id))
                     return Ok();
 
                 else return NotFound();

@@ -14,10 +14,15 @@ namespace API.Repositories
         }
 
         /// <summary>
-        /// Get all offices from the database
+        /// Asynchronously retrieves a list of all offices from the database.
         /// </summary>
-        /// <returns></returns>
-        public async Task<List<Office>> GetOffices()
+        /// <remarks>This method establishes a connection to the database, executes a query to select all
+        /// records from the Offices table, and returns a list of <see cref="Office"/> objects representing each
+        /// office.</remarks>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a list of <see cref="Office"/>
+        /// objects, each representing an office retrieved from the database. The list will be empty if no offices are
+        /// found.</returns>
+        public async Task<List<Office>> GetAllOfficesAsync()
         {
             var offices = new List<Office>();
 
@@ -53,12 +58,18 @@ namespace API.Repositories
             }
         }
 
+
         /// <summary>
-        /// Get office by office id from the database
+        /// Asynchronously retrieves the details of an office by its unique identifier.
         /// </summary>
-        /// <param name="officeId"></param>
-        /// <returns></returns>
-        public async Task<Office> GetOffice(int officeId)
+        /// <remarks>This method opens a database connection to retrieve office details. Ensure that the
+        /// database connection is properly configured before calling this method. The method will throw exceptions for
+        /// any database-related issues, which should be handled by the caller.</remarks>
+        /// <param name="officeId">The unique identifier of the office to retrieve.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="Office"/> object
+        /// with the details of the specified office. If the office is not found, the properties of the returned <see
+        /// cref="Office"/> object will be uninitialized.</returns>
+        public async Task<Office> GetOfficeAsync(int officeId)
         {
             var office = new Office();
 

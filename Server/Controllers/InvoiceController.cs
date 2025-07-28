@@ -43,13 +43,13 @@ namespace API.Controllers
         {
             try
             {
-                var invoiceId = await _invoiceAdd.CreateInvoice(reservation);
+                var invoiceId = await _invoiceAdd.CreateInvoiceAsync(reservation);
 
                 if (!invoiceId.HasValue)
                     return BadRequest();
 
                 // set invoiced status true into respective reservation
-                await _reservationUpdate.SetInvoiced(reservation.Id, true);
+                await _reservationUpdate.SetInvoicedAsync(reservation.Id, true);
 
                 var invoice = await _invoices.GetInvoiceAsync(invoiceId.Value);
                 return Ok(invoice);
@@ -94,7 +94,7 @@ namespace API.Controllers
                 if (result)
                 {
                     // set invoiced status false into respective reservation
-                    await _reservationUpdate.SetInvoiced(invoice.ReservationId, false);
+                    await _reservationUpdate.SetInvoicedAsync(invoice.ReservationId, false);
 
                     return Ok();
                 }

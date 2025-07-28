@@ -10,7 +10,17 @@ namespace API.Services
             _dbManager = db;
         }
 
-        public async Task<bool> DeleteReservationCascade(int reservationId)
+        /// <summary>
+        /// Deletes a reservation and its associated devices and services from the database in a single transaction.
+        /// </summary>
+        /// <remarks>This method performs a cascading delete operation, removing the reservation along
+        /// with any related devices and services. The operation is executed within a database transaction to ensure
+        /// atomicity. If any part of the deletion process fails, the transaction is rolled back, and an exception is
+        /// thrown.</remarks>
+        /// <param name="reservationId">The unique identifier of the reservation to be deleted.</param>
+        /// <returns><see langword="true"/> if the reservation and all associated entities were successfully deleted; otherwise,
+        /// <see langword="false"/>.</returns>
+        public async Task<bool> DeleteReservationCascadeAsync(int reservationId)
         {
             using var conn = _dbManager.GetConnection();
             await conn.OpenAsync();
@@ -18,9 +28,9 @@ namespace API.Services
 
             try
             {
-                await DeleteReservationDevices(reservationId, conn, transaction);
-                await DeleteReservationServices(reservationId, conn, transaction);
-                var result = await DeleteReservation(reservationId, conn, transaction);
+                await DeleteReservationDevicesAsync(reservationId, conn, transaction);
+                await DeleteReservationServicesAsync(reservationId, conn, transaction);
+                var result = await DeleteReservationAsync(reservationId, conn, transaction);
 
                 await transaction.CommitAsync();
                 return result;
@@ -32,7 +42,19 @@ namespace API.Services
             }
         }
 
-        public async Task<bool> DeleteReservation(int reservationId, SqlConnection conn, SqlTransaction transaction)
+
+        /// <summary>
+        /// Deletes a reservation from the database based on the specified reservation ID.
+        /// </summary>
+        /// <remarks>This method performs the deletion within the context of the provided SQL transaction.
+        /// Ensure that the transaction is properly committed or rolled back after calling this method.</remarks>
+        /// <param name="reservationId">The unique identifier of the reservation to be deleted. Must be a valid reservation ID.</param>
+        /// <param name="conn">An open <see cref="SqlConnection"/> to the database. The connection must be valid and open before calling
+        /// this method.</param>
+        /// <param name="transaction">The <see cref="SqlTransaction"/> within which the delete operation should be executed. This transaction must
+        /// be active.</param>
+        /// <returns><see langword="true"/> if the reservation was successfully deleted; otherwise, <see langword="false"/>.</returns>
+        public async Task<bool> DeleteReservationAsync(int reservationId, SqlConnection conn, SqlTransaction transaction)
         {
             try
             {
@@ -50,7 +72,19 @@ namespace API.Services
             }
         }
 
-        public async Task DeleteReservationDevices(int reservationId, SqlConnection conn, SqlTransaction transaction)
+
+        /// <summary>
+        /// Deletes all devices associated with a specified reservation from the database.
+        /// </summary>
+        /// <remarks>This method performs a database operation that deletes all entries in the
+        /// Reservation_devices table that are associated with the specified reservation ID. Ensure that the provided
+        /// <paramref name="conn"/> is open and the <paramref name="transaction"/> is active before calling this
+        /// method.</remarks>
+        /// <param name="reservationId">The unique identifier of the reservation whose devices are to be deleted. Must be a valid reservation ID.</param>
+        /// <param name="conn">An open <see cref="SqlConnection"/> to the database. The connection must be valid and open.</param>
+        /// <param name="transaction">The <see cref="SqlTransaction"/> within which the command executes. The transaction must be active.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        public async Task DeleteReservationDevicesAsync(int reservationId, SqlConnection conn, SqlTransaction transaction)
         {
             try
             {
@@ -67,7 +101,18 @@ namespace API.Services
             }
         }
 
-        public async Task DeleteReservationServices(int reservationId, SqlConnection conn, SqlTransaction transaction)
+
+        /// <summary>
+        /// Deletes all services associated with a specified reservation.
+        /// </summary>
+        /// <remarks>This method deletes all entries in the Reservation_services table that are associated
+        /// with the specified reservation ID. Ensure that the provided <paramref name="conn"/> is open and the
+        /// <paramref name="transaction"/> is active before calling this method.</remarks>
+        /// <param name="reservationId">The unique identifier of the reservation whose services are to be deleted. Must be a valid reservation ID.</param>
+        /// <param name="conn">The <see cref="SqlConnection"/> to the database. Must be open and valid.</param>
+        /// <param name="transaction">The <see cref="SqlTransaction"/> under which the command executes. Must be a valid transaction.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        public async Task DeleteReservationServicesAsync(int reservationId, SqlConnection conn, SqlTransaction transaction)
         {
             try
             {

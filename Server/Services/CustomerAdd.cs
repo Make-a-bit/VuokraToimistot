@@ -12,7 +12,12 @@ namespace API.Services
             _dbManager = dBManager;
         }
 
-        public async Task<int?> AddCustomer(Customer customer)
+        /// <summary>
+        /// Adds a new customer to the database and returns the unique identifier of the newly inserted customer.   
+        /// </summary>
+        /// <returns>The unique identifier of the newly inserted customer if the operation is successful; otherwise, <see
+        /// langword="null"/>.</returns>
+        public async Task<int?> AddCustomerAsync(Customer customer)
         {
             using var conn = _dbManager.GetConnection();
             await conn.OpenAsync();

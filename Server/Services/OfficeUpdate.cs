@@ -12,7 +12,16 @@ namespace API.Services
             _dbManager = dBManager;
         }
 
-        public async Task<bool> UpdateOffice(Office office)
+        /// <summary>
+        /// Updates the details of an existing office in the database.
+        /// </summary>
+        /// <remarks>This method performs an asynchronous update operation on the database. It uses a
+        /// transaction to ensure that the update is atomic. If an exception occurs during the update, the transaction
+        /// is rolled back, and the method returns <see langword="false"/>.</remarks>
+        /// <param name="office">The <see cref="Office"/> object containing updated information for the office. The <c>Id</c> property must
+        /// be set to identify the office to update.</param>
+        /// <returns><see langword="true"/> if the office was successfully updated; otherwise, <see langword="false"/>.</returns>
+        public async Task<bool> UpdateOfficeAsync(Office office)
         {
             using var conn = _dbManager.GetConnection();
             await conn.OpenAsync();

@@ -12,7 +12,15 @@ namespace API.Services
             _dbManager = dBManager;
         }
 
-        public async Task<bool> DeleteCustomer(int id)
+        /// <summary>
+        /// Deletes a customer from the database based on the specified customer ID.
+        /// </summary>
+        /// <remarks>This method performs the deletion within a database transaction. If an error occurs
+        /// during the operation, the transaction is rolled back, and the method returns <see
+        /// langword="false"/>.</remarks>
+        /// <param name="id">The unique identifier of the customer to be deleted. Must be a positive integer.</param>
+        /// <returns><see langword="true"/> if the customer was successfully deleted; otherwise, <see langword="false"/>.</returns>
+        public async Task<bool> DeleteCustomerAsync(int id)
         {
             using var conn = _dbManager.GetConnection();
             await conn.OpenAsync();

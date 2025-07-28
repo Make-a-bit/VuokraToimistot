@@ -26,7 +26,7 @@ namespace API.Controllers
         {
             try
             {
-                var offices = await _officeRepo.GetOffices();
+                var offices = await _officeRepo.GetAllOfficesAsync();
 
                 return Ok(offices);
             }
@@ -41,7 +41,7 @@ namespace API.Controllers
         {
             try
             {
-                var officeID = await _officeAdd.AddOffice(office);
+                var officeID = await _officeAdd.AddOfficeAsync(office);
 
                 if (!officeID.HasValue)
                     return BadRequest();
@@ -61,9 +61,9 @@ namespace API.Controllers
         {
             try
             {
-                if (await _officeUpdate.UpdateOffice(office))
+                if (await _officeUpdate.UpdateOfficeAsync(office))
                 {
-                    var updatedOffice = await _officeRepo.GetOffice(office.Id);
+                    var updatedOffice = await _officeRepo.GetOfficeAsync(office.Id);
                     return Ok(updatedOffice);
                 }
 
@@ -81,7 +81,7 @@ namespace API.Controllers
         {
             try
             {
-                if (await _officeDelete.DeleteOffice(id))
+                if (await _officeDelete.DeleteOfficeAsync(id))
                     return Ok();
 
                 else return NotFound();

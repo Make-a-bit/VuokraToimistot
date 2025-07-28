@@ -12,7 +12,16 @@ namespace API.Services
             _dbManager = dBManager;
         }
 
-        public async Task<bool> UpdateCustomer(Customer customer)
+        /// <summary>
+        /// Updates the details of an existing customer in the database.
+        /// </summary>
+        /// <remarks>This method performs an asynchronous update operation within a database transaction.
+        /// If the update fails, the transaction is rolled back, and the method returns <see
+        /// langword="false"/>.</remarks>
+        /// <param name="customer">The customer object containing updated information. The <see cref="Customer.Id"/> must match an existing
+        /// customer in the database.</param>
+        /// <returns><see langword="true"/> if the customer was successfully updated; otherwise, <see langword="false"/>.</returns>
+        public async Task<bool> UpdateCustomerAsync(Customer customer)
         {
             using var conn = _dbManager.GetConnection();
             await conn.OpenAsync();

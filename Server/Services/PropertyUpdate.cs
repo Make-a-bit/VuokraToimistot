@@ -12,7 +12,15 @@ namespace API.Services
             _dbManager = db;
         }
 
-        public async Task<bool> UpdateProperty(Property property)
+        /// <summary>
+        /// Asynchronously updates the specified property in the database.
+        /// </summary>
+        /// <remarks>This method uses a database transaction to ensure that the update operation is
+        /// atomic. If an exception occurs during the update, the transaction is rolled back, and the method returns
+        /// <see langword="false"/>.</remarks>
+        /// <param name="property">The property to update, containing the new values for the office ID, name, area, and price.</param>
+        /// <returns><see langword="true"/> if the property was successfully updated; otherwise, <see langword="false"/>.</returns>
+        public async Task<bool> UpdatePropertyAsync(Property property)
         {
             using var conn = _dbManager.GetConnection();
             await conn.OpenAsync();
