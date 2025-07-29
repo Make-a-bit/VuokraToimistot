@@ -99,14 +99,10 @@ export const fetchTaxes = () => {
             const response = await fetch(`${mainURI}/tax`, {
                 method: "GET"
             });
-            console.log("fetchTaxes response:", response);
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
+
             const data = await response.json();
             dispatch({ type: FETCH_TAXES_SUCCESS, payload: data })
         } catch (e) {
-            console.error("fetchTaxes error:", e);
             dispatch({ type: SHOW_ERROR, payload: "Verokantojen nouto epäonnistui!" })
         } finally {
             dispatch({ type: HIDE_LOADING })
