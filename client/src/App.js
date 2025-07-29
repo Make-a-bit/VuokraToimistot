@@ -8,8 +8,9 @@ import Devices from "../src/pages/devices";
 import Invoices from "../src/pages/Invoices";
 import Offices from "../src/pages/offices";
 import Properties from "../src/pages/properties";
-import Services from "../src/pages/services";
 import Reservation from "../src/pages/reservation";
+import Services from "../src/pages/services";
+import Taxes from "../src/pages/taxes";
 
 const App = () => {
     return (
@@ -29,6 +30,7 @@ const App = () => {
                     <Route path="/tilahallinta/laitteet/" element={<Devices />} />
                     <Route path="/varaushallinta/" element={<Reservation />} />
                     <Route path="/laskutus/" element={<Invoices />} />
+                    <Route path="/verot/" element={<Taxes />} />
                     <Route path="*" element={<ErrorPage />} />
                 </Route>
             </Routes>

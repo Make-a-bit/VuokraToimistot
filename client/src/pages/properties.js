@@ -6,14 +6,13 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 import AddEntry from "../components/AddEntryModal";
 import ConfirmModal from "../components/ConfirmModal";
-import inputValidation from "../utils/inputValidation";
+import EditEntry from "../components/EditEntryModal";
 import propertySchema from "../schema/property";
 import dataGridColumns from "../utils/datagridcolumns";
 import dataGridSx from "../utils/dataGridSx";
 import { useDispatch, useSelector } from "react-redux";
 import { addProperty, deleteProperty, editProperty, fetchProperties, setPropertyOffice } from "../redux/actions/propertyActions";
 import useAutoClearMessages from "../hooks/autoClearMessages";
-import { SHOW_ERROR } from "../redux/actions/actiontypes";
 
 const mainURI = "https://localhost:7017";
 
@@ -24,8 +23,10 @@ const Properties = () => {
     const properties = useSelector(state => state.properties.properties);
     const selectedOffice = useSelector(state => state.properties.selectedPropertyOffice);
     const { errorMessage, successMessage } = useSelector(state => state.ui);
+
     const [showAddProperty, setShowAddProperty] = useState(false)
     const [showConfirm, setShowConfirm] = useState(false);
+    const [showEditProperty, setShowEditProperty] = useState(false);
     const [selectedProperty, setSelectedProperty] = useState({});
 
     useAutoClearMessages(errorMessage, successMessage);
@@ -50,24 +51,25 @@ const Properties = () => {
         setShowConfirm(true)
     }
 
+    const handleRowClick = (params) => {
+        setSelectedProperty(params.row);
+        setShowEditProperty(true);
+    };
+
+    const handleCloseAddProperty = () => {
+        setShowAddProperty(false);
+        dispatch(fetchProperties());
+    };
+
+    const handleCloseEditProperty = () => {
+        setShowEditProperty(false);
+        dispatch(fetchProperties());
+    };
+
+    useAutoClearMessages(errorMessage, successMessage);
+
     const columns = React.useMemo(() => dataGridColumns(propertySchema, btnDeleteProperty), []);
-
-    const saveEdits = async (updatedRow, originalRow) => {
-        console.log("Edit property:", originalRow)
-        const requiredFields = ["name", "area", "price", "vat"]
-        const decimalFields = ["price", "vat"]
-        const isValid = inputValidation(updatedRow, requiredFields, decimalFields);
-
-        if (!isValid) {
-            await dispatch({ type: SHOW_ERROR, payload: "Vuokratilan päivitys epäonnistui!" })
-            return originalRow;
-        }
-
-        await dispatch(editProperty(updatedRow));
-
-        return updatedRow;
-    }
-
+    console.log(properties)
     return (
         <>
             <Box sx={{ marginTop: "20px", width: "200px" }}>
@@ -93,11 +95,62 @@ const Properties = () => {
             <Button
                 variant="contained"
                 disabled={!selectedOffice}
-                sx={{ marginBottom: "-10px" }}
+                sx={{
+                    marginBottom: "10px",
+                    marginTop: "10px"
+                }}
                 onClick={() => setShowAddProperty(true)}
             >
                 Lisää uusi vuokratila
             </Button>
+
+            <AddEntry
+                schema={propertySchema}
+                apiEndPoint={`${mainURI}/property`}
+                show={showAddProperty}
+                onHide={handleCloseAddProperty}
+                title="Lisää uusi vuokratila"
+                action={addProperty}
+                extraData={selectedOffice ? { officeId: selectedOffice.id } : {}}
+            />
+
+            <EditEntry
+                schema={propertySchema}
+                apiEndPoint={`${mainURI}/property/update`}
+                show={showEditProperty}
+                onHide={handleCloseEditProperty}
+                title={`Muokkaa vuokratilaa ${selectedProperty ? selectedProperty.name : ""}`}
+                action={editProperty}
+                entry={selectedProperty}
+                onClose={() => setShowEditProperty(false)}
+            />
+
+            <div style={{ height: "auto", width: "100%" }}>
+                <DataGrid
+                    rows={filteredProperties}
+                    columns={columns}
+                    disableRowSelectionOnClick
+                    onRowClick={handleRowClick}
+                    loading={loading}
+                    slotProps={{
+                        loadingOverlay: {
+                            variant: "linear-progress",
+                            noRowsVariant: "skeleton"
+                        },
+                    }}
+                    sx={dataGridSx}
+                />
+            </div>
+
+            <ConfirmModal
+                show={showConfirm}
+                onHide={() => setShowConfirm(false)}
+                title="Poista vuokrakohde"
+                message={`Haluatko varmasti poistaa vuokrakohteen ${selectedProperty?.name}?`}
+                confirmText="Poista"
+                cancelText="Peruuta"
+                onConfirm={() => dispatch(deleteProperty(selectedProperty))}
+            />
 
             {errorMessage &&
                 <Snackbar
@@ -128,53 +181,6 @@ const Properties = () => {
                     </Alert>
                 </Snackbar>
             }
-
-            <AddEntry
-                schema={propertySchema}
-                apiEndPoint={`${mainURI}/property`}
-                show={showAddProperty}
-                onHide={() => setShowAddProperty(false)}
-                title="Lisää uusi vuokratila"
-                action={addProperty}
-                extraData={selectedOffice ? { officeId: selectedOffice.id } : {}}
-            /><br /><br />
-
-            {properties.length > 0 && (
-                <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                    Kaksoisklikkaa solua muokataksesi sitä, poistu solusta tallentaaksesi.
-                </Typography>
-            )}
-
-            <div style={{ height: "auto", width: "100%" }}>
-                <DataGrid
-                    rows={filteredProperties}
-                    columns={columns}
-                    disableRowSelectionOnClick
-                    loading={loading}
-                    processRowUpdate={saveEdits}
-                    slotProps={{
-                        loadingOverlay: {
-                            variant: "linear-progress",
-                            noRowsVariant: "skeleton"
-                        },
-                    }}
-                    onProcessRowUpdateError={(error) => {
-                        console.log("Row update error:", error);
-                    }}
-                    experimentalFeatures={{ newEditingApi: true }}
-                    sx={dataGridSx}
-                />
-            </div>
-
-            <ConfirmModal
-                show={showConfirm}
-                onHide={() => setShowConfirm(false)}
-                title="Poista vuokrakohde"
-                message={`Haluatko varmasti poistaa vuokrakohteen ${selectedProperty?.name}?`}
-                confirmText="Poista"
-                cancelText="Peruuta"
-                onConfirm={() => dispatch(deleteProperty(selectedProperty))}
-            />
 
         </>
     )

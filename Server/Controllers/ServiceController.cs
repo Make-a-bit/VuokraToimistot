@@ -96,7 +96,7 @@ namespace API.Controllers
         }
 
         [HttpDelete]
-        [Route("delete/{officeId}")]
+        [Route("delete/{id}")]
         public async Task<ActionResult> DeleteService([FromRoute] int id)
         {
             try

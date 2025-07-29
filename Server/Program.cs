@@ -65,6 +65,9 @@ namespace API
             builder.Services.AddScoped<ServiceDelete>();
             builder.Services.AddScoped<ServiceRepository>();
             builder.Services.AddScoped<ServiceUpdate>();
+            builder.Services.AddScoped<TaxAdd>();
+            builder.Services.AddScoped<TaxDelete>();
+            builder.Services.AddScoped<TaxRepository>();
             builder.Services.AddScoped<UserAccessManager>();
 
 

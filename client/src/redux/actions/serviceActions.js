@@ -89,7 +89,9 @@ export const fetchServices = (officeId) => {
             const uri = (officeId != null && officeId > 0)
                 ? `${mainURI}/service/by-office?id=${officeId}`
                 : `${mainURI}/service/all`;
-            const response = await fetch(uri, { method: "GET" });
+            const response = await fetch(uri, {
+                method: "GET"
+            });
 
             const data = await response.json();
             dispatch({ type: FETCH_OFFICE_SERVICES_SUCCESS, payload: data })

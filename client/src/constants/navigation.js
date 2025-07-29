@@ -18,12 +18,7 @@
         path: "/laskutus", label: "Laskutus"
     },
     {
-        label: "Muut",
-        dropdownParent: true,
-        dropdown: [
-            { path: "/muu/1", label: "Muuta 1" },
-            { path: "/muu/2", label: "Muuta 2" }
-        ]
+        path: "/verot", label: "Verokannat"
     },
 ]
 

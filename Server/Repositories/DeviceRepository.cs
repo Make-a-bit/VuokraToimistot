@@ -37,6 +37,7 @@ namespace API.Repositories
                     d.office_id,
                     d.device_name,
                     d.device_price,
+                    v.vat_id,
                     v.vat_value,
                     o.office_name
                 FROM Office_devices d
@@ -53,6 +54,7 @@ namespace API.Repositories
                         OfficeName = reader.GetString(reader.GetOrdinal("office_name")),
                         Name = reader.GetString(reader.GetOrdinal("device_name")),
                         Price = reader.GetDecimal(reader.GetOrdinal("device_price")),
+                        VatId = reader.GetInt32(reader.GetOrdinal("vat_id")),
                         Vat = reader.GetDecimal(reader.GetOrdinal("vat_value"))
                     };
                     devices.Add(device);
@@ -87,6 +89,7 @@ namespace API.Repositories
                     d.office_id,
                     d.device_name,
                     d.device_price,
+                    v.vat_id,
                     v.vat_value,
                     o.office_name
                 FROM Office_devices d
@@ -106,6 +109,7 @@ namespace API.Repositories
                         OfficeName = reader.GetString(reader.GetOrdinal("office_name")),
                         Name = reader.GetString(reader.GetOrdinal("device_name")),
                         Price = reader.GetDecimal(reader.GetOrdinal("device_price")),
+                        VatId = reader.GetInt32(reader.GetOrdinal("vat_id")),
                         Vat = reader.GetDecimal(reader.GetOrdinal("vat_value"))
                     };
 
@@ -151,7 +155,7 @@ namespace API.Repositories
                     device.OfficeId = reader.GetInt32(reader.GetOrdinal("office_id"));
                     device.Name = reader.GetString(reader.GetOrdinal("device_name"));
                     device.Price = reader.GetDecimal(reader.GetOrdinal("device_price"));
-                    device.Vat = reader.GetDecimal(reader.GetOrdinal("device_vat"));
+                    device.VatId = reader.GetInt32(reader.GetOrdinal("device_vat"));
                 }
 
                 return device;

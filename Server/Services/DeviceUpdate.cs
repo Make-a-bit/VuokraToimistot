@@ -40,7 +40,7 @@ namespace API.Services
                 cmd.Parameters.AddWithValue("@id", device.Id);
                 cmd.Parameters.AddWithValue("@name", device.Name);
                 cmd.Parameters.AddWithValue("@price", device.Price);
-                cmd.Parameters.AddWithValue("@vat", device.Vat);
+                cmd.Parameters.AddWithValue("@vat", device.VatId);
 
                 int rowsAffected = await cmd.ExecuteNonQueryAsync();
                 await transaction.CommitAsync();

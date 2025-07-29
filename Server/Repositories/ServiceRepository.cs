@@ -37,6 +37,7 @@ namespace API.Repositories
                     s.service_name,
                     s.service_unit,
                     s.service_price,
+                    v.vat_id,
                     v.vat_value,
                     o.office_name
                 FROM Office_services s
@@ -54,6 +55,7 @@ namespace API.Repositories
                         Name = reader.GetString(reader.GetOrdinal("service_name")),
                         Unit = reader.GetString(reader.GetOrdinal("service_unit")),
                         Price = reader.GetDecimal(reader.GetOrdinal("service_price")),
+                        VatId = reader.GetInt32(reader.GetOrdinal("vat_id")),
                         Vat = reader.GetDecimal(reader.GetOrdinal("vat_value"))
                     };
                     services.Add(service);
@@ -89,6 +91,7 @@ namespace API.Repositories
                     o.service_name,
                     o.service_unit,
                     o.service_price,
+                    v.vat_id,
                     v.vat_value
                 FROM Office_services o
                 JOIN VAT v ON o.service_vat = v.vat_id
@@ -107,6 +110,7 @@ namespace API.Repositories
                         Name = reader.GetString(reader.GetOrdinal("service_name")),
                         Unit = reader.GetString(reader.GetOrdinal("service_unit")),
                         Price = reader.GetDecimal(reader.GetOrdinal("service_price")),
+                        VatId = reader.GetInt32(reader.GetOrdinal("vat_id")),
                         Vat = reader.GetDecimal(reader.GetOrdinal("vat_value"))
                     };
 
@@ -151,7 +155,7 @@ namespace API.Repositories
                 service.Name = reader.GetString(reader.GetOrdinal("service_name"));
                 service.Unit = reader.GetString(reader.GetOrdinal("service_unit"));
                 service.Price = reader.GetDecimal(reader.GetOrdinal("service_price"));
-                service.Vat = reader.GetDecimal(reader.GetOrdinal("service_vat"));
+                service.VatId = reader.GetInt32(reader.GetOrdinal("service_vat"));
             }
             return service;
         }

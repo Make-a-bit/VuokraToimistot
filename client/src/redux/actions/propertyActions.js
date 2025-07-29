@@ -10,7 +10,7 @@
 const mainURI = "https://localhost:7017";
 
 export const addProperty = (apiEndPoint, property) => {
-    console.log("Property:", property);
+    //console.log("Property:", property);
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
         try {
@@ -22,7 +22,7 @@ export const addProperty = (apiEndPoint, property) => {
 
             if (response.ok) {
                 const createdProperty = await response.json();
-                console.log("Created property:", createdProperty)
+                //console.log("Created property:", createdProperty)
                 dispatch({ type: ADD_PROPERTY_SUCCESS, payload: createdProperty })
                 dispatch({ type: SHOW_SUCCESS, payload: "Vuokratilan tallennus onnistui!" })
             } 
