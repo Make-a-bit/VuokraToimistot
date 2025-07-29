@@ -2,8 +2,8 @@
 
 import CloseIcon from "@mui/icons-material/Close";
 import {
-    Alert, Button, Dialog, DialogTitle,
-    DialogContent, DialogActions, TextField
+    Alert, Box, Button, Dialog, DialogTitle, DialogContent, DialogActions,
+    FormControl, InputLabel, MenuItem, Select, TextField
 } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,6 +17,9 @@ const AddEntry = ({ schema, show, onHide, apiEndPoint, title, action, extraData 
     const firstInputRef = useRef(null);
     const dispatch = useDispatch();
     const loading = useSelector(state => state.ui.loadingState);
+    const vats = useSelector(state => state.taxes.vats);
+
+    const nameInputRef = useRef(null);
 
     useEffect(() => {
         if (!show) {
@@ -35,7 +38,13 @@ const AddEntry = ({ schema, show, onHide, apiEndPoint, title, action, extraData 
         e.preventDefault();
         dispatch({ type: SHOW_LOADING })
 
-        const isValid = Object.values(formData).every(value => value.trim() !== "");
+        const isValid = schema
+            .filter(input => input.field !== "officeName" && input.field !== "kohde")
+            .every(input => {
+                const value = formData[input.field];
+                // Accept 0 and non-empty strings
+                return value !== undefined && value !== null && !(typeof value === "string" && value.trim() === "");
+            });
 
         if (!isValid) {
             setErrorState(true);
@@ -77,8 +86,8 @@ const AddEntry = ({ schema, show, onHide, apiEndPoint, title, action, extraData 
             slotProps={{
                 transition: {
                     onEntered: () => {
-                        if (firstInputRef.current) {
-                            firstInputRef.current.focus();
+                        if (nameInputRef.current) {
+                            nameInputRef.current.focus();
                         }
                     }
                 },
@@ -89,43 +98,89 @@ const AddEntry = ({ schema, show, onHide, apiEndPoint, title, action, extraData 
 
             <DialogTitle>{title}</DialogTitle>
             <DialogContent dividers>
-                {schema.map((input, index) => (
-                    <TextField
-                        key={input.field}
-                        inputRef={index === 0 ? firstInputRef : null}
-                        label={input.header}
-                        name={input.field}
-                        value={formData[input.field] || ""}
-                        onChange={handleChange}
-                        margin="normal"
-                        required={true}
-                        fullWidth
-                    />
-                ))}
-            </DialogContent>
+                {schema.map((input, index) => {
+                    if (input.field === "vat") {
+                        return (
+                            <FormControl fullWidth margin="normal" required key={input.field} sx={{ minWidth: 100 }}>
+                                <InputLabel id="vat-select-label">{input.header}</InputLabel>
+                                <Select
+                                    labelId="vat-select-label"
+                                    id="vat-select"
+                                    name="vat"
+                                    value={formData["vat"] || ""}
+                                    label={input.header}
+                                    onChange={handleChange}
+                                    inputRef={index === 0 ? firstInputRef : null}
+                                >
+                                    {vats && vats.length > 0 ? vats.map((vat) => (
+                                        <MenuItem key={vat.id || vat.taxValue} value={vat.id}>
+                                            {vat.taxValue} %
+                                        </MenuItem>
+                                    )) : (
+                                        <MenuItem value="">Ei ALV-vaihtoehtoja</MenuItem>
+                                    )}
+                                </Select>
+                            </FormControl>
+                        );
+                    }
 
-            <DialogActions>
-                <Button
-                    size="small"
-                    startIcon={<CloseIcon />}
-                    color="secondary"
-                    variant="outlined"
-                    disabled={loading}
-                    onClick={onHide}
-                    sx={{ marginBottom: "10px" }}>
-                    Peruuta
-                </Button>
-                <Button
-                    size="small"
-                    startIcon={<SaveIcon />}
-                    color="success"
-                    loading={loading}
-                    variant="contained"
-                    onClick={handleSubmit}
-                    disabled={loading}
-                    sx={{ marginBottom: "10px", marginRight: "20px" }}>
-                    Tallenna
-                </Button>
+                    // Hide officeName/kohde field from formData
+                    if (input.field === "officeName" || input.field === "kohde") {
+                        return null;
+                    }
+                    return (
+                        <TextField
+                            key={input.field}
+                            inputRef={input.field === "name" ? nameInputRef : null} label={input.header}
+                            name={input.field}
+                            value={formData[input.field] || ""}
+                            onChange={handleChange}
+                            margin="normal"
+                            required={true}
+                            fullWidth
+                        />
+                    );
+                })}
+            </DialogContent>
+            <DialogActions sx={{
+                display: "flex",
+                alignItems: "flex-end",
+                justifyContent: "space-between",
+                padding: "20px"
+            }}>
+                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+                    <Button
+                        size="small"
+                        startIcon={<SaveIcon />}
+                        color="success"
+                        loading={loading}
+                        variant="contained"
+                        onClick={handleSubmit}
+                        disabled={
+                            loading ||
+                            !schema
+                                .filter(input => input.field !== "officeName" && input.field !== "kohde")
+                                .every(input => {
+                                    const value = formData[input.field];
+                                    return value !== undefined && value !== null && !(typeof value === "string" && value.trim() === "");
+                                })
+                        }
+                    >
+                        Tallenna
+                    </Button>
+                </Box>
+                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+                    <Button
+                        size="small"
+                        startIcon={<CloseIcon />}
+                        color="error"
+                        variant="contained"
+                        disabled={loading}
+                        onClick={onHide}
+                    >
+                        Sulje
+                    </Button>
+                </Box>
             </DialogActions>
         </Dialog>
     )

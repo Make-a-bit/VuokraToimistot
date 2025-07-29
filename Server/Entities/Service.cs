@@ -8,6 +8,7 @@
         public string Name { get; set; }
         public string Unit { get; set; }
         public decimal Price { get; set; }
+        public int VatId { get; set; }
         public decimal Vat { get; set; }
         public int Qty { get; set; }
         public decimal Discount { get; set; }

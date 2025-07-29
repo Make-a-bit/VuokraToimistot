@@ -14,7 +14,14 @@ const dataGridColumns = (schema, onDelete) => {
         headerName: "Poista",
         sortable: false,
         renderCell: (params) => (
-            <IconButton size="small" color="error" onClick={() => onDelete(params.row)}>
+            <IconButton
+                size="small"
+                color="error"
+                onClick={e => {
+                    e.stopPropagation(); // Prevent row click event
+                    onDelete(params.row);
+                }}
+            >
                 <DeleteIcon />
             </IconButton>
         ),

@@ -87,7 +87,6 @@ export const fetchCustomers = () => {
         try {
             const response = await fetch(`${mainURI}/customer`, {
                 method: "GET",
-                headers: { "Content-type": "application/json" },
             });
             const data = await response.json();
             dispatch({ type: FETCH_CUSTOMERS_SUCCESS, payload: data });

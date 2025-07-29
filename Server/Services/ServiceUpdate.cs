@@ -43,7 +43,7 @@ namespace API.Services
                 cmd.Parameters.AddWithValue("@name", service.Name);
                 cmd.Parameters.AddWithValue("@unit", service.Unit);
                 cmd.Parameters.AddWithValue("@price", service.Price);
-                cmd.Parameters.AddWithValue("@vat", service.Vat);
+                cmd.Parameters.AddWithValue("@vat", service.VatId);
 
                 int rowsAffected = await cmd.ExecuteNonQueryAsync();
                 await transaction.CommitAsync();

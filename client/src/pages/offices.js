@@ -4,11 +4,10 @@ import { Alert, Button, Snackbar, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import AddEntry from "../components/AddEntryModal";
 import ConfirmModal from "../components/ConfirmModal";
-import inputValidation from "../utils/inputValidation";
+import EditEntry from "../components/EditEntryModal";
 import officeSchema from "../schema/office";
 import dataGridColumns from "../utils/datagridcolumns";
 import dataGridSx from "../utils/dataGridSx";
-import { SHOW_ERROR } from "../redux/actions/actiontypes";
 import { addOffice, deleteOffice, editOffice } from "../redux/actions/officeActions";
 import useAutoClearMessages from "../hooks/autoClearMessages";
 
@@ -20,8 +19,11 @@ const Offices = () => {
     const offices = useSelector(state => state.offices.offices);
     const { errorMessage, successMessage } = useSelector(state => state.ui);
     const [showAddOffice, setShowAddOffice] = useState(false)
+    const [showEditOffice, setShowEditOffice] = useState(false)
     const [showConfirm, setShowConfirm] = useState(false);
     const [selectedOffice, setSelectedOffice] = useState({});
+
+    // console.log(offices)
 
     useAutoClearMessages(errorMessage, successMessage);
 
@@ -30,28 +32,20 @@ const Offices = () => {
         setShowConfirm(true)
     }
 
+    const handleRowClick = (params) => {
+        setSelectedOffice(params.row);
+        setShowEditOffice(true);
+    };
+
+    useAutoClearMessages(errorMessage, successMessage);
+
     const columns = React.useMemo(() => dataGridColumns(officeSchema, btnDeleteOffice), []);
-
-    const saveEdits = async (updatedRow, originalRow) => {
-        console.log("Edit office:", originalRow)
-        const requiredFields = ["name", "address", "postalCode", "city", "country", "phone", "email"]
-        const isValid = inputValidation(updatedRow, requiredFields);
-
-        if (!isValid) {
-            await dispatch({ type: SHOW_ERROR, payload: "Asiakkaan päivitys epäonnistui!" })
-            return originalRow;
-        }
-
-        await dispatch(editOffice(updatedRow));
-
-        return updatedRow;
-    }
 
     return (
         <>
             <Button
                 variant="contained"
-                sx={{ marginBottom: "-10px" }}
+                sx={{ marginBottom: "10px" }}
                 onClick={() => setShowAddOffice(true)}>Lisää uusi kohde</Button>
 
             <AddEntry
@@ -61,7 +55,17 @@ const Offices = () => {
                 onHide={() => setShowAddOffice(false)}
                 title="Lisää uusi kohde"
                 action={addOffice}
-            /><br /><br />
+            />
+
+            <EditEntry
+                schema={officeSchema}
+                apiEndPoint={`${mainURI}/office`}
+                show={showEditOffice}
+                onHide={() => setShowEditOffice(false)}
+                title={`Muokkaa kohdetta ${selectedOffice ? selectedOffice.name : ""}`}
+                action={editOffice}
+                entry={selectedOffice}
+            />
 
             {errorMessage &&
                 <Snackbar
@@ -93,18 +97,12 @@ const Offices = () => {
                 </Snackbar>
             }
 
-            {offices.length > 0 && (
-                <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                    Kaksoisklikkaa solua muokataksesi, poistu solusta tallentaaksesi.
-                </Typography>
-            )}
-
             <div style={{ height: "auto", width: "100%" }}>
                 <DataGrid
                     rows={offices}
                     columns={columns}
                     disableRowSelectionOnClick
-                    processRowUpdate={saveEdits}
+                    onRowClick={handleRowClick}
                     loading={loading}
                     slotProps={{
                         loadingOverlay: {
@@ -112,10 +110,6 @@ const Offices = () => {
                             noRowsVariant: "skeleton"
                         },
                     }}
-                    onProcessRowUpdateError={(error) => {
-                        console.log("Row update error:", error);
-                    }}
-                    experimentalFeatures={{ newEditingApi: true }}
                     sx={dataGridSx}
                 />
             </div>

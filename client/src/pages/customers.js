@@ -5,12 +5,11 @@ import { DataGrid } from "@mui/x-data-grid";
 import { addCustomer, editCustomer, deleteCustomer } from "../redux/actions/customerActions";
 import AddEntry from "../components/AddEntryModal";
 import ConfirmModal from "../components/ConfirmModal";
+import EditEntry from "../components/EditEntryModal";
 import customerSchema from "../schema/customer";
 import dataGridColumns from "../utils/datagridcolumns";
 import dataGridSx from "../utils/dataGridSx";
-import inputValidation from "../utils/inputValidation";
 import useAutoClearMessages from "../hooks/autoClearMessages";
-import { SHOW_ERROR } from "../redux/actions/actiontypes";
 
 const mainURI = "https://localhost:7017";
 
@@ -21,6 +20,7 @@ const Customers = () => {
     const { errorMessage, successMessage } = useSelector(state => state.ui);
     const [showAddCustomer, setShowAddCustomer] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
+    const [showEditCustomer, setShowEditCustomer] = useState(false)
     const [selectedCustomer, setSelectedCustomer] = useState({});
 
     const btnDeleteCustomer = (customer) => {
@@ -28,30 +28,22 @@ const Customers = () => {
         setShowConfirm(true);
     }
 
+    const handleRowClick = (params) => {
+        setSelectedCustomer(params.row);
+        setShowEditCustomer(true);
+    };
+
     useAutoClearMessages(errorMessage, successMessage);
 
     const columns = React.useMemo(() => dataGridColumns(customerSchema, btnDeleteCustomer), []);
 
-    const saveEdits = async (updatedRow, originalRow) => {
-        console.log("Edit customer:", originalRow)
-        const requiredFields = ["name", "email", "phone", "address", "postalCode", "city", "country"];
-        const isValid = inputValidation(updatedRow, requiredFields);
-
-        if (!isValid) {
-            await dispatch({ type: SHOW_ERROR, payload: "Asiakkaan päivitys epäonnistui!" })
-            return originalRow;
-        }
-
-        await dispatch(editCustomer(updatedRow));
-
-        return updatedRow;
-    }
+    //console.log(customers)
 
     return (
         <>
             <Button
                 variant="contained"
-                sx={{ marginBottom: "-10px" }}
+                sx={{ marginBottom: "10px" }}
                 onClick={() => setShowAddCustomer(true)}>Lisää uusi asiakas</Button>
 
             <AddEntry
@@ -61,7 +53,46 @@ const Customers = () => {
                 onHide={() => setShowAddCustomer(false)}
                 title="Lisää uusi asiakas"
                 action={addCustomer}
-            /><br /><br />
+            />
+
+            <EditEntry
+                schema={customerSchema}
+                apiEndPoint={`${mainURI}/customer`}
+                show={showEditCustomer}
+                onHide={() => setShowEditCustomer(false)}
+                title={`Muokkaa asiakasta ${selectedCustomer ? selectedCustomer.name : ""}`}
+                action={editCustomer}
+                entry={selectedCustomer}
+                onClose={() => setShowEditCustomer(false)}
+            />
+
+            <div style={{ height: "auto", width: "100%" }}>
+                <DataGrid
+                    rows={customers}
+                    getRowId={(row => row.id) }
+                    columns={columns}
+                    disableRowSelectionOnClick
+                    onRowClick={handleRowClick}
+                    loading={loading}
+                    slotProps={{
+                        loadingOverlay: {
+                            variant: "linear-progress",
+                            noRowsVariant: "skeleton"
+                        },
+                    }}
+                    sx={dataGridSx}
+                />
+            </div>
+
+            <ConfirmModal
+                show={showConfirm}
+                onHide={() => setShowConfirm(false)}
+                title="Poista asiakas"
+                message={`Haluatko varmasti poistaa asiakkaan ${selectedCustomer?.name}?`}
+                confirmText="Poista"
+                cancelText="Peruuta"
+                onConfirm={() => dispatch(deleteCustomer(selectedCustomer))}
+            />
 
             {errorMessage &&
                 <Snackbar
@@ -95,43 +126,6 @@ const Customers = () => {
                 </Snackbar>
             }
 
-            { customers.length > 0 && (
-            <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                 Kaksoisklikkaa solua muokataksesi sitä, poistu solusta tallentaaksesi.
-                </Typography>
-            )}
-
-            <div style={{ height: "auto", width: "100%" }}>
-                <DataGrid
-                    rows={customers}
-                    getRowId={(row => row.id) }
-                    columns={columns}
-                    disableRowSelectionOnClick
-                    processRowUpdate={saveEdits}
-                    loading={loading}
-                    slotProps={{
-                        loadingOverlay: {
-                            variant: "linear-progress",
-                            noRowsVariant: "skeleton"
-                        },
-                    }}
-                    onProcessRowUpdateError={(error) => {
-                        console.log("Row update error:", error);
-                    }}
-                    experimentalFeatures={{ newEditingApi: true }}
-                    sx={dataGridSx}
-                />
-            </div>
-
-            <ConfirmModal
-                show={showConfirm}
-                onHide={() => setShowConfirm(false)}
-                title="Poista asiakas"
-                message={`Haluatko varmasti poistaa asiakkaan ${selectedCustomer?.name}?`}
-                confirmText="Poista"
-                cancelText="Peruuta"
-                onConfirm={() => dispatch(deleteCustomer(selectedCustomer))}
-            />
         </>
     )
 }

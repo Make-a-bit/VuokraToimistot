@@ -7,6 +7,7 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 import AddEntry from "../components/AddEntryModal";
 import ConfirmModal from "../components/ConfirmModal";
+import EditEntry from "../components/EditEntryModal";
 import { addDevice, editDevice, deleteDevice, fetchDevices, setDeviceOffice } from "../redux/actions/deviceActions";
 import dataGridColumns from "../utils/datagridcolumns";
 import dataGridSx from "../utils/dataGridSx";
@@ -14,7 +15,6 @@ import deviceSchema from "../schema/device";
 import inputValidation from "../utils/inputValidation";
 import { SHOW_ERROR } from "../redux/actions/actiontypes";
 import useAutoClearMessages from "../hooks/autoClearMessages";
-
 
 const mainURI = "https://localhost:7017";
 
@@ -25,9 +25,10 @@ const Devices = () => {
     const devices = useSelector(state => state.devices.devices);
     const selectedOffice = useSelector(state => state.devices.selectedDeviceOffice);
     const { errorMessage, successMessage } = useSelector(state => state.ui);
-    const [selectedOfficeLocal, setSelectedOfficeLocal] = useState(selectedOffice)
+
     const [showAddDevice, setShowAddDevice] = useState(false)
     const [showConfirm, setShowConfirm] = useState(false)
+    const [showEditDevice, setShowEditDevice] = useState(false)
     const [selectedDevice, setSelectedDevice] = useState({})
 
     useAutoClearMessages(errorMessage, successMessage);
@@ -41,29 +42,29 @@ const Devices = () => {
         ? devices.filter(d => d.officeId === selectedOffice.id)
         : devices;
 
-    const saveEdits = async (updatedRow, originalRow) => {
-        console.log("Edit device:", originalRow)
-        const requiredFields = ["name", "price", "vat"]
-        const decimalFields = ["price", "vat"]
-        const isValid = inputValidation(updatedRow, requiredFields, decimalFields);
-
-        if (!isValid) {
-            await dispatch({ type: SHOW_ERROR, payload: "Laitteen päivitys epäonnistui!" })
-            return originalRow;
-        }
-
-        await dispatch(editDevice(updatedRow));
-
-        return updatedRow;
-    }
-
     const btnDeleteDevice = (device) => {
         setSelectedDevice(device)
         setShowConfirm(true)
     }
 
+    const handleRowClick = (params) => {
+        setSelectedDevice(params.row);
+        setShowEditDevice(true);
+    };
+
+    const handleCloseAddDevice = () => {
+        setShowAddDevice(false);
+        dispatch(fetchDevices());
+    };
+
+    const handleCloseEditDevice = () => {
+        setShowEditDevice(false);
+        dispatch(fetchDevices());
+    };
+
     const columns = React.useMemo(() => dataGridColumns(deviceSchema, btnDeleteDevice), []);
 
+    //console.log("DEVICES:", devices)
 
     return (
         <>
@@ -90,11 +91,62 @@ const Devices = () => {
             <Button
                 variant="contained"
                 disabled={!selectedOffice}
-                sx={{ marginBottom: "-10px" }}
+                sx={{
+                    marginBottom: "10px",
+                    marginTop: "10px"
+                }}
                 onClick={() => setShowAddDevice(true)}
             >
                 Lisää uusi laite
             </Button>
+
+            <AddEntry
+                schema={deviceSchema}
+                apiEndPoint={`${mainURI}/device`}
+                show={showAddDevice}
+                onHide={handleCloseAddDevice}
+                title={`Lisää vuokralaite kohteeseen ${selectedOffice ? selectedOffice.name : ""}`}
+                action={addDevice}
+                extraData={selectedOffice ? { officeId: selectedOffice.id } : {}}
+            />
+
+            <EditEntry
+                schema={deviceSchema}
+                apiEndPoint={`${mainURI}/device/update`}
+                show={showEditDevice}
+                onHide={handleCloseEditDevice}
+                title={`Muokkaa vuokralaitetta ${selectedDevice ? selectedDevice.name : ""}`}
+                action={editDevice}
+                entry={selectedDevice}
+                onClose={() => setShowEditDevice(false)}
+            />
+
+            <div style={{ height: "auto", width: "100%" }}>
+                <DataGrid
+                    rows={filteredDevices}
+                    columns={columns}
+                    disableRowSelectionOnClick
+                    onRowClick={handleRowClick}
+                    loading={loading}
+                    slotProps={{
+                        loadingOverlay: {
+                            variant: "linear-progress",
+                            noRowsVariant: "skeleton"
+                        },
+                    }}
+                    sx={dataGridSx}
+                />
+            </div>
+
+            <ConfirmModal
+                show={showConfirm}
+                onHide={() => setShowConfirm(false)}
+                title="Poista laite"
+                message={`Haluatko varmasti poistaa laitteen ${selectedDevice?.name}?`}
+                confirmText="Poista"
+                cancelText="Peruuta"
+                onConfirm={() => dispatch(deleteDevice(selectedDevice))}
+            />
 
             {errorMessage &&
                 <Snackbar
@@ -125,54 +177,6 @@ const Devices = () => {
                     </Alert>
                 </Snackbar>
             }
-
-            <AddEntry
-                schema={deviceSchema}
-                apiEndPoint={`${mainURI}/device`}
-                show={showAddDevice}
-                onHide={() => setShowAddDevice(false)}
-                title="Lisää uusi laite"
-                action={addDevice}
-                extraData={selectedOffice ? { officeId: selectedOffice.id } : {}}
-            /><br /><br />
-
-            {devices.length > 0 && (
-                <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                    Kaksoisklikkaa solua muokataksesi sitä, poistu solusta tallentaaksesi.
-                </Typography>
-            )}
-
-            <div style={{ height: "auto", width: "100%" }}>
-                <DataGrid
-                    rows={filteredDevices}
-                    columns={columns}
-                    disableRowSelectionOnClick
-                    loading={loading}
-                    processRowUpdate={saveEdits}
-                    slotProps={{
-                        loadingOverlay: {
-                            variant: "linear-progress",
-                            noRowsVariant: "skeleton"
-                        },
-                    }}
-                    onProcessRowUpdateError={(error) => {
-                        console.log("Row update error:", error);
-                    }}
-                    experimentalFeatures={{ newEditingApi: true }}
-                    sx={dataGridSx}
-                />
-            </div>
-
-            <ConfirmModal
-                show={showConfirm}
-                onHide={() => setShowConfirm(false)}
-                title="Poista laite"
-                message={`Haluatko varmasti poistaa laitteen ${selectedDevice?.name}?`}
-                confirmText="Poista"
-                cancelText="Peruuta"
-                onConfirm={() => dispatch(deleteDevice(selectedDevice))}
-            />
-
         </>
     )
 }

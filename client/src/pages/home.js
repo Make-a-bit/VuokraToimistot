@@ -7,8 +7,10 @@ import { fetchInvoices } from "../redux/actions/invoiceActions";
 import { fetchOffices } from "../redux/actions/officeActions";
 import { fetchProperties } from "../redux/actions/propertyActions";
 import { fetchReservations } from "../redux/actions/reservationActions";
-import useAutoClearMessages from "../hooks/autoClearMessages";
 import { fetchServices } from "../redux/actions/serviceActions";
+import { fetchTaxes } from "../redux/actions/taxActions";
+
+import useAutoClearMessages from "../hooks/autoClearMessages";
 
 const Home = () => {
     const dispatch = useDispatch();
@@ -24,6 +26,7 @@ const Home = () => {
         dispatch(fetchProperties());
         dispatch(fetchReservations());
         dispatch(fetchServices());
+        dispatch(fetchTaxes());
     }, [dispatch]);
 
     return (

@@ -86,7 +86,6 @@ export const fetchOffices = () => {
         try {
             const response = await fetch(`${mainURI}/office`, {
                 method: "GET",
-                headers: { "Content-type": "application/json" },
             });
             const data = await response.json();
             dispatch({ type: FETCH_OFFICES_SUCCESS, payload: data });

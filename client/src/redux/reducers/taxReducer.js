@@ -1,0 +1,40 @@
+﻿import {
+    ADD_TAX_SUCCESS, DELETE_TAX_SUCCESS,
+    EDIT_TAX_SUCCESS, FETCH_TAXES_SUCCESS
+} from "../actions/actiontypes";
+
+const initialState = {
+    vats: []
+}
+
+export const taxReducer = (state = initialState, action) => {
+    switch (action.type) {
+        case ADD_TAX_SUCCESS:
+            return {
+                ...state,
+                vats: [...state.vats, action.payload]
+            }
+
+        case DELETE_TAX_SUCCESS:
+            return {
+                ...state,
+                vats: state.vats.filter((v) => v.id !== action.payload.id)
+            }
+
+        case EDIT_TAX_SUCCESS:
+            return {
+                ...state,
+                vats: state.vats.map(v => 
+                    v.id === action.payload.id ? action.payload : v
+                ),
+            }
+
+        case FETCH_TAXES_SUCCESS:
+            return {
+                ...state,
+                vats: action.payload
+            }
+
+        default: return state;
+    }
+}

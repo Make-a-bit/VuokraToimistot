@@ -8,6 +8,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import { addOfficeService, deleteService, editService, fetchServices, setOffice } from "../redux/actions/serviceActions"
 import AddEntry from "../components/AddEntryModal";
 import ConfirmModal from "../components/ConfirmModal";
+import EditEntry from "../components/EditEntryModal";
 import dataGridColumns from "../utils/datagridcolumns";
 import dataGridSx from "../utils/dataGridSx";
 import inputValidation from "../utils/inputValidation";
@@ -24,8 +25,10 @@ const Services = () => {
     const services = useSelector(state => state.services.services);
     const selectedOffice = useSelector(state => state.services.selectedServiceOffice);
     const { errorMessage, successMessage } = useSelector(state => state.ui);
+
     const [showAddService, setShowAddService] = useState(false)
     const [showConfirm, setShowConfirm] = useState(false)
+    const [showEditService, setShowEditService] = useState(false)
     const [selectedService, setSelectedService] = useState({})
 
     useAutoClearMessages(errorMessage, successMessage);
@@ -35,25 +38,24 @@ const Services = () => {
         dispatch(setOffice(office))
     };
 
+    const handleCloseAddService = () => {
+        setShowAddService(false);
+        dispatch(fetchServices());
+    };
+
+    const handleCloseEditService = () => {
+        setShowEditService(false);
+        dispatch(fetchServices());
+    };
+
+    const handleRowClick = (params) => {
+        setSelectedService(params.row);
+        setShowEditService(true);
+    };
+
     const filteredServices = selectedOffice
         ? services.filter(s => s.officeId === selectedOffice.id)
         : services;
-
-    const saveEdits = async (updatedRow, originalRow) => {
-        console.log("Edit property:", originalRow)
-        const requiredFields = ["name", "unit", "price", "vat"]
-        const decimalFields = ["price", "vat"]
-        const isValid = inputValidation(updatedRow, requiredFields, decimalFields);
-
-        if (!isValid) {
-            await dispatch({ type: SHOW_ERROR, payload: "Palvelun päivitys epäonnistui!" })
-            return originalRow;
-        }
-
-        await dispatch(editService(updatedRow));
-
-        return updatedRow;
-    }
 
     const btnDeleteService = (service) => {
         setSelectedService(service)
@@ -62,6 +64,7 @@ const Services = () => {
 
     const columns = React.useMemo(() => dataGridColumns(serviceSchema, btnDeleteService), []);
 
+    console.log(services)
     return (
         <>
             <Box sx={{ marginTop: "20px", width: "200px" }}>
@@ -87,11 +90,62 @@ const Services = () => {
             <Button
                 variant="contained"
                 disabled={!selectedOffice}
-                sx={{ marginBottom: "-10px" }}
+                sx={{
+                    marginTop: "10px",
+                    marginBottom: "10px"
+                }}
                 onClick={() => setShowAddService(true)}
             >
                 Lisää uusi palvelu
             </Button>
+
+            <AddEntry
+                schema={serviceSchema}
+                apiEndPoint={`${mainURI}/service`}
+                show={showAddService}
+                onHide={handleCloseAddService}
+                title={`Lisää uusi palvelu kohteeseen ${selectedOffice ? selectedOffice.name : ""}`}
+                action={addOfficeService}
+                extraData={selectedOffice ? { officeId: selectedOffice.id } : {}}
+            />
+
+            <EditEntry
+                schema={serviceSchema}
+                apiEndPoint={`${mainURI}/service/update`}
+                show={showEditService}
+                onHide={handleCloseEditService}
+                title={`Muokkaa lisäpalvelua ${selectedService ? selectedService.name : ""}`}
+                action={editService}
+                entry={selectedService}
+                onClose={() => setShowEditService(false)}
+            />
+
+            <div style={{ height: "auto", width: "100%" }}>
+                <DataGrid
+                    rows={filteredServices}
+                    columns={columns}
+                    disableRowSelectionOnClick
+                    onRowClick={handleRowClick}
+                    loading={loading}
+                    slotProps={{
+                        loadingOverlay: {
+                            variant: "linear-progress",
+                            noRowsVariant: "skeleton"
+                        },
+                    }}
+                    sx={dataGridSx}
+                />
+            </div>
+
+            <ConfirmModal
+                show={showConfirm}
+                onHide={() => setShowConfirm(false)}
+                title="Poista palvelu"
+                message={`Haluatko varmasti poistaa palvelun ${selectedService?.name}?`}
+                confirmText="Poista"
+                cancelText="Peruuta"
+                onConfirm={() => dispatch(deleteService(selectedService))}
+            />
 
             {errorMessage &&
                 <Snackbar
@@ -123,52 +177,6 @@ const Services = () => {
                 </Snackbar>
             }
 
-            <AddEntry
-                schema={serviceSchema}
-                apiEndPoint={`${mainURI}/service`}
-                show={showAddService}
-                onHide={() => setShowAddService(false)}
-                title="Lisää uusi palvelu"
-                action={addOfficeService}
-                extraData={selectedOffice ? { officeId: selectedOffice.id } : {}}
-            /><br /><br />
-
-            {services.length > 0 && (
-                <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                    Kaksoisklikkaa solua muokataksesi sitä, poistu solusta tallentaaksesi.
-                </Typography>
-            )}
-
-            <div style={{ height: "auto", width: "100%" }}>
-                <DataGrid
-                    rows={filteredServices}
-                    columns={columns}
-                    disableRowSelectionOnClick
-                    loading={loading}
-                    processRowUpdate={saveEdits}
-                    slotProps={{
-                        loadingOverlay: {
-                            variant: "linear-progress",
-                            noRowsVariant: "skeleton"
-                        },
-                    }}
-                    onProcessRowUpdateError={(error) => {
-                        console.log("Row update error:", error);
-                    }}
-                    experimentalFeatures={{ newEditingApi: true }}
-                    sx={dataGridSx}
-                />
-            </div>
-
-            <ConfirmModal
-                show={showConfirm}
-                onHide={() => setShowConfirm(false)}
-                title="Poista palvelu"
-                message={`Haluatko varmasti poistaa palvelun ${selectedService?.name}?`}
-                confirmText="Poista"
-                cancelText="Peruuta"
-                onConfirm={() => dispatch(deleteService(selectedService))}
-            />
         </>
     )
 }

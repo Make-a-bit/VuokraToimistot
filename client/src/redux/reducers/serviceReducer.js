@@ -20,7 +20,7 @@ export const serviceReducer = (state = initialState, action) => {
         case DELETE_OFFICE_SERVICE_SUCCESS:
             return {
                 ...state,
-                services: state.services.filter((a) => a.id !== action.payload.id),
+                services: state.services.filter((s) => s.id !== action.payload.id),
             }
 
         case EDIT_OFFICE_SERVICE_SUCCESS:
