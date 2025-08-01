@@ -1,6 +1,7 @@
 ﻿import {
     ADD_TAX_SUCCESS, DELETE_TAX_SUCCESS,
-    EDIT_TAX_SUCCESS, FETCH_TAXES_SUCCESS
+    EDIT_TAX_SUCCESS, FETCH_TAXES_SUCCESS,
+    RESET_APP_STATE
 } from "../actions/actiontypes";
 
 const initialState = {
@@ -34,6 +35,9 @@ export const taxReducer = (state = initialState, action) => {
                 ...state,
                 vats: action.payload
             }
+
+        case RESET_APP_STATE:
+            return initialState;
 
         default: return state;
     }

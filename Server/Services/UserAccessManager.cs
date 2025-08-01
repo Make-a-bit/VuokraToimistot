@@ -1,6 +1,8 @@
 ﻿using API.Controllers;
 using Microsoft.Data.SqlClient;
 using System.Diagnostics;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace API.Services
 {
@@ -10,10 +12,12 @@ namespace API.Services
     public class UserAccessManager
     {
         private readonly DBManager _dbManager;
+        private readonly string _salt;
 
         public UserAccessManager(DBManager dbManager)
         {
             _dbManager = dbManager;
+            _salt = Environment.GetEnvironmentVariable("VUOKRATOIMISTOT_SALT") ?? "";
         }
 
 
@@ -22,30 +26,49 @@ namespace API.Services
         /// </summary>
         /// <param name="credentials">Login credentials</param>
         /// <returns>True if user exists, otherwise false</returns>
-        public bool GetUser(Credentials credentials)
+        public async Task<bool> ValidateUser(Credentials credentials)
         {
+
             try
             {
                 using var connection = _dbManager.GetConnection();
-                connection.Open();
+                await connection.OpenAsync();
 
                 using var command = new SqlCommand(@"
-                SELECT * FROM Users
-                WHERE userID = @userID AND userPassword = @password", connection);
+                SELECT userPassword FROM Users
+                WHERE userID = @userID", connection);
 
                 command.Parameters.AddWithValue("@userID", credentials.UserName);
-                command.Parameters.AddWithValue("@password", credentials.Password);
+                using var reader = await command.ExecuteReaderAsync();
 
-                using var reader = command.ExecuteReader();
+                if (!await reader.ReadAsync())
+                {
+                    return false;
+                }
 
-                Debug.WriteLine(reader);
+                var storedPassword = reader.GetString(0);
 
-                return reader.HasRows;
+                var computedHash = await GetRFCHash(credentials.Password, _salt, 10000);
+
+                return CryptographicOperations.FixedTimeEquals(
+                Convert.FromBase64String(storedPassword),
+                Convert.FromBase64String(computedHash)
+                );
             }
             catch
             {
                 throw;
             }
+        }
+
+        private async Task<string> GetRFCHash(string password, string salt, int rounds)
+        {
+            var passwordBytes = Encoding.UTF8.GetBytes(password);
+            var saltBytes = Encoding.UTF8.GetBytes(salt);
+            var hashedPasswordBytes = Rfc2898DeriveBytes.Pbkdf2(passwordBytes, saltBytes, rounds, HashAlgorithmName.SHA256, 32);
+            var base64String = Convert.ToBase64String(hashedPasswordBytes);
+
+            return base64String;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿import {
     ADD_INVOICE_SUCCESS, DELETE_INVOICE_SUCCESS,
-    EDIT_INVOICE_SUCCESS, FETCH_INVOICES_SUCCESS
+    EDIT_INVOICE_SUCCESS, FETCH_INVOICES_SUCCESS,
+    RESET_APP_STATE
 } from "../actions/actiontypes";
 
 const initialState = {
@@ -34,6 +35,9 @@ export const invoiceReducer = (state = initialState, action) => {
                 ...state,
                 invoices: state.invoices.filter((i) => i.id !== action.payload.id)
             }
+
+        case RESET_APP_STATE:
+            return initialState;
 
         default: return state;
     }

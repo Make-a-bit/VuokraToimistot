@@ -61,3 +61,10 @@ export const HIDE_LOADING = "HIDE_LOADING";
 export const SHOW_ERROR = "SHOW_ERROR";
 export const SHOW_LOADING = "SHOW_LOADING"
 export const SHOW_SUCCESS = "SHOW_SUCCESS"
+
+// LOGIN
+export const LOGIN_SUCCESS = "LOGIN_SUCCESS";
+export const LOGIN_FAILED = "LOGIN_FAILED"; 
+export const LOGOUT = "LOGOUT"
+
+export const RESET_APP_STATE = "RESET_APP_STATE";

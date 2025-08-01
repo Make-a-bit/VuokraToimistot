@@ -1,8 +1,8 @@
 ﻿import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-    Alert, Box, Button, FormControl, InputLabel, MenuItem,
-    Select, Snackbar, Typography
+    Alert, Autocomplete, Box, Button, FormControl, InputLabel, MenuItem,
+    Select, Snackbar, TextField
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { addOfficeService, deleteService, editService, fetchServices, setOffice } from "../redux/actions/serviceActions"
@@ -11,8 +11,6 @@ import ConfirmModal from "../components/ConfirmModal";
 import EditEntry from "../components/EditEntryModal";
 import dataGridColumns from "../utils/datagridcolumns";
 import dataGridSx from "../utils/dataGridSx";
-import inputValidation from "../utils/inputValidation";
-import { SHOW_ERROR } from "../redux/actions/actiontypes";
 import serviceSchema from "../schema/service";
 import useAutoClearMessages from "../hooks/autoClearMessages";
 
@@ -69,21 +67,17 @@ const Services = () => {
         <>
             <Box sx={{ marginTop: "20px", width: "200px" }}>
                 <FormControl>
-                    <InputLabel>
-                        {selectedOffice ? "Kohde" : "Valitse kohde"}
-                    </InputLabel>
-                    <Select
-                        label="Toimisto"
-                        value={selectedOffice?.id || ""}
-                        onChange={handleOfficeChange}
-                        sx={{ minWidth: "200px" }}
-                    >
-                        {offices.map((item) => (
-                            <MenuItem key={item.id} value={item.id}>
-                                {item.name}
-                            </MenuItem>
-                        ))}
-                    </Select>
+                    <Autocomplete
+                        options={offices}
+                        getOptionLabel={(option) => option.name}
+                        value={selectedOffice || null}
+                        onChange={(_, newValue) => dispatch(setOffice(newValue))}
+                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                        renderInput={(params) => (
+                            <TextField {...params} label="Valitse kohde" variant="outlined" />
+                        )}
+                        sx={{ width: "300px" }}
+                    />
                 </FormControl>
             </Box>
 

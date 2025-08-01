@@ -12,10 +12,14 @@ export const addOffice = (apiEndPoint, office) => {
     console.log("Office:", office);
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             const response = await fetch(apiEndPoint, {
                 method: "POST",
-                headers: { "Content-type": "application/json" },
+                headers: {
+                    "Content-type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
                 body: JSON.stringify(office),
             });
 
@@ -40,9 +44,14 @@ export const deleteOffice = (office) => {
     console.log("Office to del:", office);
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             await fetch(`${mainURI}/office/delete/${office.id}`, {
-                method: "DELETE"
+                method: "DELETE",
+                headers: {
+                    "Content-type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
             });
             dispatch({ type: DELETE_OFFICE_SUCCESS, payload: office });
             dispatch({ type: SHOW_SUCCESS, payload: "Kohteen poistaminen onnistui!" })
@@ -58,10 +67,14 @@ export const deleteOffice = (office) => {
 export const editOffice = (office) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             const response = await fetch(`${mainURI}/office/update`, {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
                 body: JSON.stringify(office),
             });
 
@@ -83,9 +96,14 @@ export const editOffice = (office) => {
 export const fetchOffices = () => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             const response = await fetch(`${mainURI}/office`, {
                 method: "GET",
+                headers: {
+                    "Content-type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
             });
             const data = await response.json();
             dispatch({ type: FETCH_OFFICES_SUCCESS, payload: data });

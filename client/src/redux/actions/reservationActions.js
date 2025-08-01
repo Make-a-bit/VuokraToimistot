@@ -10,10 +10,14 @@ const mainURI = "https://localhost:7017";
 export const addReservation = (reservation) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             const response = await fetch(`${mainURI}/reservation`, {
                 method: "POST",
-                headers: { "Content-type": "application/json" },
+                headers: {
+                    "Content-type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
                 body: JSON.stringify(reservation),
             });
 
@@ -35,9 +39,14 @@ export const addReservation = (reservation) => {
 export const deleteReservation = (reservation) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             await fetch(`${mainURI}/reservation/delete/${reservation.id}`, {
-                method: "DELETE"
+                method: "DELETE",
+                headers: {
+                    "Content-type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
             });
             dispatch({ type: DELETE_RESERVATION_SUCCESS, payload: reservation })
             dispatch({ type: SHOW_SUCCESS, payload: "Varauksen poisto onnistui!" })
@@ -52,9 +61,14 @@ export const deleteReservation = (reservation) => {
 export const fetchReservations = () => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             const response = await fetch(`${mainURI}/reservation`, {
-                method: "GET"
+                method: "GET",
+                headers: {
+                    "Content-type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
             });
             const data = await response.json();
             dispatch({ type: FETCH_RESERVATION_SUCCESS, payload: data })
@@ -68,8 +82,15 @@ export const fetchReservations = () => {
 
 export const fetchReservedDates = (propertyId) => async (dispatch) => {
     dispatch({ type: SHOW_LOADING });
+    const token = localStorage.getItem("token");
     try {
-        const response = await fetch(`${mainURI}/reservation/reserved-dates/${propertyId}`);
+        const response = await fetch(`${mainURI}/reservation/reserved-dates/${propertyId}`, {
+            method: "GET",
+            headers: {
+                "Content-type": "application/json",
+                'Authorization': `Bearer ${token}`,
+            },
+        });
         const data = await response.json();
         dispatch({ type: FETCH_RESERVED_DATES_SUCCESS, payload: data });
     } catch (error) {
@@ -81,10 +102,14 @@ export const fetchReservedDates = (propertyId) => async (dispatch) => {
 
 export const updateReservation = (reservation) => async (dispatch) => {
     dispatch({ type: SHOW_LOADING })
+    const token = localStorage.getItem("token");
     try {
         const response = await fetch(`${mainURI}/reservation/update`, {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-type": "application/json",
+                'Authorization': `Bearer ${token}`,
+            },
             body: JSON.stringify(reservation)
         });
 

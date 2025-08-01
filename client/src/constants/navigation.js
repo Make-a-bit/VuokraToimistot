@@ -19,7 +19,7 @@
     },
     {
         path: "/verot", label: "Verokannat"
-    },
+    }
 ]
 
 export default navigationLinks;

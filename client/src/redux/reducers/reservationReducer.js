@@ -4,6 +4,7 @@
     FETCH_RESERVED_DATES_SUCCESS,
     SELECTED_RESERVATION_OFFICE_SET, SELECTED_RESERVATION_OFFICE_PROPERTY_SET,
     SET_AVAILABLE_DEVICES, SET_AVAILABLE_SERVICES,
+    RESET_APP_STATE
 } from "../actions/actiontypes";
 
 const initialState = {
@@ -73,6 +74,9 @@ export const reservationReducer = (state = initialState, action) => {
                 ...state,
                 availableServices: action.payload
             }
+
+        case RESET_APP_STATE:
+            return initialState;
 
         default: return state;
     }

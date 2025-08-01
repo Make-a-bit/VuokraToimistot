@@ -1,10 +1,12 @@
 ﻿using API.Entities;
 using API.Repositories;
 using API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
+    [Authorize]
     [Route("[controller]")]
     public class TaxController : Controller
     {

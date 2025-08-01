@@ -1,7 +1,7 @@
 ﻿import React, { useState, useEffect } from "react";
 import {
-    Alert, Box, Button, FormControl, InputLabel,
-    MenuItem, Select, Snackbar, Typography
+    Alert, Autocomplete, Box, Button, FormControl, InputLabel,
+    MenuItem, Select, Snackbar, TextField, Typography
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import AddEntry from "../components/AddEntryModal";
@@ -74,21 +74,17 @@ const Properties = () => {
         <>
             <Box sx={{ marginTop: "20px", width: "200px" }}>
                 <FormControl>
-                    <InputLabel>
-                        {selectedOffice ? "Kohde" : "Valitse kohde"}
-                    </InputLabel>
-                    <Select
-                        label="Toimisto"
-                        value={selectedOffice?.id || ""}
-                        onChange={handleOfficeChange}
-                        sx={{ minWidth: "200px" }}
-                    >
-                        {offices.map((item) => (
-                            <MenuItem key={item.id} value={item.id}>
-                                {item.name}
-                            </MenuItem>
-                        ))}
-                    </Select>
+                    <Autocomplete
+                        options={offices}
+                        getOptionLabel={(option) => option.name}
+                        value={selectedOffice || null}
+                        onChange={(_, newValue) => dispatch(setPropertyOffice(newValue))}
+                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                        renderInput={(params) => (
+                            <TextField {...params} label="Valitse kohde" variant="outlined" />
+                        )}
+                        sx={{ width: "300px" }}
+                    />
                 </FormControl>
             </Box>
 

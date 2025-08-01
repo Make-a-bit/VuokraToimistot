@@ -1,7 +1,7 @@
 ﻿import {
     ADD_OFFICE_DEVICE_SUCCESS, DELETE_OFFICE_DEVICE_SUCCESS,
     EDIT_OFFICE_DEVICE_SUCCESS, FETCH_OFFICE_DEVICES_SUCCESS,
-    SELECTED_DEVICE_OFFICE_SET
+    SELECTED_DEVICE_OFFICE_SET, RESET_APP_STATE
 } from "../actions/actiontypes";
 
 const initialState = {
@@ -42,6 +42,9 @@ export const deviceReducer = (state = initialState, action) => {
                 ...state,
                 selectedDeviceOffice: action.payload
             }
+
+        case RESET_APP_STATE:
+            return initialState;
 
         default: return state;
     }

@@ -13,10 +13,14 @@ export const addOfficeService = (apiEndPoint, service) => {
     console.log("Service:", service);
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             const response = await fetch(apiEndPoint, {
                 method: "POST",
-                headers: { "Content-type": "application/json" },
+                headers: {
+                    "Content-type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
                 body: JSON.stringify(service),
 
             });
@@ -42,9 +46,14 @@ export const deleteService = (service) => {
     console.log("Service to del:", service)
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             await fetch(`${mainURI}/service/delete/${service.id}`, {
-                method: "DELETE"
+                method: "DELETE",
+                headers: {
+                    "Content-type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
             });
             dispatch({ type: DELETE_OFFICE_SERVICE_SUCCESS, payload: service })
             dispatch({ type: SHOW_SUCCESS, payload: "Palvelun poisto onnistui!" })
@@ -60,10 +69,14 @@ export const deleteService = (service) => {
 export const editService = (service) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             const response = await fetch(`${mainURI}/service/update`, {
                 method: "PUT",
-                headers: { "Content-type": "application/json" },
+                headers: {
+                    "Content-type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
                 body: JSON.stringify(service)
             });
 
@@ -85,12 +98,17 @@ export const editService = (service) => {
 export const fetchServices = (officeId) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             const uri = (officeId != null && officeId > 0)
                 ? `${mainURI}/service/by-office?id=${officeId}`
                 : `${mainURI}/service/all`;
             const response = await fetch(uri, {
-                method: "GET"
+                method: "GET",
+                headers: {
+                    "Content-type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
             });
 
             const data = await response.json();

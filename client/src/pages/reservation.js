@@ -19,7 +19,6 @@ import useAutoClearMessages from "../hooks/autoClearMessages";
 const Reservation = () => {
     const dispatch = useDispatch();
     const { errorMessage, successMessage } = useSelector(state => state.ui);
-    const loading = useSelector(state => state.ui.loadingState);
     const offices = useSelector(state => state.offices.offices);
     const properties = useSelector(state => state.properties.properties);
     const allReservations = useSelector(state => state.reservations.reservations);
@@ -109,36 +108,6 @@ const Reservation = () => {
 
     return (
         <>
-            {errorMessage &&
-                <Snackbar
-                    anchorOrigin={{ horizontal: "right", vertical: "top" }}
-                    open={Boolean(errorMessage)}
-                    autoHideDuration={6000}>
-                    <Alert
-                        color="warning"
-                        severity="warning"
-                        variant="filled"
-                        sx={{ border: "1px solid #000", width: "100%" }}>
-                        {errorMessage}
-                    </Alert>
-                </Snackbar>
-            }
-
-            {successMessage &&
-                <Snackbar
-                    anchorOrigin={{ horizontal: "right", vertical: "top" }}
-                    open={Boolean(successMessage)}
-                    autoHideDuration={6000}>
-                    <Alert
-                        color="success"
-                        severity="success"
-                        variant="filled"
-                        sx={{ border: "1px solid #000", width: "100%" }}>
-                        {successMessage}
-                    </Alert>
-                </Snackbar>
-            }
-
             <Button
                 variant="contained"
                 onClick={() => {
@@ -279,6 +248,36 @@ const Reservation = () => {
                 }
                 title={"Poista varaus"}
             />
+
+            {errorMessage &&
+                <Snackbar
+                    anchorOrigin={{ horizontal: "right", vertical: "top" }}
+                    open={Boolean(errorMessage)}
+                    autoHideDuration={6000}>
+                    <Alert
+                        color="warning"
+                        severity="warning"
+                        variant="filled"
+                        sx={{ border: "1px solid #000", width: "100%" }}>
+                        {errorMessage}
+                    </Alert>
+                </Snackbar>
+            }
+
+            {successMessage &&
+                <Snackbar
+                    anchorOrigin={{ horizontal: "right", vertical: "top" }}
+                    open={Boolean(successMessage)}
+                    autoHideDuration={6000}>
+                    <Alert
+                        color="success"
+                        severity="success"
+                        variant="filled"
+                        sx={{ border: "1px solid #000", width: "100%" }}>
+                        {successMessage}
+                    </Alert>
+                </Snackbar>
+            }
         </>
     )
 }

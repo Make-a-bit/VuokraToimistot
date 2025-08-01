@@ -1,6 +1,7 @@
 ﻿import {
     ADD_OFFICE_SUCCESS, DELETE_OFFICE_SUCCESS,
     EDIT_OFFICE_SUCCESS, FETCH_OFFICES_SUCCESS,
+    RESET_APP_STATE
 } from "../actions/actiontypes"
 
 const initialState = {
@@ -34,6 +35,9 @@ export const officeReducer = (state = initialState, action) => {
                 ...state,
                 offices: action.payload
             };
+
+        case RESET_APP_STATE:
+            return initialState;
 
         default: return state;
     }

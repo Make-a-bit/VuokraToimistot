@@ -1,7 +1,7 @@
 ﻿import {
     ADD_PROPERTY_SUCCESS, DELETE_PROPERTY_SUCCESS,
     EDIT_PROPERTY_SUCCESS, FETCH_PROPERTIES_SUCCESS,
-    SELECTED_PROPERTY_OFFICE_SET
+    SELECTED_PROPERTY_OFFICE_SET, RESET_APP_STATE
 } from "../actions/actiontypes"
 
 const initialState = {
@@ -42,6 +42,9 @@ export const propertyReducer = (state = initialState, action) => {
                 ...state,
                 selectedPropertyOffice: action.payload
             }
+
+        case RESET_APP_STATE:
+            return initialState;
 
         default: return state;
     }

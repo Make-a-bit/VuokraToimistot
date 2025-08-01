@@ -12,10 +12,14 @@ export const addCustomer = (apiEndPoint, customer) => {
     console.log("Customer:", customer)
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             const response = await fetch(apiEndPoint, {
                 method: "POST",
-                headers: { "Content-type": "application/json" },
+                headers: {
+                    "Content-type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
                 body: JSON.stringify(customer),
             });
 
@@ -40,9 +44,14 @@ export const deleteCustomer = (customer) => {
     console.log("Customer to del:", customer);
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             await fetch(`${mainURI}/customer/delete/${customer.id}`, {
-                method: "DELETE"
+                method: "DELETE",
+                headers: {
+                    "Content-type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
             });
             dispatch({ type: DELETE_CUSTOMER_SUCCESS, payload: customer });
             dispatch({ type: SHOW_SUCCESS, payload: "Asiakkaan poistaminen onnistui!" })
@@ -58,10 +67,14 @@ export const deleteCustomer = (customer) => {
 export const editCustomer = (customer) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             const response = await fetch(`${mainURI}/customer/update`, {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
                 body: JSON.stringify(customer),
             });
 
@@ -84,9 +97,14 @@ export const editCustomer = (customer) => {
 export const fetchCustomers = () => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             const response = await fetch(`${mainURI}/customer`, {
                 method: "GET",
+                headers: {
+                    "Content-type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
             });
             const data = await response.json();
             dispatch({ type: FETCH_CUSTOMERS_SUCCESS, payload: data });
