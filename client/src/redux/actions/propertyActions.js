@@ -13,10 +13,14 @@ export const addProperty = (apiEndPoint, property) => {
     //console.log("Property:", property);
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             const response = await fetch(apiEndPoint, {
                 method: "POST",
-                headers: { "Content-type": "application/json" },
+                headers: {
+                    "Content-type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
                 body: JSON.stringify(property),
             });
 
@@ -39,9 +43,14 @@ export const deleteProperty = (property) => {
     console.log("Property to del:", property)
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             await fetch(`${mainURI}/property/delete/${property.id}`, {
-                method: "DELETE"
+                method: "DELETE",
+                headers: {
+                    "Content-type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
             });
             dispatch({ type: DELETE_PROPERTY_SUCCESS, payload: property });
             dispatch({ type: SHOW_SUCCESS, payload: "Vuokratilan poisto onnistui!" })
@@ -57,10 +66,14 @@ export const deleteProperty = (property) => {
 export const editProperty = (property) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             const response = await fetch(`${mainURI}/property/update`, {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
                 body: JSON.stringify(property)
             });
 
@@ -82,11 +95,18 @@ export const editProperty = (property) => {
 export const fetchProperties = (officeId) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             const uri = (officeId != null && officeId > 0)
                 ? `${mainURI}/property/by-office?id=${officeId}`
                 : `${mainURI}/property/all`;
-            const response = await fetch(uri, { method: "GET" });
+            const response = await fetch(uri, {
+                method: "GET",
+                headers: {
+                    "Content-type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
 
             const data = await response.json();
             dispatch({ type: FETCH_PROPERTIES_SUCCESS, payload: data });

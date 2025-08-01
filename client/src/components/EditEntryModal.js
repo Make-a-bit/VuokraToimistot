@@ -16,8 +16,8 @@ const EditEntryModal = ({ schema, onClose, show, onHide, title, action, entry })
     const [errorState, setErrorState] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
 
-    console.log(vats)
-    console.log("ENTRY:", entry);
+    //console.log(vats)
+    //console.log("ENTRY:", entry);
     //console.log("SCHEMA:", schema);
 
     useEffect(() => {

@@ -1,11 +1,14 @@
 using API.Repositories;
 using API.Services;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace API
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -70,6 +73,19 @@ namespace API
             builder.Services.AddScoped<TaxRepository>();
             builder.Services.AddScoped<UserAccessManager>();
 
+            builder.Services.AddAuthentication("Bearer").AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new()
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = "VuokraToimistot",
+                    ValidAudience = "VuokraToimistot",
+                    IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Environment.GetEnvironmentVariable("VUOKRATOIMISTOT_JWT_SECRET_KEY")))
+                };
+            });
 
             var app = builder.Build();
 
@@ -77,6 +93,7 @@ namespace API
             app.UseHttpsRedirection();
             app.UseCors(corsPolicyName);
 
+            app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
             app.Run();

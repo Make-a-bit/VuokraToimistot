@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -13,12 +14,13 @@ namespace API.Controllers
     public class AuthController : Controller
     {
         private readonly string keyString;
+        private readonly string salt;
         private readonly UserAccessManager AccessManager;
 
         public AuthController(UserAccessManager userAccessManager)
         {
             AccessManager = userAccessManager;
-            keyString = Environment.GetEnvironmentVariable("VUOKRATOIMISTOT_JWT_SECRET_KEY");
+            keyString = Environment.GetEnvironmentVariable("VUOKRATOIMISTOT_JWT_SECRET_KEY") ?? "";
         }
 
 
@@ -28,9 +30,9 @@ namespace API.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult<string> Authenticate([FromBody] Credentials request)
+        public async Task<ActionResult<string>> Authenticate([FromBody] Credentials request)
         {
-            var validation = AccessManager.GetUser(request);
+                var validation = await AccessManager.ValidateUser(request);
 
             if (!validation)
             {
@@ -43,6 +45,8 @@ namespace API.Controllers
 
             var jwtToken = new JwtSecurityToken(
                 issuer: "VuokraToimistot",
+                audience: "VuokraToimistot",
+                claims: new[] { new Claim(ClaimTypes.Name, request.UserName) },
                 expires: DateTime.Now.AddMinutes(30),
                 signingCredentials: signCredentials
             );

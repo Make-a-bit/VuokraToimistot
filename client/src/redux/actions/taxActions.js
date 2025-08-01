@@ -18,10 +18,14 @@ const mainURI = "https://localhost:7017";
 export const addTax = (apiEndPoint, tax) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             const response = await fetch(apiEndPoint, {
                 method: "POST",
-                headers: { "Content-type": "application/json" },
+                headers: {
+                    "Content-type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
                 body: JSON.stringify(tax)
             });
 
@@ -46,9 +50,14 @@ export const addTax = (apiEndPoint, tax) => {
 export const deleteTax = (tax) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             await fetch(`${mainURI}/tax/delete/${tax.id}`, {
-                method: "DELETE"
+                method: "DELETE",
+                headers: {
+                    "Content-type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
             });
             dispatch({ type: DELETE_TAX_SUCCESS, payload: tax })
             dispatch({ type: SHOW_SUCCESS, payload: "Verokannan poisto onnistui!" })
@@ -68,10 +77,14 @@ export const deleteTax = (tax) => {
 export const editTax = (tax) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             const response = await fetch(`${mainURI}/tax/update`, {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
                 body: JSON.stringify(tax)
             });
 
@@ -95,18 +108,19 @@ export const editTax = (tax) => {
 export const fetchTaxes = () => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             const response = await fetch(`${mainURI}/tax`, {
-                method: "GET"
+                method: "GET",
+                headers: {
+                    "Content-type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
             });
-            console.log("fetchTaxes response:", response);
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
+
             const data = await response.json();
             dispatch({ type: FETCH_TAXES_SUCCESS, payload: data })
         } catch (e) {
-            console.error("fetchTaxes error:", e);
             dispatch({ type: SHOW_ERROR, payload: "Verokantojen nouto epäonnistui!" })
         } finally {
             dispatch({ type: HIDE_LOADING })

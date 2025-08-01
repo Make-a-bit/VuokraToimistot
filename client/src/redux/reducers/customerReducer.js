@@ -1,6 +1,7 @@
 ﻿import {
     ADD_CUSTOMER_SUCCESS, DELETE_CUSTOMER_SUCCESS,
-    EDIT_CUSTOMER_SUCCESS, FETCH_CUSTOMERS_SUCCESS
+    EDIT_CUSTOMER_SUCCESS, FETCH_CUSTOMERS_SUCCESS,
+    RESET_APP_STATE
 } from "../actions/actiontypes"
 
 const initialState = {
@@ -35,6 +36,8 @@ export const customerReducer = (state = initialState, action) => {
                 customers: action.payload
             };
 
+        case RESET_APP_STATE:
+            return initialState;
 
         default: return state;
     }

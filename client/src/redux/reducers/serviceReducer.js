@@ -1,7 +1,7 @@
 ﻿import {
     ADD_OFFICE_SERVICE_SUCCESS, DELETE_OFFICE_SERVICE_SUCCESS,
     EDIT_OFFICE_SERVICE_SUCCESS, FETCH_OFFICE_SERVICES_SUCCESS,
-    SELECTED_SERVICE_OFFICE_SET
+    SELECTED_SERVICE_OFFICE_SET, RESET_APP_STATE
 } from "../actions/actiontypes"
 
 const initialState = {
@@ -42,6 +42,9 @@ export const serviceReducer = (state = initialState, action) => {
                 ...state,
                 selectedServiceOffice: action.payload
             }
+
+        case RESET_APP_STATE:
+            return initialState;
 
         default: return state;
     }

@@ -9,10 +9,14 @@ const mainURI = "https://localhost:7017";
 export const createInvoice = (reservation) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             const response = await fetch(`${mainURI}/invoice`, {
                 method: "POST",
-                headers: { "Content-type": "application/json" },
+                headers: {
+                    "Content-type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
                 body: JSON.stringify(reservation)
             });
 
@@ -32,10 +36,14 @@ export const createInvoice = (reservation) => {
 export const deleteInvoice = (invoice) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             await fetch(`${mainURI}/invoice`, {
                 method: "DELETE",
-                headers: { "Content-type": "application/json" },
+                headers: {
+                    "Content-type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
                 body: JSON.stringify(invoice)
             });
             dispatch({ type: DELETE_INVOICE_SUCCESS, payload: invoice })
@@ -51,9 +59,14 @@ export const deleteInvoice = (invoice) => {
 export const fetchInvoices = () => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             const response = await fetch(`${mainURI}/invoice`, {
-                method: "GET"
+                method: "GET",
+                headers: {
+                    "Content-type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
             });
             const data = await response.json();
             dispatch({ type: FETCH_INVOICES_SUCCESS, payload: data })
@@ -67,10 +80,14 @@ export const fetchInvoices = () => {
 
 export const updateInvoice = (invoice) => async (dispatch) => {
     dispatch({ type: SHOW_LOADING })
+    const token = localStorage.getItem("token");
     try {
         const response = await fetch(`${mainURI}/invoice/update`, {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-type": "application/json",
+                'Authorization': `Bearer ${token}`,
+            },
             body: JSON.stringify(invoice)
         });
 

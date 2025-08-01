@@ -11,10 +11,14 @@ export const addDevice = (apiEndPoint, device) => {
     console.log("Device", device)
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             const response = await fetch(apiEndPoint, {
                 method: "POST",
-                headers: { "Content-type": "application/json" },
+                headers: {
+                    "Content-type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
                 body: JSON.stringify(device)
             });
 
@@ -37,9 +41,14 @@ export const deleteDevice = (device) => {
     console.log("Device to del:", device)
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             await fetch(`${mainURI}/device/delete/${device.id}`, {
-                method: "DELETE"
+                method: "DELETE",
+                headers: {
+                    "Content-type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
             });
             dispatch({ type: DELETE_OFFICE_DEVICE_SUCCESS, payload: device })
             dispatch({ type: SHOW_SUCCESS, payload: "Laitteen poistaminen onnistui!" })
@@ -55,10 +64,14 @@ export const deleteDevice = (device) => {
 export const editDevice = (device) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             const response = await fetch(`${mainURI}/device/update`, {
                 method: "PUT",
-                headers: { "Content-type": "application/json" },
+                headers: {
+                    "Content-type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
                 body: JSON.stringify(device)
             });
 
@@ -79,11 +92,18 @@ export const editDevice = (device) => {
 export const fetchDevices = (officeId) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        const token = localStorage.getItem("token");
         try {
             const uri = (officeId !== null && officeId > 0)
                 ? `${mainURI}/device/by-office?id=${officeId}`
                 : `${mainURI}/device/all`;
-            const response = await fetch(uri, { method: "GET" });
+            const response = await fetch(uri, {
+                method: "GET",
+                headers: {
+                    "Content-type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
 
             const data = await response.json();
             dispatch({ type: FETCH_OFFICE_DEVICES_SUCCESS, payload: data })
