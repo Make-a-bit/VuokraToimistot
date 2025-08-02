@@ -5,23 +5,60 @@ import navigationLinks from '../../constants/navigation';
 import { AppBar, Box, Button, Container, Menu, MenuItem, Toolbar, Typography } from "@mui/material";
 import { logoutUser } from "../../redux/actions/loginActions";
 
+/**
+ * 
+ * @returns
+ * anchorEls is an object mapping dropdown labels to their anchor elements (HTMLButtonElement or null).
+ * @type {Object.<string, (HTMLElement|null)>}
+ */
 const Header = () => {
     const [anchorEls, setAnchorEls] = useState({});
+
+    /**
+     * location is the current location object from react-router.
+     * @type {import('react-router-dom').Location}
+     */
     const location = useLocation();
+
+    /**
+     * dispatch is the Redux dispatch function.
+     * @type {import('redux').Dispatch}
+     */
     const dispatch = useDispatch();
+
+    /**
+     * loggedUser is the currently logged-in user's name or null/undefined if not logged in.
+     * @type {string|null|undefined}
+     */
     const loggedUser = useSelector(state => state.login.loggedUser);
 
     // Open dropdown menu for key
+    /**
+     * Opens the dropdown menu for a given key.
+     * @param {React.MouseEvent<HTMLElement>} event - The click event from the button.
+     * @param {string} key - The label key for the dropdown.
+     * @returns {void}
+     */
     const handleMenuOpen = (event, key) => {
         setAnchorEls(prev => ({ ...prev, [key]: event.currentTarget }));
     };
 
     // Close dropdown menu for key
+    /**
+     * Closes the dropdown menu for a given key.
+     * @param {string} key - The label key for the dropdown.
+     * @returns {void}
+     */
     const handleMenuClose = (key) => {
         setAnchorEls(prev => ({ ...prev, [key]: null }));
     };
 
     // Check if any dropdown link is active
+    /**
+     * Checks if any link in the dropdown is active (matches current pathname).
+     * @param {Array<{path: string, label: string}>} dropdown - Array of dropdown link objects.
+     * @returns {boolean}
+     */
     const isDropdownActive = (dropdown) =>
         dropdown.some(link => location.pathname === link.path);
 

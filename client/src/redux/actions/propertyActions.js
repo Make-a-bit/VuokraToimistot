@@ -7,10 +7,16 @@
     SELECTED_PROPERTY_OFFICE_SET
 } from "./actiontypes";
 
-const mainURI = "https://localhost:7017";
+import mainURI from "../../constants/apiEndpoint";
 
+/**
+ * Adds a new property via API.
+ * @param {string} apiEndPoint - The API endpoint to send the request to.
+ * @param {Object} property - The property object to add.
+ * @returns {function(Function): Promise<void>} Thunk function for Redux dispatch.
+ * Chose string for apiEndPoint as it is used as a URL, and Object for property as it is serialized to JSON.
+ */
 export const addProperty = (apiEndPoint, property) => {
-    //console.log("Property:", property);
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
         const token = localStorage.getItem("token");
@@ -26,21 +32,24 @@ export const addProperty = (apiEndPoint, property) => {
 
             if (response.ok) {
                 const createdProperty = await response.json();
-                //console.log("Created property:", createdProperty)
                 dispatch({ type: ADD_PROPERTY_SUCCESS, payload: createdProperty })
                 dispatch({ type: SHOW_SUCCESS, payload: "Vuokratilan tallennus onnistui!" })
             } 
         } catch (err) {
             dispatch({ type: SHOW_ERROR, payload: "Vuokratilan tallennus epäonnistui!" })
-            console.log("Error while adding a new property:", err)
         } finally {
             dispatch({ type: HIDE_LOADING })
         }
     }
 }
 
+/**
+ * Deletes a property via API.
+ * @param {{id: number, [key: string]: any}} property - The property object to delete, must have an id.
+ * @returns {function(Function): Promise<void>} Thunk function for Redux dispatch.
+ * Chose object with id:number as id is used in the URL.
+ */
 export const deleteProperty = (property) => {
-    console.log("Property to del:", property)
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
         const token = localStorage.getItem("token");
@@ -55,7 +64,6 @@ export const deleteProperty = (property) => {
             dispatch({ type: DELETE_PROPERTY_SUCCESS, payload: property });
             dispatch({ type: SHOW_SUCCESS, payload: "Vuokratilan poisto onnistui!" })
         } catch (error) {
-            console.log("Error while deleting property:", error)
             dispatch({ type: SHOW_ERROR, payload: "Vuokratilan poisto epäonnistui!" })
         } finally {
             dispatch({ type: HIDE_LOADING })
@@ -63,6 +71,12 @@ export const deleteProperty = (property) => {
     }
 }
 
+/**
+ * Edits an existing property via API.
+ * @param {Object} property - The property object to edit.
+ * @returns {function(Function): Promise<void>} Thunk function for Redux dispatch.
+ * Chose Object for property as it is serialized to JSON.
+ */
 export const editProperty = (property) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
@@ -79,12 +93,10 @@ export const editProperty = (property) => {
 
             if (response.ok) {
                 const editedProperty = await response.json();
-                console.log("Property edited:", editedProperty)
                 dispatch({ type: EDIT_PROPERTY_SUCCESS, payload: editedProperty })
                 dispatch({ type: SHOW_SUCCESS, payload: "Vuokratilan päivitys onnistui!" })
             }
         } catch (error) {
-            console.log("Error while saving edited property data:", error)
             dispatch({ type: SHOW_ERROR, payload: "Vuokratilan päivitys epäonnistui!" })
         } finally {
             dispatch({ type: HIDE_LOADING })
@@ -92,6 +104,12 @@ export const editProperty = (property) => {
     }
 }
 
+/**
+ * Fetches properties for a given office or all properties.
+ * @param {number|null|undefined} officeId - The office ID to filter properties, or null/undefined for all.
+ * @returns {function(Function): Promise<void>} Thunk function for Redux dispatch.
+ * Chose number|null|undefined for officeId as it is checked for null and compared as a number.
+ */
 export const fetchProperties = (officeId) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
@@ -111,7 +129,6 @@ export const fetchProperties = (officeId) => {
             const data = await response.json();
             dispatch({ type: FETCH_PROPERTIES_SUCCESS, payload: data });
         } catch (error) {
-            console.log("Error while fetching office properties:", error)
             dispatch({ type: SHOW_ERROR, payload: "Vuokratilojen nouto epäonnistui!" })
         } finally {
             dispatch({ type: HIDE_LOADING })
@@ -119,6 +136,12 @@ export const fetchProperties = (officeId) => {
     }
 }
 
+/**
+ * Sets the selected office for property.
+ * @param {Object} office - The office object to set as selected.
+ * @returns {function(Function): Promise<void>} Thunk function for Redux dispatch.
+ * Chose Object for office as it is passed as payload.
+ */
 export const setPropertyOffice = (office) => {
     return async (dispatch) => {
         dispatch({ type: SELECTED_PROPERTY_OFFICE_SET, payload: office })

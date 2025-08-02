@@ -6,10 +6,15 @@
     HIDE_LOADING, SHOW_LOADING, SHOW_ERROR, SHOW_SUCCESS,
 } from "./actiontypes"
 
-const mainURI = "https://localhost:7017";
+import mainURI from "../../constants/apiEndpoint";
 
+/**
+ * Adds a new office by making a POST request to the given API endpoint.
+ * @param {string} apiEndPoint - The API endpoint URL.
+ * @param {Object} office - The office object to add.
+ * @returns {function(Function): Promise<void>} Thunk action for Redux dispatch.
+ */
 export const addOffice = (apiEndPoint, office) => {
-    console.log("Office:", office);
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
         const token = localStorage.getItem("token");
@@ -25,7 +30,6 @@ export const addOffice = (apiEndPoint, office) => {
 
             if (response.ok) {
                 const createdOffice = await response.json();
-                console.log("Office created:", createdOffice)
                 dispatch({ type: ADD_OFFICE_SUCCESS, payload: createdOffice })
                 dispatch({ type: SHOW_SUCCESS, payload: "Kohteen tallennus onnistui!" })
             } else {
@@ -33,15 +37,18 @@ export const addOffice = (apiEndPoint, office) => {
             }
         } catch (err) {
             dispatch({ type: SHOW_ERROR, payload: "Kohteen tallennus epäonnistui!" })
-            console.log("Error while adding a new office:", err)
         } finally {
             dispatch({ type: HIDE_LOADING })
         }
     }
 }
 
+/**
+ * Deletes an office by making a DELETE request.
+ * @param {Object} office - The office object to delete. Must contain an 'id' property.
+ * @returns {function(Function): Promise<void>} Thunk action for Redux dispatch.
+ */
 export const deleteOffice = (office) => {
-    console.log("Office to del:", office);
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
         const token = localStorage.getItem("token");
@@ -56,7 +63,6 @@ export const deleteOffice = (office) => {
             dispatch({ type: DELETE_OFFICE_SUCCESS, payload: office });
             dispatch({ type: SHOW_SUCCESS, payload: "Kohteen poistaminen onnistui!" })
         } catch (error) {
-            console.log("Error while deleting office:", error)
             dispatch({ type: SHOW_ERROR, payload: "Kohteen poistaminen epäonnistui!" })
         } finally {
             dispatch({ type: HIDE_LOADING })
@@ -64,6 +70,11 @@ export const deleteOffice = (office) => {
     }
 }
 
+/**
+ * Edits an office by making a PUT request.
+ * @param {Object} office - The office object to edit.
+ * @returns {function(Function): Promise<void>} Thunk action for Redux dispatch.
+ */
 export const editOffice = (office) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
@@ -80,12 +91,10 @@ export const editOffice = (office) => {
 
             if (response.ok) {
                 const editedOffice = await response.json();
-                console.log("Office edited:", editedOffice)
                 dispatch({ type: EDIT_OFFICE_SUCCESS, payload: editedOffice })
                 dispatch({ type: SHOW_SUCCESS, payload: "Kohteen päivitys onnistui!" })
             }
         } catch (error) {
-            console.log("Error while saving edited office data:", error)
             dispatch({ type: SHOW_ERROR, payload: "Kohteen päivitys epäonnistui!" })
         } finally {
             dispatch({ type: HIDE_LOADING })
@@ -93,6 +102,10 @@ export const editOffice = (office) => {
     }
 }
 
+/**
+ * Fetches all offices by making a GET request.
+ * @returns {function(Function): Promise<void>} Thunk action for Redux dispatch.
+ */
 export const fetchOffices = () => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
@@ -108,7 +121,6 @@ export const fetchOffices = () => {
             const data = await response.json();
             dispatch({ type: FETCH_OFFICES_SUCCESS, payload: data });
         } catch (error) {
-            console.log("Error while fetching offices:", error)
             dispatch({ type: SHOW_ERROR, payload: "Kohteiden nouto epäonnistui!" })
         } finally {
             dispatch({ type: HIDE_LOADING })

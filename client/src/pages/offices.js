@@ -1,6 +1,6 @@
-﻿import React, { useState, useEffect } from "react";
+﻿import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Alert, Button, Snackbar, Typography } from "@mui/material";
+import { Alert, Button, Snackbar } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import AddEntry from "../components/AddEntryModal";
 import ConfirmModal from "../components/ConfirmModal";
@@ -10,28 +10,80 @@ import dataGridColumns from "../utils/datagridcolumns";
 import dataGridSx from "../utils/dataGridSx";
 import { addOffice, deleteOffice, editOffice } from "../redux/actions/officeActions";
 import useAutoClearMessages from "../hooks/autoClearMessages";
+import mainURI from "../constants/apiEndpoint";
 
-const mainURI = "https://localhost:7017";
-
+/**
+ * Offices page component.
+ * 
+ * @returns {JSX.Element}
+ */
 const Offices = () => {
+    /** @type {import('react-redux').Dispatch} */
     const dispatch = useDispatch();
+
+    /**
+     * @type {boolean}
+     * Loading state from Redux UI slice.
+     */
     const loading = useSelector(state => state.ui.loadingState);
+
+    /**
+     * @type {Array<Object>}
+     * List of office objects from Redux store.
+     */
     const offices = useSelector(state => state.offices.offices);
+
+    /**
+     * @type {{ errorMessage: string, successMessage: string }}
+     * Error and success messages from Redux UI slice.
+     */
     const { errorMessage, successMessage } = useSelector(state => state.ui);
-    const [showAddOffice, setShowAddOffice] = useState(false)
-    const [showEditOffice, setShowEditOffice] = useState(false)
+
+    /**
+     * @type {[boolean, Function]}
+     * State for showing the Add Office modal.
+     */
+    const [showAddOffice, setShowAddOffice] = useState(false);
+
+    /**
+     * @type {[boolean, Function]}
+     * State for showing the Edit Office modal.
+     */
+    const [showEditOffice, setShowEditOffice] = useState(false);
+
+    /**
+     * @type {[boolean, Function]}
+     * State for showing the Confirm modal.
+     */
     const [showConfirm, setShowConfirm] = useState(false);
+
+    /**
+     * @type {[Object, Function]}
+     * State for the currently selected office.
+     */
     const [selectedOffice, setSelectedOffice] = useState({});
 
-    // console.log(offices)
-
+    // useAutoClearMessages expects string messages, so errorMessage and successMessage are strings.
     useAutoClearMessages(errorMessage, successMessage);
 
+    /**
+     * Handles the delete button click for an office.
+     * 
+     * @param {Object} office - The office object to delete.
+     * @returns {void}
+     */
     const btnDeleteOffice = (office) => {
-        setSelectedOffice(office)
-        setShowConfirm(true)
-    }
+        setSelectedOffice(office);
+        setShowConfirm(true);
+    };
 
+    /**
+     * Handles row click in the DataGrid.
+     * 
+     * @param {Object} params - DataGrid row params.
+     * @param {Object} params.row - The office object for the clicked row.
+     * @returns {void}
+     */
     const handleRowClick = (params) => {
         setSelectedOffice(params.row);
         setShowEditOffice(true);
@@ -39,6 +91,10 @@ const Offices = () => {
 
     useAutoClearMessages(errorMessage, successMessage);
 
+    /**
+     * @type {Array<Object>}
+     * Memoized columns for the DataGrid, generated from officeSchema and btnDeleteOffice.
+     */
     const columns = React.useMemo(() => dataGridColumns(officeSchema, btnDeleteOffice), []);
 
     return (
@@ -67,36 +123,6 @@ const Offices = () => {
                 entry={selectedOffice}
             />
 
-            {errorMessage &&
-                <Snackbar
-                    anchorOrigin={{ horizontal: "right", vertical: "top" }}
-                    open={Boolean(errorMessage)}
-                    autoHideDuration={6000}>
-                    <Alert
-                        color="warning"
-                        severity="warning"
-                        variant="filled"
-                        sx={{ border: "1px solid #000", width: "100%" }}>
-                        {errorMessage}
-                    </Alert>
-                </Snackbar>
-            }
-
-            {successMessage &&
-                <Snackbar
-                    anchorOrigin={{ horizontal: "right", vertical: "top" }}
-                    open={Boolean(successMessage)}
-                    autoHideDuration={6000}>
-                    <Alert
-                        color="success"
-                        severity="success"
-                        variant="filled"
-                        sx={{ border: "1px solid #000", width: "100%" }}>
-                        {successMessage}
-                    </Alert>
-                </Snackbar>
-            }
-
             <div style={{ height: "auto", width: "100%" }}>
                 <DataGrid
                     rows={offices}
@@ -123,6 +149,36 @@ const Offices = () => {
                 cancelText="Peruuta"
                 onConfirm={() => dispatch(deleteOffice(selectedOffice))}
             />
+
+            {errorMessage &&
+                <Snackbar
+                    anchorOrigin={{ horizontal: "right", vertical: "top" }}
+                    open={Boolean(errorMessage)}
+                    autoHideDuration={3000}>
+                    <Alert
+                        color="error"
+                        severity="error"
+                        variant="filled"
+                        sx={{ border: "1px solid #000", width: "100%" }}>
+                        {errorMessage}
+                    </Alert>
+                </Snackbar>
+            }
+
+            {successMessage &&
+                <Snackbar
+                    anchorOrigin={{ horizontal: "right", vertical: "top" }}
+                    open={Boolean(successMessage)}
+                    autoHideDuration={3000}>
+                    <Alert
+                        color="success"
+                        severity="success"
+                        variant="filled"
+                        sx={{ border: "1px solid #000", width: "100%" }}>
+                        {successMessage}
+                    </Alert>
+                </Snackbar>
+            }
         </>
     )
 }

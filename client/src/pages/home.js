@@ -12,10 +12,37 @@ import { fetchTaxes } from "../redux/actions/taxActions";
 
 import useAutoClearMessages from "../hooks/autoClearMessages";
 
+/**
+ * Home component for the main page.
+ * @function
+ * @returns {JSX.Element} The rendered Home component.
+ */
 const Home = () => {
+    /**
+     * Redux dispatch function.
+     * @type {function}
+     */
     const dispatch = useDispatch();
-    const { errorMessage, successMessage } = useSelector(state => state.ui);
 
+    /**
+     * Extracts errorMessage and successMessage from the Redux UI state.
+     * @type {{ errorMessage: string | null, successMessage: string | null }}
+     * Reasoning: Based on usage, these are either strings or null.
+     */
+    const { errorMessage, successMessage } = useSelector(
+        /**
+         * @param {object} state - The Redux state object.
+         * @returns {{ errorMessage: string | null, successMessage: string | null }}
+         */
+        state => state.ui
+    );
+
+    /**
+     * Custom hook to auto-clear messages.
+     * @param {string | null} errorMessage
+     * @param {string | null} successMessage
+     * Reasoning: Both arguments are string or null, as per state shape.
+     */
     useAutoClearMessages(errorMessage, successMessage);
 
     useEffect(() => {

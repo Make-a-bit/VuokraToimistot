@@ -4,11 +4,39 @@
     SELECTED_DEVICE_OFFICE_SET, RESET_APP_STATE
 } from "../actions/actiontypes";
 
+/**
+ * @typedef {Object} OfficeDevice
+ * @property {number|string} id - Unique identifier for the device
+ */
+
+/**
+ * @typedef {Object} DeviceState
+ * @property {OfficeDevice[]} devices - List of office devices
+ * @property {OfficeDevice|null} selectedDeviceOffice - Currently selected device or null
+ */
+
+/**
+ * The initial state for the device reducer.
+ * @type {DeviceState}
+ */
 const initialState = {
     devices: [],
     selectedDeviceOffice: null,
 }
 
+/**
+ * Redux reducer for managing office devices.
+ * @param {DeviceState} state - Current state of the reducer
+ * @param {Object} action - Redux action object
+ * @param {string} action.type - Action type
+ * @param {*} [action.payload] - Action payload, varies by action type
+ * @returns {DeviceState} New state after applying the action
+ *
+ * Reasoning: 
+ * - `state` is always a DeviceState object.
+ * - `action` is a Redux action, with a string `type` and optional `payload`.
+ * - Returns a new DeviceState object.
+ */
 export const deviceReducer = (state = initialState, action) => {
     switch (action.type) {
         case ADD_OFFICE_DEVICE_SUCCESS:

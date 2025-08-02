@@ -4,10 +4,22 @@
     RESET_APP_STATE
 } from "../actions/actiontypes"
 
+/**
+ * The initial state of the customer reducer.
+ * @type {{ customers: Array<Object> }}
+ * Reasoning: customers is always an array of objects representing customers.
+ */
 const initialState = {
     customers: [],
 }
 
+/**
+ * Customer reducer function to handle customer-related actions.
+ * @param {{ customers: Array<Object> }} state - The current state of the reducer.
+ * @param {{ type: string, payload?: any }} action - The action dispatched to the reducer.
+ * @returns {{ customers: Array<Object> }} The new state after applying the action.
+ * Reasoning: state always has a customers array; action has a type and may have a payload.
+ */
 export const customerReducer = (state = initialState, action) => {
     switch (action.type) {
         case ADD_CUSTOMER_SUCCESS:

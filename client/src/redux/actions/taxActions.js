@@ -4,11 +4,7 @@
     HIDE_LOADING, SHOW_ERROR, SHOW_LOADING, SHOW_SUCCESS
 } from "../actions/actiontypes";
 
-/**
- * mainURI is a string containing the base URL for API requests.
- * @type {string}
- */
-const mainURI = "https://localhost:7017";
+import mainURI from "../../constants/apiEndpoint";
 
 /**
  * Adds a new tax entry by sending a POST request.
@@ -128,4 +124,6 @@ export const fetchTaxes = () => {
     }
 }
 
-// Reasoning: The tax parameter is assumed to be an object with at least an id property for delete/edit, and possibly other properties for add/edit. The thunk actions return a function that takes dispatch and returns a Promise<void>.
+// Reasoning: The tax parameter is assumed to be an object with at least an id property for delete/edit, 
+// and possibly other properties for add / edit.The thunk actions return a function that takes dispatch 
+// and returns a Promise <void>.

@@ -4,11 +4,23 @@
     SELECTED_SERVICE_OFFICE_SET, RESET_APP_STATE
 } from "../actions/actiontypes"
 
+/**
+ * The initial state for the service reducer.
+ * @type {{services: Array<Object>, selectedServiceOffice: (Object|null)}}
+ * Reasoning: 'services' is always an array (populated by payloads), 'selectedServiceOffice' is either an object or null.
+ */
 const initialState = {
     services: [],
     selectedServiceOffice: null,
 }
 
+/**
+ * Service reducer to handle office service actions.
+ * @param {{services: Array<Object>, selectedServiceOffice: (Object|null)}} state - Current state of the reducer.
+ * @param {{type: string, payload?: any}} action - Redux action with optional payload.
+ * @returns {{services: Array<Object>, selectedServiceOffice: (Object|null)}} New state after applying the action.
+ * Reasoning: State shape is defined by initialState, action is a standard Redux action object.
+ */
 export const serviceReducer = (state = initialState, action) => {
     switch (action.type) {
         case ADD_OFFICE_SERVICE_SUCCESS:

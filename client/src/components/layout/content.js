@@ -5,6 +5,12 @@ import { Footer } from "./footer"
 import { Outlet } from "react-router-dom";
 import AppBreadcrumbs from "./breadcrumbs";
 
+/**
+ * Content component renders the main layout structure.
+ * 
+ * @function
+ * @returns {JSX.Element} The layout containing header, breadcrumbs, outlet, and footer.
+ */
 const Content = () => {
     return (
         <Box

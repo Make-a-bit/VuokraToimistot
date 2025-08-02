@@ -15,37 +15,115 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { getReservationDateUtils } from "../utils/reservationDateUtils";
-import { getDuration, addItemRow, updateRowsQty, deleteRow, updateRow } from "../utils/reservationUtils";
-import { autoCompleteFieldMargins, leftButton, middleButton, rightButton } from "../utils/fieldMarginals"
+import { getDuration, addItemRow, deleteRow } from "../utils/reservationUtils";
+import { autoCompleteFieldMargins } from "../utils/fieldMarginals"
 import dayjs from "../../src/dayjs-setup";
 
+/**
+ * EditReservationModal component for editing a reservation.
+ * @param {Object} props
+ * @param {boolean} props.show - Whether the modal is visible.
+ * @param {function} props.onHide - Function to close the modal.
+ * @param {Object} props.reservation - The reservation object to edit.
+ * @returns {JSX.Element|null}
+ */
 export const EditReservationModal = ({ show, onHide, reservation }) => {
     const dispatch = useDispatch();
+
+    /**
+     * @type {Array<Object>} customers - List of customer objects from Redux.
+     */
     const customers = useSelector(state => state.customers.customers);
+
+    /**
+     * @type {Array<Object>} devices - List of device objects from Redux.
+     */
     const devices = useSelector(state => state.devices.devices);
+
+    /**
+     * @type {Array<Object>} offices - List of office objects from Redux.
+     */
     const offices = useSelector(state => state.offices.offices);
+
+    /**
+     * @type {Array<Object>} properties - List of property objects from Redux.
+     */
     const properties = useSelector(state => state.properties.properties);
+
+    /**
+     * @type {Array<Object>} reservedDates - List of reserved date objects from Redux.
+     */
     const reservedDates = useSelector(state => state.reservations.reservedDates);
+
+    /**
+     * @type {Array<Object>} services - List of service objects from Redux.
+     */
     const services = useSelector(state => state.services.services);
 
+    /**
+     * @type {[Object|null, function]} selectedCustomer - Currently selected customer.
+     */
     const [selectedCustomer, setSelectedCustomer] = useState(null);
+
+    /**
+     * @type {[Object|null, function]} selectedDevice - Currently selected device.
+     */
     const [selectedDevice, setSelectedDevice] = useState(null);
+
+    /**
+     * @type {[Object|null, function]} selectedOffice - Currently selected office.
+     */
     const [selectedOffice, setSelectedOffice] = useState(null)
+
+    /**
+     * @type {[Object|null, function]} selectedOfficeProperty - Currently selected property.
+     */
     const [selectedOfficeProperty, setSelectedOfficeProperty] = useState(null);
+
+    /**
+     * @type {[Object|null, function]} selectedService - Currently selected service.
+     */
     const [selectedService, setSelectedService] = useState(null);
+
+    /**
+     * @type {[import("dayjs").Dayjs|null, function]} startDate - Reservation start date.
+     */
     const [startDate, setStartDate] = useState(null);
+
+    /**
+     * @type {[import("dayjs").Dayjs|null, function]} endDate - Reservation end date.
+     */
     const [endDate, setEndDate] = useState(null);
+
+    /**
+     * @type {[boolean, function]} invoiced - Whether the reservation is invoiced.
+     */
     const [invoiced, setInvoiced] = useState(false);
+
+    /**
+     * @type {[Array<Object>, function]} itemRows - Rows for DataGrid (devices, services, property).
+     */
     const [itemRows, setItemRows] = useState([]);
+
+    /**
+     * @type {[string, function]} description - Reservation description.
+     */
     const [description, setDescription] = useState(reservation?.description || "");
 
+    // getReservationDateUtils returns functions for disabling dates
     const {
         shouldDisableStartDate,
         shouldDisableEndDate,
     } = getReservationDateUtils(reservedDates, reservation, startDate);
 
+    /**
+     * @type {boolean} isDisabled - True if reservation is invoiced.
+     */
     const isDisabled = reservation?.invoiced ?? false;
 
+    /**
+     * @type {React.MutableRefObject<Object>} originalReservationRef - Stores original reservation and itemRows for change detection.
+     */
     const originalReservationRef = React.useRef();
 
     useEffect(() => {
@@ -218,6 +296,9 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
         setDescription(reservation?.description || "");
     }, [reservation]);
 
+    /**
+     * @type {React.MutableRefObject<HTMLInputElement|null>} firstFieldRef - Ref for focusing the first field.
+     */
     const firstFieldRef = useRef(null);
 
     useEffect(() => {
@@ -240,17 +321,29 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
 
 
 
+    /**
+     * Memoized device options, excluding already selected devices.
+     * @type {Array<Object>}
+     */
     const deviceOptions = useMemo(() =>
         devices.filter(
             d => !itemRows.some(row => row.type === "device" && row.itemId === d.id)
         ), [devices, itemRows]);
 
+    /**
+     * Memoized service options, excluding already selected services.
+     * @type {Array<Object>}
+     */
     const serviceOptions = useMemo(() =>
         services.filter(
             s => !itemRows.some(row => row.type === "service" && row.itemId === s.id)
         ), [services, itemRows]
     );
 
+    /**
+     * Calculates the total sum for all item rows.
+     * @type {number}
+     */
     const totalSum = useMemo(() => {
         return itemRows.reduce((acc, row) => {
             const price = parseFloat(row.price) || 0;
@@ -266,6 +359,11 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
         }, 0);
     }, [itemRows]);
 
+    /**
+     * Handles row edit in DataGrid.
+     * @param {Object} newRow - The updated row object.
+     * @returns {Object} The updated row.
+     */
     const handleRowEdit = (newRow) => {
         setItemRows(prev =>
             prev.map(row =>
@@ -277,10 +375,18 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
         return newRow;
     };
 
+    /**
+     * Handles row deletion in DataGrid.
+     * @param {string|number} id - The id of the row to delete.
+     */
     const handleRowDelete = (id) => {
         setItemRows(prev => deleteRow(prev, id));
     };
 
+    /**
+     * Checks if the reservation has been modified.
+     * @returns {boolean}
+     */
     const isModified = () => {
         if (!originalReservationRef.current) return false;
 
@@ -319,6 +425,11 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
         return false;
     }
 
+    /**
+     * Handles saving the reservation.
+     * @param {React.SyntheticEvent} [e]
+     * @returns {Promise<void>}
+     */
     const handleSave = async (e) => {
         if (e) e.preventDefault();
 
@@ -361,6 +472,11 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
         onHide();
     };
 
+    /**
+     * Handles invoicing the reservation.
+     * @param {React.SyntheticEvent} e
+     * @returns {Promise<void>}
+     */
     const handleInvoicing = async (e) => {
         e.preventDefault();
 
@@ -372,6 +488,10 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
         }
     };
 
+    /**
+     * Actually creates the invoice for the reservation.
+     * @returns {void}
+     */
     const actuallyInvoice = () => {
         const services = itemRows
             .filter(row => row.type === "service" || row.type === "property")
@@ -758,7 +878,7 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
                         color="error"
                         variant="contained"
                         startIcon={<CloseIcon />}
-                        sx={{  }}
+                        sx={{}}
                     >Sulje</Button>
                 </Box>
             </DialogActions>

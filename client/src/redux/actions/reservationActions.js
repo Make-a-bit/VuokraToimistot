@@ -5,8 +5,13 @@
     SELECTED_RESERVATION_OFFICE_SET, SELECTED_RESERVATION_OFFICE_PROPERTY_SET,
 } from "../actions/actiontypes";
 
-const mainURI = "https://localhost:7017";
+import mainURI from "../../constants/apiEndpoint";
 
+/**
+ * Adds a reservation by sending a POST request.
+ * @param {Object} reservation - The reservation object to add.
+ * @returns {function(Function): Promise<Object|null>} Thunk action returning the created reservation or null.
+ */
 export const addReservation = (reservation) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
@@ -36,6 +41,11 @@ export const addReservation = (reservation) => {
     }
 }
 
+/**
+ * Deletes a reservation by sending a DELETE request.
+ * @param {{id: number}} reservation - The reservation object to delete, must contain an id.
+ * @returns {function(Function): Promise<void>} Thunk action.
+ */
 export const deleteReservation = (reservation) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
@@ -58,6 +68,10 @@ export const deleteReservation = (reservation) => {
     }
 }
 
+/**
+ * Fetches all reservations.
+ * @returns {function(Function): Promise<void>} Thunk action.
+ */
 export const fetchReservations = () => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
@@ -80,6 +94,11 @@ export const fetchReservations = () => {
     }
 }
 
+/**
+ * Fetches reserved dates for a property.
+ * @param {number|string} propertyId - The ID of the property.
+ * @returns {function(Function): Promise<void>} Thunk action.
+ */
 export const fetchReservedDates = (propertyId) => async (dispatch) => {
     dispatch({ type: SHOW_LOADING });
     const token = localStorage.getItem("token");
@@ -100,6 +119,11 @@ export const fetchReservedDates = (propertyId) => async (dispatch) => {
     }
 };
 
+/**
+ * Updates a reservation by sending a PUT request.
+ * @param {Object} reservation - The reservation object to update.
+ * @returns {function(Function): Promise<void>} Thunk action.
+ */
 export const updateReservation = (reservation) => async (dispatch) => {
     dispatch({ type: SHOW_LOADING })
     const token = localStorage.getItem("token");
@@ -125,11 +149,21 @@ export const updateReservation = (reservation) => async (dispatch) => {
     }
 }
 
+/**
+ * Sets the selected office.
+ * @param {Object} office - The office object to set as selected.
+ * @returns {{type: string, payload: Object}} Action object.
+ */
 export const setOffice = (office) => ({
     type: SELECTED_RESERVATION_OFFICE_SET,
     payload: office,
 });
 
+/**
+ * Sets the selected property.
+ * @param {Object} property - The property object to set as selected.
+ * @returns {{type: string, payload: Object}} Action object.
+ */
 export const setProperty = (property) => ({
     type: SELECTED_RESERVATION_OFFICE_PROPERTY_SET,
     payload: property

@@ -6,7 +6,6 @@
  * @param {Array<string>} [decimalFields] - List of keys that must be valid decimals.
  * @returns {boolean} - True if all required fields are valid.
  */
-
 const inputValidation = (data, requiredFields, decimalFields = []) => {
     const decimalRegex = /^\d+(\.\d{1,2})?$/;
     return requiredFields.every(key => {

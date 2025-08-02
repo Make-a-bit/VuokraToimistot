@@ -1,8 +1,7 @@
 ﻿import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-    Alert, Box, Button, FormControl, InputLabel, MenuItem,
-    Select, Snackbar, Typography
+    Alert, Button, Snackbar
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import dataGridColumns from "../utils/datagridcolumns";
@@ -15,33 +14,96 @@ import EditEntry from "../components/EditEntryModal";
 import { addTax, fetchTaxes, deleteTax, editTax } from "../redux/actions/taxActions";
 import useAutoClearMessages from "../hooks/autoClearMessages";
 
+/**
+ * Taxes component for managing VAT entries.
+ * @function
+ * @returns {JSX.Element}
+ */
 const Taxes = () => {
+    /**
+     * Redux dispatch function.
+     * @type {function}
+     */
     const dispatch = useDispatch();
+
+    /**
+     * Loading state from Redux.
+     * @type {boolean}
+     */
     const loading = useSelector(state => state.ui.loadingState);
+
+    /**
+     * List of VAT entries from Redux.
+     * @type {Array<Object>}
+     */
     const vats = useSelector(state => state.taxes.vats);
+
+    /**
+     * Error and success messages from Redux.
+     * @type {{ errorMessage: string, successMessage: string }}
+     */
     const { errorMessage, successMessage } = useSelector(state => state.ui);
 
-    const [selectedVat, setSelectedVat] = useState(null)
-    const [showAddTax, setShowAddTax] = useState(false)
-    const [showConfirm, setShowConfirm] = useState(false)
-    const [showEditTax, setShowEditTax] = useState(false)
+    /**
+     * Currently selected VAT entry for edit/delete.
+     * @type {Object|null}
+     */
+    const [selectedVat, setSelectedVat] = useState(null);
 
+    /**
+     * Controls visibility of AddEntry modal.
+     * @type {boolean}
+     */
+    const [showAddTax, setShowAddTax] = useState(false);
+
+    /**
+     * Controls visibility of ConfirmModal.
+     * @type {boolean}
+     */
+    const [showConfirm, setShowConfirm] = useState(false);
+
+    /**
+     * Controls visibility of EditEntry modal.
+     * @type {boolean}
+     */
+    const [showEditTax, setShowEditTax] = useState(false);
+
+    // Custom hook to auto-clear messages. No return value.
     useAutoClearMessages(errorMessage, successMessage);
 
+    /**
+     * API base URI.
+     * @type {string}
+     */
     const mainURI = "https://localhost:7017";
 
+    /**
+     * Handles delete button click for a VAT entry.
+     * @param {Object} vat - VAT entry object to delete.
+     * @returns {void}
+     */
     const btnDeleteVat = (vat) => {
-        setSelectedVat(vat)
-        setShowConfirm(true)
-    }
+        setSelectedVat(vat);
+        setShowConfirm(true);
+    };
 
+    /**
+     * Handles row click in the DataGrid.
+     * @param {Object} params - DataGrid row params.
+     * @returns {void}
+     */
     const handleRowClick = (params) => {
         setSelectedVat(params.row);
         setShowEditTax(true);
     };
 
-    console.log(vats)
+    // Logging VATs for debugging.
+    console.log(vats);
 
+    /**
+     * Memoized columns for DataGrid.
+     * @type {Array<Object>}
+     */
     const columns = React.useMemo(() => dataGridColumns(vatSchema, btnDeleteVat), []);
 
     return (
@@ -75,8 +137,8 @@ const Taxes = () => {
                     apiEndPoint={`${mainURI}/tax`}
                     show={showAddTax}
                     onHide={() => {
-                        setShowAddTax(false)
-                        dispatch(fetchTaxes())
+                        setShowAddTax(false);
+                        dispatch(fetchTaxes());
                     }}
                     title={`Lisää uusi verokanta`}
                     action={addTax}
@@ -101,14 +163,43 @@ const Taxes = () => {
                     confirmText="Poista"
                     cancelText="Sulje"
                     onConfirm={() => {
-                        dispatch(deleteTax(selectedVat))
+                        dispatch(deleteTax(selectedVat));
                         //dispatch(fetchTaxes())
                     }}
                 />
 
+                {errorMessage &&
+                    <Snackbar
+                        anchorOrigin={{ horizontal: "right", vertical: "top" }}
+                        open={Boolean(errorMessage)}
+                        autoHideDuration={3000}>
+                        <Alert
+                            color="error"
+                            severity="error"
+                            variant="filled"
+                            sx={{ border: "1px solid #000", width: "100%" }}>
+                            {errorMessage}
+                        </Alert>
+                    </Snackbar>
+                }
+
+                {successMessage &&
+                    <Snackbar
+                        anchorOrigin={{ horizontal: "right", vertical: "top" }}
+                        open={Boolean(successMessage)}
+                        autoHideDuration={3000}>
+                        <Alert
+                            color="success"
+                            severity="success"
+                            variant="filled"
+                            sx={{ border: "1px solid #000", width: "100%" }}>
+                            {successMessage}
+                        </Alert>
+                    </Snackbar>
+                }
             </div>
         </>
-    )
-}
+    );
+};
 
 export default Taxes;

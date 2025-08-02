@@ -1,11 +1,13 @@
 ﻿import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-    Alert, Autocomplete, Box, Button, FormControl, InputLabel, MenuItem,
-    Select, Snackbar, TextField
+    Alert, Autocomplete, Box, Button, FormControl, Snackbar, TextField
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { addOfficeService, deleteService, editService, fetchServices, setOffice } from "../redux/actions/serviceActions"
+import {
+    addOfficeService, deleteService, editService,
+    fetchServices, setOffice
+} from "../redux/actions/serviceActions"
 import AddEntry from "../components/AddEntryModal";
 import ConfirmModal from "../components/ConfirmModal";
 import EditEntry from "../components/EditEntryModal";
@@ -13,53 +15,137 @@ import dataGridColumns from "../utils/datagridcolumns";
 import dataGridSx from "../utils/dataGridSx";
 import serviceSchema from "../schema/service";
 import useAutoClearMessages from "../hooks/autoClearMessages";
+import mainURI from "../constants/apiEndpoint";
 
-const mainURI = "https://localhost:7017";
-
+/**
+ * 
+ * @returns
+ * Services page component.
+ * @returns {JSX.Element}
+ */
 const Services = () => {
+    /**
+     * Redux dispatch function.
+     * @type {function}
+     */
     const dispatch = useDispatch();
+
+    /**
+     * Loading state from Redux.
+     * @type {boolean}
+     */
     const loading = useSelector(state => state.ui.loadingState);
+
+    /**
+     * List of office objects from Redux.
+     * @type {Array<Object>}
+     */
     const offices = useSelector(state => state.offices.offices);
+
+    /**
+     * List of service objects from Redux.
+     * @type {Array<Object>}
+     */
     const services = useSelector(state => state.services.services);
+
+    /**
+     * Currently selected office object from Redux.
+     * @type {?Object}
+     */
     const selectedOffice = useSelector(state => state.services.selectedServiceOffice);
+
+    /**
+     * Error and success messages from Redux UI state.
+     * @type {{ errorMessage: ?string, successMessage: ?string }}
+     */
     const { errorMessage, successMessage } = useSelector(state => state.ui);
 
-    const [showAddService, setShowAddService] = useState(false)
-    const [showConfirm, setShowConfirm] = useState(false)
-    const [showEditService, setShowEditService] = useState(false)
-    const [selectedService, setSelectedService] = useState({})
+    /**
+     * Controls visibility of Add Service modal.
+     * @type {[boolean, function]}
+     */
+    const [showAddService, setShowAddService] = useState(false);
+
+    /**
+     * Controls visibility of Confirm modal.
+     * @type {[boolean, function]}
+     */
+    const [showConfirm, setShowConfirm] = useState(false);
+
+    /**
+     * Controls visibility of Edit Service modal.
+     * @type {[boolean, function]}
+     */
+    const [showEditService, setShowEditService] = useState(false);
+
+    /**
+     * Currently selected service object for editing or deleting.
+     * @type {[Object, function]}
+     */
+    const [selectedService, setSelectedService] = useState({});
 
     useAutoClearMessages(errorMessage, successMessage);
 
+    /**
+     * Handles office selection change.
+     * @param {React.ChangeEvent<HTMLInputElement>} e
+     * @returns {void}
+     */
     const handleOfficeChange = (e) => {
         const office = offices.find(o => o.id === e.target.value);
         dispatch(setOffice(office))
     };
 
+    /**
+     * Handles closing the Add Service modal and refreshes services.
+     * @returns {void}
+     */
     const handleCloseAddService = () => {
         setShowAddService(false);
         dispatch(fetchServices());
     };
 
+    /**
+     * Handles closing the Edit Service modal and refreshes services.
+     * @returns {void}
+     */
     const handleCloseEditService = () => {
         setShowEditService(false);
         dispatch(fetchServices());
     };
 
+    /**
+     * Handles row click in the DataGrid to open Edit Service modal.
+     * @param {Object} params - DataGrid row params.
+     * @returns {void}
+     */
     const handleRowClick = (params) => {
         setSelectedService(params.row);
         setShowEditService(true);
     };
 
+    /**
+     * Filters services by selected office.
+     * @type {Array<Object>}
+     */
     const filteredServices = selectedOffice
         ? services.filter(s => s.officeId === selectedOffice.id)
         : services;
 
+    /**
+     * Handles delete button click for a service.
+     * @param {Object} service - Service object to delete.
+     * @returns {void}
+     */
     const btnDeleteService = (service) => {
         setSelectedService(service)
         setShowConfirm(true)
     }
 
+    /**
+     * Memoized columns for DataGrid.
+     * @type {Array<Object>}
+     */
     const columns = React.useMemo(() => dataGridColumns(serviceSchema, btnDeleteService), []);
 
     console.log(services)
@@ -145,7 +231,7 @@ const Services = () => {
                 <Snackbar
                     anchorOrigin={{ horizontal: "right", vertical: "top" }}
                     open={Boolean(errorMessage)}
-                    autoHideDuration={6000}>
+                    autoHideDuration={3000}>
                     <Alert
                         color="error"
                         severity="error"
@@ -160,7 +246,7 @@ const Services = () => {
                 <Snackbar
                     anchorOrigin={{ horizontal: "right", vertical: "top" }}
                     open={Boolean(successMessage)}
-                    autoHideDuration={6000}>
+                    autoHideDuration={3000}>
                     <Alert
                         color="success"
                         severity="success"

@@ -4,23 +4,89 @@ import {
     FormControl, InputLabel, MenuItem, Select, TextField
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import inputValidation from "../utils/inputValidation";
 
+/**
+ * @typedef {Object} FieldDef
+ * @property {string} field - The field name
+ * @property {string} [header] - The display header for the field
+ * @property {string} [type] - The type of the field (e.g., "decimal", "text")
+ * @property {boolean} [required] - Whether the field is required
+ */
+
+/**
+ * @typedef {Object} Office
+ * @property {number|string} id - The office id
+ * @property {string} name - The office name
+ */
+
+/**
+ * @typedef {Object} Vat
+ * @property {number|string} id - The VAT id
+ * @property {number|string} vatValue - The VAT value (percentage)
+ */
+
+/**
+ * @typedef {Object.<string, any>} FormData
+ */
+
+/**
+ * @typedef {Object.<string, string>} Errors
+ */
+
+/**
+ * EditEntryModal component for editing an entry with dynamic schema.
+ * 
+ * @param {Object} props
+ * @param {FieldDef[]} props.schema - Array of field definitions for the form
+ * @param {Function} props.onClose - Function to call when closing the modal
+ * @param {boolean} props.show - Whether the modal is visible
+ * @param {Function} props.onHide - Function to call to hide the modal
+ * @param {string} [props.title] - Optional title for the modal
+ * @param {Function} props.action - Redux action to dispatch on submit
+ * @param {Object} [props.entry] - The entry object being edited
+ * @returns {JSX.Element}
+ */
 const EditEntryModal = ({ schema, onClose, show, onHide, title, action, entry }) => {
     const dispatch = useDispatch();
+
+    /**
+     * @type {Vat[]}
+     * vats: Array of VAT objects from Redux store.
+     */
     const vats = useSelector(state => state.taxes.vats);
+
+    /**
+     * @type {Office[]}
+     * offices: Array of office objects from Redux store.
+     */
     const offices = useSelector(state => state.offices.offices);
 
+    /**
+     * @type {[FormData, Function]}
+     * formData: State for form field values.
+     */
     const [formData, setFormData] = useState({});
+
+    /**
+     * @type {[Errors, Function]}
+     * errors: State for field-level error messages.
+     */
     const [errors, setErrors] = useState({});
+
+    /**
+     * @type {[boolean, Function]}
+     * errorState: State for showing a general error alert.
+     */
     const [errorState, setErrorState] = useState(false);
+
+    /**
+     * @type {[string, Function]}
+     * errorMessage: State for the general error message.
+     */
     const [errorMessage, setErrorMessage] = useState("");
 
-    //console.log(vats)
-    //console.log("ENTRY:", entry);
-    //console.log("SCHEMA:", schema);
-
     useEffect(() => {
+        /** @type {FormData} */
         const initialData = {};
         (schema || []).forEach(fieldDef => {
             const key = fieldDef.field;
@@ -54,11 +120,21 @@ const EditEntryModal = ({ schema, onClose, show, onHide, title, action, entry })
         setErrorMessage("");
     }, [entry, show, schema, offices, vats]);
 
+    /**
+     * Returns a change handler for a given field.
+     * @param {string} field - The field name to handle changes for.
+     * @returns {(event: React.ChangeEvent<HTMLInputElement | { value: unknown }>) => void}
+     */
     const handleChange = (field) => (event) => {
         setFormData({ ...formData, [field]: event.target.value });
         setErrors({ ...errors, [field]: undefined });
     };
 
+    /**
+     * Handles form submission, validates fields, and dispatches the action.
+     * @param {React.FormEvent<HTMLFormElement> | React.MouseEvent} e
+     * @returns {Promise<void>}
+     */
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -91,8 +167,6 @@ const EditEntryModal = ({ schema, onClose, show, onHide, title, action, entry })
         // Map officeName to office_id for backend
         let dataToSend = { ...formData };
 
-        console.log("FormData", formData)
-
         if (formData.officeName !== undefined) {
             dataToSend.officeId = formData.officeName;
             delete dataToSend.officeName;
@@ -100,20 +174,15 @@ const EditEntryModal = ({ schema, onClose, show, onHide, title, action, entry })
 
         // Map vat (selected VAT id) to vatId for backend
         if (formData.vat !== undefined) {
-            console.log("Vat block")
             const vatObj = vats.find(v => v.id === Number(formData.vat));
-            dataToSend.vatId = vatObj ? vatObj.id : null;         // send the id
-            dataToSend.vatValue = vatObj ? vatObj.vatValue : null; // send the percentage
+            dataToSend.vatId = vatObj ? vatObj.id : null;         
+            dataToSend.vatValue = vatObj ? vatObj.vatValue : null;
             delete dataToSend.vat;
         }
-
-        console.log(dataToSend)
 
         await dispatch(action(dataToSend));
         onHide();
     };
-
-    //console.log("Entry:", entry)
 
     return (
         <Dialog open={show} onClose={onHide} maxWidth="sm" fullWidth>

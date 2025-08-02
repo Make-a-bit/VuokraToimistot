@@ -4,8 +4,14 @@
     HIDE_LOADING, SHOW_ERROR, SHOW_LOADING, SHOW_SUCCESS
 } from "../actions/actiontypes";
 
-const mainURI = "https://localhost:7017";
+import mainURI from "../../constants/apiEndpoint";
 
+/**
+ * Creates an invoice for a given reservation.
+ * @param {Object} reservation - The reservation object to create an invoice for.
+ * @returns {function(Function): Promise<void>} Thunk action for Redux dispatch.
+ * Chose Object for reservation as its structure is not specified but is serialized to JSON.
+ */
 export const createInvoice = (reservation) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
@@ -33,6 +39,12 @@ export const createInvoice = (reservation) => {
     }
 }
 
+/**
+ * Deletes a given invoice.
+ * @param {Object} invoice - The invoice object to delete.
+ * @returns {function(Function): Promise<void>} Thunk action for Redux dispatch.
+ * Chose Object for invoice as its structure is not specified but is serialized to JSON.
+ */
 export const deleteInvoice = (invoice) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
@@ -56,6 +68,11 @@ export const deleteInvoice = (invoice) => {
     }
 }
 
+/**
+ * Fetches all invoices.
+ * @returns {function(Function): Promise<void>} Thunk action for Redux dispatch.
+ * No parameters, returns a thunk for async Redux.
+ */
 export const fetchInvoices = () => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
@@ -78,6 +95,12 @@ export const fetchInvoices = () => {
     }
 }
 
+/**
+ * Updates a given invoice.
+ * @param {Object} invoice - The invoice object to update.
+ * @returns {function(Function): Promise<void>} Thunk action for Redux dispatch.
+ * Chose Object for invoice as its structure is not specified but is serialized to JSON.
+ */
 export const updateInvoice = (invoice) => async (dispatch) => {
     dispatch({ type: SHOW_LOADING })
     const token = localStorage.getItem("token");

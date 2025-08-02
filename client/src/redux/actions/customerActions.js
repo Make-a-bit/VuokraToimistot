@@ -6,10 +6,15 @@
     HIDE_LOADING, SHOW_ERROR, SHOW_LOADING, SHOW_SUCCESS
 } from "./actiontypes"
 
-const mainURI = "https://localhost:7017";
+import mainURI from "../../constants/apiEndpoint";
 
+/**
+ * Adds a new customer via API call.
+ * @param {string} apiEndPoint - The API endpoint URL to send the request to.
+ * @param {Object} customer - The customer object to add.
+ * @returns {function(Function): Promise<void>} - Redux thunk action.
+ */
 export const addCustomer = (apiEndPoint, customer) => {
-    console.log("Customer:", customer)
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
         const token = localStorage.getItem("token");
@@ -25,7 +30,6 @@ export const addCustomer = (apiEndPoint, customer) => {
 
             if (response.ok) {
                 const createdCustomer = await response.json();
-                console.log("Customer created:", createdCustomer)
                 dispatch({ type: ADD_CUSTOMER_SUCCESS, payload: createdCustomer })
                 dispatch({ type: SHOW_SUCCESS, payload: "Asiakkaan tallennus onnistui!" })
             } else {
@@ -33,15 +37,18 @@ export const addCustomer = (apiEndPoint, customer) => {
             }
         } catch (err) {
             dispatch({ type: SHOW_ERROR, payload: "Asiakkaan tallennus epäonnistui!" })
-            console.log("Error while adding a new customer:", err)
         } finally {
             dispatch({ type: HIDE_LOADING })
         }
     }
 }
 
+/**
+ * Deletes a customer via API call.
+ * @param {{id: number|string, [key: string]: any}} customer - The customer object to delete, must have an id.
+ * @returns {function(Function): Promise<void>} - Redux thunk action.
+ */
 export const deleteCustomer = (customer) => {
-    console.log("Customer to del:", customer);
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
         const token = localStorage.getItem("token");
@@ -56,7 +63,6 @@ export const deleteCustomer = (customer) => {
             dispatch({ type: DELETE_CUSTOMER_SUCCESS, payload: customer });
             dispatch({ type: SHOW_SUCCESS, payload: "Asiakkaan poistaminen onnistui!" })
         } catch (error) {
-            console.log("Error while deleting customer:", error)
             dispatch({ type: SHOW_ERROR, payload: "Asiakkaan poistaminen epäonnistui!" })
         } finally {
             dispatch({ type: HIDE_LOADING })
@@ -64,6 +70,11 @@ export const deleteCustomer = (customer) => {
     }
 }
 
+/**
+ * Edits an existing customer via API call.
+ * @param {Object} customer - The customer object to edit.
+ * @returns {function(Function): Promise<void>} - Redux thunk action.
+ */
 export const editCustomer = (customer) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
@@ -80,13 +91,11 @@ export const editCustomer = (customer) => {
 
             if (response.ok) {
                 const editedCustomer = await response.json();
-                console.log("Customer edited:", editedCustomer)
                 dispatch({ type: EDIT_CUSTOMER_SUCCESS, payload: editedCustomer })
                 dispatch({ type: SHOW_SUCCESS, payload: "Asiakkaan päivitys onnistui!" })
             }
         }
         catch (error) {
-            console.log("Error while saving edited customer data:", error)
             dispatch({ type: SHOW_ERROR, payload: "Asiakkaan päivitys epäonnistui!" })
         } finally {
             dispatch({ type: HIDE_LOADING })
@@ -94,6 +103,10 @@ export const editCustomer = (customer) => {
     }
 }
 
+/**
+ * Fetches all customers via API call.
+ * @returns {function(Function): Promise<void>} - Redux thunk action.
+ */
 export const fetchCustomers = () => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
@@ -109,7 +122,6 @@ export const fetchCustomers = () => {
             const data = await response.json();
             dispatch({ type: FETCH_CUSTOMERS_SUCCESS, payload: data });
         } catch (error) {
-            console.log("Error while fetching customers:", error)
             dispatch({ type: SHOW_ERROR, payload: "Asiakkaiden nouto epäonnistui!" })
         } finally {
             dispatch({ type: HIDE_LOADING })

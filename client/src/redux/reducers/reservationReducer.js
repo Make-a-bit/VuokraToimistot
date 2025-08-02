@@ -7,6 +7,26 @@
     RESET_APP_STATE
 } from "../actions/actiontypes";
 
+/**
+ * The initial state for the reservation reducer.
+ * - reservations: Array of reservation objects.
+ * - reservedDates: Array of reserved date objects or strings.
+ * - availableDevices: Array of device objects.
+ * - availableServices: Array of service objects.
+ * - selectedReservationCustomer: Selected customer object or null.
+ * - selectedReservationOffice: Selected office object or null.
+ * - selectedReservationOfficeProperty: Selected office property object or null.
+ * 
+ * @type {{
+ *   reservations: Array<Object>,
+ *   reservedDates: Array<Object|string>,
+ *   availableDevices: Array<Object>,
+ *   availableServices: Array<Object>,
+ *   selectedReservationCustomer: Object|null,
+ *   selectedReservationOffice: Object|null,
+ *   selectedReservationOfficeProperty: Object|null
+ * }}
+ */
 const initialState = {
     reservations: [],
     reservedDates: [],
@@ -17,6 +37,18 @@ const initialState = {
     selectedReservationOfficeProperty: null,
 }
 
+/**
+ * Reducer for reservation-related actions.
+ * 
+ * @param {typeof initialState} state - The current state.
+ * @param {{ type: string, payload?: any }} action - The dispatched action.
+ * @returns {typeof initialState} The new state after applying the action.
+ * 
+ * Reasoning: 
+ * - state is always the shape of initialState.
+ * - action is a Redux action with a string type and optional payload.
+ * - Returns a new state object matching the initialState shape.
+ */
 export const reservationReducer = (state = initialState, action) => {
     switch (action.type) {
         case ADD_RESERVATION_SUCCESS:
