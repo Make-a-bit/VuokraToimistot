@@ -46,10 +46,7 @@ namespace API.Controllers
             {
                 var dates = await _reservationRepository.GetReservedDatesAsync(propertyId);
 
-                if (dates.Count > 0)
-                    return Ok(dates);
-
-                else return NotFound();
+                return Ok(dates);
             }
             catch
             {

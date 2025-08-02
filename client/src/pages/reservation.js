@@ -336,20 +336,24 @@ const Reservation = () => {
                 message={
                     selectedReservation ? (
                         <>
-                            Haluatko varmasti poistaa tämän varauksen?
+                            Haluatko varmasti poistaa varauksen?
+                            <br /><br />
+                            <span>Asiakas: <strong>{selectedReservation.customerName}</strong></span>
                             <br />
-                            <strong>{selectedReservation.customerName}</strong>
+                            <span>Kohde: <strong>{selectedReservation.officeName}</strong></span>
                             <br />
-                            {selectedReservation.officeName}
+                            <span>Vuokratila: <strong>{selectedReservation.propertyName}</strong></span>
                             <br />
-                            {selectedReservation.propertyName}
-                            <br />
-                            Alku: {selectedReservation.startDate}<br />
-                            Loppu: {selectedReservation.endDate}
+                            Alku: <strong>{dayjs(selectedReservation.startDate).locale('fi').format('DD-MM-YYYY')}</strong><br />
+                            Loppu: <strong>{dayjs(selectedReservation.endDate).locale('fi').format('DD-MM-YYYY')}</strong>
                         </>
                     ) : "Haluatko varmasti poistaa tämän varauksen?"
                 }
-                title={"Poista varaus"}
+                title={
+                    selectedReservation
+                        ? `Poista varaus #${selectedReservation.id}`
+                        : "Poista varaus"
+                }
             />
 
             {errorMessage &&

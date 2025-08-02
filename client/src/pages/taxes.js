@@ -97,9 +97,6 @@ const Taxes = () => {
         setShowEditTax(true);
     };
 
-    // Logging VATs for debugging.
-    console.log(vats);
-
     /**
      * Memoized columns for DataGrid.
      * @type {Array<Object>}

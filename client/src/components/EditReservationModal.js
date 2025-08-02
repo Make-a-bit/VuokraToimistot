@@ -1,8 +1,8 @@
 ﻿import React, { useEffect, useMemo, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-    Autocomplete, Box, Checkbox, Dialog, DialogTitle, DialogContent, DialogActions,
-    Button, TextField, FormControl, FormControlLabel
+    Alert, Autocomplete, Box, Checkbox, Dialog, DialogTitle, DialogContent, DialogActions,
+    Button, TextField, FormControl, FormControlLabel, Snackbar
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { updateReservation, fetchReservations, fetchReservedDates } from "../redux/actions/reservationActions";
@@ -17,7 +17,9 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { getReservationDateUtils } from "../utils/reservationDateUtils";
 import { getDuration, addItemRow, deleteRow } from "../utils/reservationUtils";
 import { autoCompleteFieldMargins } from "../utils/fieldMarginals"
+import ConfirmModal from "../components/ConfirmModal";
 import dayjs from "../../src/dayjs-setup";
+import useAutoClearMessages from "../hooks/autoClearMessages";
 
 /**
  * EditReservationModal component for editing a reservation.
@@ -59,6 +61,24 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
      * @type {Array<Object>} services - List of service objects from Redux.
      */
     const services = useSelector(state => state.services.services);
+
+    /**
+     * errorMessage and successMessage are strings or null from Redux UI state.
+    * @type {{ errorMessage: string|null, successMessage: string|null }}
+    */
+    const { errorMessage, successMessage } = useSelector(state => state.ui);
+
+    /**
+     * Controls the visibility of the confirm modal (update invoice).
+     * @type {[Object|null, function]}
+     */
+    const [showConfirm, setShowConfirm] = useState(false);
+
+    /**
+     * Controls the visibility of the confirm modal (update invoice).
+     * @type {[Object|null, function]}
+     */
+    const [showConfirmInvoicing, setShowConfirmInvoicing] = useState(false);
 
     /**
      * @type {[Object|null, function]} selectedCustomer - Currently selected customer.
@@ -125,6 +145,8 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
      * @type {React.MutableRefObject<Object>} originalReservationRef - Stores original reservation and itemRows for change detection.
      */
     const originalReservationRef = React.useRef();
+
+    useAutoClearMessages(errorMessage, successMessage);
 
     useEffect(() => {
         if (reservation) {
@@ -478,13 +500,13 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
      * @returns {Promise<void>}
      */
     const handleInvoicing = async (e) => {
-        e.preventDefault();
+        if (e && e.preventDefault) e.preventDefault();
 
         if (isModified()) {
             await handleSave();
-            actuallyInvoice();
+            await actuallyInvoice();
         } else {
-            actuallyInvoice();
+            await actuallyInvoice();
         }
     };
 
@@ -492,7 +514,7 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
      * Actually creates the invoice for the reservation.
      * @returns {void}
      */
-    const actuallyInvoice = () => {
+    const actuallyInvoice = async () => {
         const services = itemRows
             .filter(row => row.type === "service" || row.type === "property")
             .map(s => ({
@@ -528,360 +550,416 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
             dueDate: dateInvoiced.add(14, "day").format("YYYY-MM-DD")
         };
 
-        dispatch(createInvoice(invoiceReservation))
-            .then(() => {
-                dispatch(fetchReservations());
-                dispatch(fetchReservedDates(reservation.propertyId));
-                dispatch(fetchInvoices());
-                onHide();
-            });
+        onHide();
+        await dispatch(createInvoice(invoiceReservation));
+        await dispatch(fetchReservations());
+        await dispatch(fetchReservedDates(reservation.propertyId));
+        await dispatch(fetchInvoices());
     };
 
     if (!reservation) return null;
 
     return (
-        <Dialog
-            open={show}
-            onClose={onHide}
-            PaperProps={{
-                sx: { width: "900px", maxWidth: "100%" }
-            }}
-        >
-            <DialogTitle>Muokkaa varausta #{reservation.id} / {reservation.customer.name}</DialogTitle>
-            <DialogContent dividers>
-                <FormControl>
-                    <Autocomplete
-                        options={offices}
-                        value={selectedOffice}
-                        onChange={(event, newValue) => {
-                            setSelectedOffice(newValue)
-                            if (newValue) {
-                                setSelectedOfficeProperty(null);
+        <>
+            <Dialog
+                open={show}
+                onClose={onHide}
+                PaperProps={{
+                    sx: { width: "900px", maxWidth: "100%" }
+                }}
+            >
+                <DialogTitle>Muokkaa varausta #{reservation.id} / {reservation.customer.name}</DialogTitle>
+                <DialogContent dividers>
+                    <FormControl>
+                        <Autocomplete
+                            options={offices}
+                            value={selectedOffice}
+                            onChange={(event, newValue) => {
+                                setSelectedOffice(newValue)
+                                if (newValue) {
+                                    setSelectedOfficeProperty(null);
+                                }
+                            }}
+                            getOptionLabel={option => option.name || ""}
+                            renderInput={params => (
+                                <TextField
+                                    {...params}
+                                    disabled={isDisabled}
+                                    label={selectedOffice ? "Kohde" : "Valitse kohde"}
+                                    variant="outlined"
+                                    fullWidth
+                                />
+                            )}
+                            isOptionEqualToValue={(option, value) => option.id === value?.id}
+                            sx={{ ...autoCompleteFieldMargins }}
+                        />
+                    </FormControl>
+
+                    <FormControl>
+                        <Autocomplete
+                            options={
+                                selectedOffice
+                                    ? properties.filter(p => p.officeId === selectedOffice.id)
+                                    : []
                             }
-                        }}
-                        getOptionLabel={option => option.name || ""}
-                        renderInput={params => (
-                            <TextField
-                                {...params}
-                                disabled={isDisabled}
-                                label={selectedOffice ? "Kohde" : "Valitse kohde"}
-                                variant="outlined"
-                                fullWidth
+                            onChange={(event, newValue) => setSelectedOfficeProperty(newValue)}
+                            getOptionLabel={option => option.name || ""}
+                            value={selectedOfficeProperty}
+                            renderInput={params => (
+                                <TextField
+                                    {...params}
+                                    disabled={isDisabled}
+                                    label={selectedOfficeProperty ? "Vuokratila" : "Valitse vuokratila"}
+                                    variant="outlined"
+                                    fullWidth />
+                            )}
+                            sx={{ ...autoCompleteFieldMargins }}
+                            isOptionEqualToValue={(option, value) => option.id === value?.id}
+                        />
+                    </FormControl>
+                    <br />
+
+                    <FormControl>
+                        <Autocomplete
+                            options={customers}
+                            getOptionLabel={option => option.name || ""}
+                            value={selectedCustomer}
+                            onChange={(event, newValue) => setSelectedCustomer(newValue)}
+                            renderInput={params => (
+                                <TextField
+                                    {...params}
+                                    disabled={isDisabled}
+                                    label={selectedCustomer ? "Asiakas" : "Valitse asiakas"}
+                                    variant="outlined"
+                                    fullWidth />
+                            )}
+                            sx={{ ...autoCompleteFieldMargins }}
+                            isOptionEqualToValue={(option, value) => option.id === value?.id}
+                        />
+                    </FormControl>
+                    <br />
+
+                    <FormControl>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DatePicker
+                                key={reservedDates.length}
+                                enableAccessibleFieldDOMStructure={false}
+                                disabled={!selectedCustomer || !selectedOffice || !selectedOfficeProperty || isDisabled}
+                                format="YYYY-MM-DD"
+                                label="Varauksen alku"
+                                onChange={(newValue) => {
+                                    setStartDate(newValue);
+                                    setEndDate(null);
+                                }}
+                                shouldDisableDate={shouldDisableStartDate}
+                                value={startDate}
+                                slots={{ textField: TextField }}
+                                slotProps={{
+                                    textField: {
+                                        disabled: !selectedCustomer || !selectedOffice || !selectedOfficeProperty || isDisabled,
+                                        label: "Varauksen alku",
+                                        variant: "outlined",
+                                        sx: { ...autoCompleteFieldMargins  }
+                                    }
+                                }}
                             />
-                        )}
-                        isOptionEqualToValue={(option, value) => option.id === value?.id}
-                        sx={{ ...autoCompleteFieldMargins }}
-                    />
-                </FormControl>
+                        </LocalizationProvider>
+                    </FormControl>
 
-                <FormControl>
-                    <Autocomplete
-                        options={
-                            selectedOffice
-                                ? properties.filter(p => p.officeId === selectedOffice.id)
-                                : []
-                        }
-                        onChange={(event, newValue) => setSelectedOfficeProperty(newValue)}
-                        getOptionLabel={option => option.name || ""}
-                        value={selectedOfficeProperty}
-                        renderInput={params => (
-                            <TextField
-                                {...params}
-                                disabled={isDisabled}
-                                label={selectedOfficeProperty ? "Vuokratila" : "Valitse vuokratila"}
-                                variant="outlined"
-                                fullWidth />
-                        )}
-                        sx={{ ...autoCompleteFieldMargins }}
-                        isOptionEqualToValue={(option, value) => option.id === value?.id}
-                    />
-                </FormControl>
-                <br />
+                    <FormControl>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DatePicker
+                                key={reservedDates.length}
+                                enableAccessibleFieldDOMStructure={false}
+                                defaultValue={startDate}
+                                format="YYYY-MM-DD"
+                                label="Varauksen loppu"
+                                disabled={!startDate || isDisabled}
+                                onChange={setEndDate}
+                                shouldDisableDate={shouldDisableEndDate}
+                                value={endDate}
+                                slots={{ textField: TextField }}
+                                slotProps={{
+                                    textField: {
+                                        disabled: !startDate || isDisabled,
+                                        label: "Varauksen loppu",
+                                        variant: "outlined",
+                                        sx: { ...autoCompleteFieldMargins }
+                                    }
+                                }}
+                            />
+                        </LocalizationProvider>
+                    </FormControl>
 
-                <FormControl>
-                    <Autocomplete
-                        options={customers}
-                        getOptionLabel={option => option.name || ""}
-                        value={selectedCustomer}
-                        onChange={(event, newValue) => setSelectedCustomer(newValue)}
-                        renderInput={params => (
-                            <TextField
-                                {...params}
-                                disabled={isDisabled}
-                                label={selectedCustomer ? "Asiakas" : "Valitse asiakas"}
-                                variant="outlined"
-                                fullWidth />
-                        )}
-                        sx={{ ...autoCompleteFieldMargins }}
-                        isOptionEqualToValue={(option, value) => option.id === value?.id}
-                    />
-                </FormControl>
-                <br />
-
-                <FormControl>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DatePicker
-                            key={reservedDates.length}
-                            enableAccessibleFieldDOMStructure={false}
-                            disabled={!selectedCustomer || !selectedOffice || !selectedOfficeProperty || isDisabled}
-                            format="YYYY-MM-DD"
-                            label="Varauksen alku"
-                            onChange={(newValue) => {
-                                setStartDate(newValue);
-                                setEndDate(null);
-                            }}
-                            shouldDisableDate={shouldDisableStartDate}
-                            value={startDate}
-                            slots={{ textField: TextField }}
-                            slotProps={{
-                                textField: {
-                                    disabled: !selectedCustomer || !selectedOffice || !selectedOfficeProperty || isDisabled,
-                                    label: "Varauksen alku",
-                                    variant: "outlined",
-                                    fullWidth: true,
-                                    sx: { ...autoCompleteFieldMargins, marginRight: "10px" }
-                                }
-                            }}
-                        />
-                    </LocalizationProvider>
-                </FormControl>
-
-                <FormControl>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DatePicker
-                            key={reservedDates.length}
-                            enableAccessibleFieldDOMStructure={false}
-                            defaultValue={startDate}
-                            format="YYYY-MM-DD"
-                            label="Varauksen loppu"
-                            disabled={!startDate || isDisabled}
-                            onChange={setEndDate}
-                            shouldDisableDate={shouldDisableEndDate}
-                            value={endDate}
-                            slots={{ textField: TextField }}
-                            slotProps={{
-                                textField: {
-                                    disabled: !startDate || isDisabled,
-                                    label: "Varauksen loppu",
-                                    variant: "outlined",
-                                    fullWidth: true,
-                                    sx: { ...autoCompleteFieldMargins }
-                                }
-                            }}
-                        />
-                    </LocalizationProvider>
-                </FormControl>
-
-                <FormControl>
-                    <Autocomplete
-                        disabled={!endDate || isDisabled}
-                        options={
-                            selectedOffice ?
-                                deviceOptions.filter(d => d.officeId === selectedOffice.id)
-                                : []
-                        }
-                        getOptionLabel={option => option.name}
-                        value={selectedDevice}
-                        onChange={(event, newValue) => setSelectedDevice(newValue)}
-                        renderInput={params => (
-                            <TextField {...params} label="Vuokralaitteet" />
-                        )}
-                        sx={{ ...autoCompleteFieldMargins }}
-                        isOptionEqualToValue={(option, value) => option?.id === value?.id}
-                    />
-                </FormControl>
-
-                <FormControl>
-                    <Autocomplete
-                        disabled={!endDate || isDisabled}
-                        options={
-                            selectedOffice
-                                ? serviceOptions.filter(s => s.officeId === selectedOffice.id)
-                                : []
-                        }
-                        getOptionLabel={option => option.name}
-                        value={selectedService}
-                        onChange={(event, newValue) => setSelectedService(newValue)}
-                        renderInput={params => (
-                            <TextField {...params} label="Lisäpalvelut" />
-                        )}
-                        sx={{ ...autoCompleteFieldMargins }}
-                        isOptionEqualToValue={(option, value) => option?.id === value?.id}
-                    />
-                </FormControl>
-
-                <FormControl>
-                    <TextField
-                        disabled={isDisabled}
-                        label="Lisätiedot"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        sx={{ ...autoCompleteFieldMargins, width: "710px" }}
-                    />
-                </FormControl>
-
-                <br />
-
-                <FormControlLabel
-                    control={
-                        <Checkbox
-                            checked={invoiced}
-                            disabled={true}
-                            onChange={(event) => setInvoiced(event.target.checked)}
-                        />
-                    }
-                    label="Laskutettu"
-                />
-
-                <DataGrid
-                    rows={itemRows}
-                    columns={[
-                        {
-                            field: "type",
-                            headerName: "Tyyppi",
-                            width: 90,
-                            renderCell: (params) => {
-                                if (params.row.type === "device") return "Laite";
-                                if (params.row.type === "service") return "Palvelu";
-                                if (params.row.type === "property") return "Vuokratila";
-                                return "";
+                    <FormControl>
+                        <Autocomplete
+                            disabled={!endDate || isDisabled}
+                            options={
+                                selectedOffice ?
+                                    deviceOptions.filter(d => d.officeId === selectedOffice.id)
+                                    : []
                             }
-                        },
-                        { field: "name", headerName: "Nimi", flex: 1 },
-                        { field: "price", headerName: "Hinta", width: 70, editable: !isDisabled },
-                        { field: "qty", headerName: "Määrä", width: 70, editable: !isDisabled },
-                        { field: "discount", headerName: "Ale %", width: 70, editable: !isDisabled },
-                        {
-                            field: "subtotal",
-                            headerName: "Summa",
-                            width: 100,
-                            renderCell: (params) => {
-                                const row = params.row;
-                                if (!row) return "";
+                            getOptionLabel={option => option.name}
+                            value={selectedDevice}
+                            onChange={(event, newValue) => setSelectedDevice(newValue)}
+                            renderInput={params => (
+                                <TextField {...params} label="Vuokralaitteet" />
+                            )}
+                            sx={{ ...autoCompleteFieldMargins }}
+                            isOptionEqualToValue={(option, value) => option?.id === value?.id}
+                        />
+                    </FormControl>
 
-                                const price = parseFloat(row.price) || 0;
-                                const qty = parseFloat(row.qty) || 0;
-                                const discount = parseFloat(row.discount) || 0;
-
-                                let total = (price * qty);
-
-                                if (discount !== 0) {
-                                    total = total - (discount / 100 * total);
-                                }
-
-                                return (
-                                    <span>{total.toLocaleString("fi-FI", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €</span>
-                                );
+                    <FormControl>
+                        <Autocomplete
+                            disabled={!endDate || isDisabled}
+                            options={
+                                selectedOffice
+                                    ? serviceOptions.filter(s => s.officeId === selectedOffice.id)
+                                    : []
                             }
-                        },
-                        { field: "vat", headerName: "ALV %", width: 70 },
-                        {
-                            field: "total",
-                            headerName: "Yhteensä",
-                            width: 100,
-                            renderCell: (params) => {
-                                const row = params.row;
-                                if (!row) return "";
+                            getOptionLabel={option => option.name}
+                            value={selectedService}
+                            onChange={(event, newValue) => setSelectedService(newValue)}
+                            renderInput={params => (
+                                <TextField {...params} label="Lisäpalvelut" />
+                            )}
+                            sx={{ ...autoCompleteFieldMargins }}
+                            isOptionEqualToValue={(option, value) => option?.id === value?.id}
+                        />
+                    </FormControl>
 
-                                const price = parseFloat(row.price) || 0;
-                                const qty = parseFloat(row.qty) || 0;
-                                const discount = parseFloat(row.discount) || 0;
-                                const vat = parseFloat(row.vat) || 0;
+                    <FormControl>
+                        <TextField
+                            disabled={isDisabled}
+                            label="Lisätiedot"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            sx={{ ...autoCompleteFieldMargins, width: "710px" }}
+                        />
+                    </FormControl>
 
-                                const subtotal = price * qty
-                                const discountedSubtotal = subtotal - ((discount / 100) * subtotal)
-                                const total = discountedSubtotal + ((vat / 100) * discountedSubtotal)
+                    <br />
 
-                                return (
-                                    <span>{total.toLocaleString("fi-FI", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €</span>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={invoiced}
+                                disabled={true}
+                                onChange={(event) => setInvoiced(event.target.checked)}
+                            />
+                        }
+                        label="Laskutettu"
+                    />
+
+                    <DataGrid
+                        rows={itemRows}
+                        columns={[
+                            {
+                                field: "type",
+                                headerName: "Tyyppi",
+                                width: 90,
+                                renderCell: (params) => {
+                                    if (params.row.type === "device") return "Laite";
+                                    if (params.row.type === "service") return "Palvelu";
+                                    if (params.row.type === "property") return "Vuokratila";
+                                    return "";
+                                }
+                            },
+                            { field: "name", headerName: "Nimi", flex: 1 },
+                            { field: "price", headerName: "Hinta", width: 70, editable: !isDisabled },
+                            { field: "qty", headerName: "Määrä", width: 70, editable: !isDisabled },
+                            { field: "discount", headerName: "Ale %", width: 70, editable: !isDisabled },
+                            {
+                                field: "subtotal",
+                                headerName: "Summa",
+                                width: 100,
+                                renderCell: (params) => {
+                                    const row = params.row;
+                                    if (!row) return "";
+
+                                    const price = parseFloat(row.price) || 0;
+                                    const qty = parseFloat(row.qty) || 0;
+                                    const discount = parseFloat(row.discount) || 0;
+
+                                    let total = (price * qty);
+
+                                    if (discount !== 0) {
+                                        total = total - (discount / 100 * total);
+                                    }
+
+                                    return (
+                                        <span>{total.toLocaleString("fi-FI", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €</span>
+                                    );
+                                }
+                            },
+                            { field: "vat", headerName: "ALV %", width: 70 },
+                            {
+                                field: "total",
+                                headerName: "Yhteensä",
+                                width: 100,
+                                renderCell: (params) => {
+                                    const row = params.row;
+                                    if (!row) return "";
+
+                                    const price = parseFloat(row.price) || 0;
+                                    const qty = parseFloat(row.qty) || 0;
+                                    const discount = parseFloat(row.discount) || 0;
+                                    const vat = parseFloat(row.vat) || 0;
+
+                                    const subtotal = price * qty
+                                    const discountedSubtotal = subtotal - ((discount / 100) * subtotal)
+                                    const total = discountedSubtotal + ((vat / 100) * discountedSubtotal)
+
+                                    return (
+                                        <span>{total.toLocaleString("fi-FI", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €</span>
+                                    )
+                                }
+                            },
+                            {
+                                field: "actions",
+                                headerName: "Poista",
+                                width: 60,
+                                renderCell: (params) => (
+                                    <Box sx={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        height: "100%",
+                                        width: "100%"
+                                    }}>
+                                        <Button
+                                            color="error"
+                                            disabled={isDisabled}
+                                            size="small"
+                                            onClick={() => handleRowDelete(params.id)}
+                                        >
+                                            <DeleteIcon />
+                                        </Button>
+                                    </Box>
                                 )
                             }
-                        },
-                        {
-                            field: "actions",
-                            headerName: "Poista",
-                            width: 60,
-                            renderCell: (params) => (
-                                <Box sx={{
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                    height: "100%",
-                                    width: "100%"
-                                }}>
-                                    <Button
-                                        color="error"
-                                        disabled={isDisabled}
-                                        size="small"
-                                        onClick={() => handleRowDelete(params.id)}
-                                    >
-                                        <DeleteIcon />
-                                    </Button>
-                                </Box>
-                            )
-                        }
-                    ]}
-                    autoHeight
-                    hideFooter
-                    disableSelectionOnClick
-                    processRowUpdate={handleRowEdit}
-                    experimentalFeatures={{ newEditingApi: true }}
-                    sx={{
-                        marginBottom: "20px",
-                        minHeight: "175px",
-                    }}
-                />
-
-                <Box sx={{ textAlign: "right", fontWeight: "bold" }}>
-                    Laskutettavat yhteensä: {totalSum.toLocaleString("fi-FI", {
-                        minimumFractionDigits: 2, maximumFractionDigits: 2
-                    })} €
-                </Box>
-
-            </DialogContent>
-
-            <DialogActions sx={{
-                display: "flex",
-                alignItems: "flex-end",
-                justifyContent: "space-between",
-                padding: "20px"
-            }}>
-                <Box sx={{ display: "flex", flexDirection: "column" }}>
-                    <Button
-                        size="small"
-                        disabled={isDisabled}
-                        startIcon={<SaveIcon />}
-                        onClick={handleSave}
-                        color="success"
-                        variant="contained"
-                        sx={{ marginBottom: "10px" }}
-                    >Tallenna muutokset</Button>
-                    <Button
-                        color="success"
-                        disabled={isDisabled}
-                        onClick={handleInvoicing}
-                        variant="contained"
-                        size="small"
-                        startIcon={<ReceiptLongIcon />}
-                    >
-                        Laskuta varaus
-                    </Button>
-                </Box>
-
-                <Box sx={{ alignItems: "flex-end" }}>
-
-                    <Button
-                        size="small"
-                        onClick={() => {
-                            onHide();
+                        ]}
+                        autoHeight
+                        hideFooter
+                        disableSelectionOnClick
+                        processRowUpdate={handleRowEdit}
+                        experimentalFeatures={{ newEditingApi: true }}
+                        sx={{
+                            marginBottom: "20px",
+                            minHeight: "175px",
                         }}
+                    />
+
+                    <Box sx={{ textAlign: "right", fontWeight: "bold" }}>
+                        Laskutettavat yhteensä: {totalSum.toLocaleString("fi-FI", {
+                            minimumFractionDigits: 2, maximumFractionDigits: 2
+                        })} €
+                    </Box>
+
+                </DialogContent>
+
+                <DialogActions sx={{
+                    display: "flex",
+                    alignItems: "flex-end",
+                    justifyContent: "space-between",
+                    padding: "20px"
+                }}>
+                    <Box sx={{ display: "flex", flexDirection: "column" }}>
+                        <Button
+                            size="small"
+                            disabled={isDisabled}
+                            startIcon={<SaveIcon />}
+                            onClick={() => setShowConfirm(true)}
+                            color="success"
+                            variant="contained"
+                            sx={{ marginBottom: "10px" }}
+                        >Tallenna muutokset</Button>
+                        <Button
+                            color="success"
+                            disabled={isDisabled}
+                            onClick={() => setShowConfirmInvoicing(true)}
+                            variant="contained"
+                            size="small"
+                            startIcon={<ReceiptLongIcon />}
+                        >
+                            Laskuta varaus
+                        </Button>
+                    </Box>
+
+                    <Box sx={{ alignItems: "flex-end" }}>
+
+                        <Button
+                            size="small"
+                            onClick={() => {
+                                onHide();
+                            }}
+                            color="error"
+                            variant="contained"
+                            startIcon={<CloseIcon />}
+                            sx={{}}
+                        >Sulje</Button>
+                    </Box>
+                </DialogActions>
+            </Dialog>
+
+            <ConfirmModal
+                onConfirm={async () => {
+                    await handleSave();
+                    setShowConfirm(false);
+                }}
+                onHide={() => setShowConfirm(false)}
+                show={showConfirm}
+                cancelText="Peruuta"
+                confirmText="Tallenna"
+                message="Haluatko varmasti tallentaa muutokset varaukseen?"
+                title="Vahvista tallennus"
+            />
+
+            <ConfirmModal
+                onConfirm={async () => {
+                    setShowConfirmInvoicing(false);
+                    await handleInvoicing();
+                }}
+                onHide={() => setShowConfirmInvoicing(false)}
+                show={showConfirmInvoicing}
+                cancelText="Peruuta"
+                confirmText="Laskuta"
+                message="Luodaanko varauksesta lasku?"
+                title="Vahvista laskutus"
+            />
+
+            {
+                errorMessage &&
+                <Snackbar
+                    anchorOrigin={{ horizontal: "right", vertical: "top" }}
+                    open={Boolean(errorMessage)}
+                    autoHideDuration={3000}>
+                    <Alert
                         color="error"
-                        variant="contained"
-                        startIcon={<CloseIcon />}
-                        sx={{}}
-                    >Sulje</Button>
-                </Box>
-            </DialogActions>
-        </Dialog>
+                        severity="error"
+                        variant="filled"
+                        sx={{ border: "1px solid #000", width: "100%" }}>
+                        {errorMessage}
+                    </Alert>
+                </Snackbar>
+            }
+
+            {
+                successMessage &&
+                <Snackbar
+                    anchorOrigin={{ horizontal: "right", vertical: "top" }}
+                    open={Boolean(successMessage)}
+                    autoHideDuration={3000}>
+                    <Alert
+                        color="success"
+                        severity="success"
+                        variant="filled"
+                        sx={{ border: "1px solid #000", width: "100%" }}>
+                        {successMessage}
+                    </Alert>
+                </Snackbar>
+            }
+        </>
     );
 };

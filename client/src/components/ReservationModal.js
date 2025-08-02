@@ -239,7 +239,6 @@ export const AddReservation = ({ show, onHide, office, property }) => {
             // Remove property row if property is deselected
             setItemRows(prev => prev.filter(row => row.type !== "property"));
         }
-        // eslint-disable-next-line
     }, [selectedPropertyLocal, startDate, endDate, properties]);
 
     /**
@@ -267,8 +266,12 @@ export const AddReservation = ({ show, onHide, office, property }) => {
      */
     const deviceOptions = useMemo(() =>
         devices.filter(
-            d => !itemRows.some(row => row.type === "device" && row.itemId === d.id)
-        ), [devices, itemRows]);
+            d =>
+                !itemRows.some(row => row.type === "device" && row.itemId === d.id) &&
+                selectedPropertyLocal && d.officeId === selectedPropertyLocal.officeId
+        ),
+        [devices, itemRows, selectedPropertyLocal]
+    );
 
     /**
      * Service options for Autocomplete, filtered to exclude already selected services.
@@ -276,8 +279,11 @@ export const AddReservation = ({ show, onHide, office, property }) => {
      */
     const serviceOptions = useMemo(() =>
         services.filter(
-            s => !itemRows.some(row => row.type === "service" && row.itemId === s.id)
-        ), [services, itemRows]
+            s =>
+                !itemRows.some(row => row.type === "service" && row.itemId === s.id) &&
+                selectedPropertyLocal && s.officeId === selectedPropertyLocal.officeId
+        ),
+        [services, itemRows, selectedPropertyLocal]
     );
 
     /**
@@ -506,8 +512,10 @@ export const AddReservation = ({ show, onHide, office, property }) => {
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             key={reservedDates.length}
+                            enableAccessibleFieldDOMStructure={false}
                             disabled={!selectedCustomer || !selectedOfficeLocal || !selectedPropertyLocal}
                             disablePast={true}
+                            format="DD-MM-YYYY"
                             label="Varauksen alku"
                             shouldDisableDate={shouldDisableStartDate}
                             onChange={(newValue) => {
@@ -517,7 +525,16 @@ export const AddReservation = ({ show, onHide, office, property }) => {
                                 }
                             }}
                             value={startDate}
-                            renderInput={(params) => <TextField {...params} />}
+                            slots={{ textField: TextField }}
+                            slotProps={{
+                                textField: {
+                                    sx: { ...autoCompleteFieldMargins, marginRight: "10px" },
+                                    fullWidth: true,
+                                    label: "Varauksen alku",
+                                    variant: "outlined",
+                                    disabled: !selectedCustomer || !selectedOfficeLocal || !selectedPropertyLocal
+                                }
+                            }}
                             sx={{ ...autoCompleteFieldMargins, marginRight: "10px" }}
                         />
                     </LocalizationProvider>
@@ -527,11 +544,22 @@ export const AddReservation = ({ show, onHide, office, property }) => {
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             disabled={!startDate}
+                            enableAccessibleFieldDOMStructure={false}
+                            format="DD-MM-YYYY"
                             label="Varauksen loppu"
                             onChange={setEndDate}
                             shouldDisableDate={shouldDisableEndDate}
                             value={endDate}
-                            renderInput={(params) => <TextField {...params} />}
+                            slots={{ textField: TextField }}
+                            slotProps={{
+                                textField: {
+                                    sx: { ...autoCompleteFieldMargins },
+                                    fullWidth: true,
+                                    label: "Varauksen loppu",
+                                    variant: "outlined",
+                                    disabled: !startDate
+                                }
+                            }}
                             sx={{ ...autoCompleteFieldMargins }}
                         />
                     </LocalizationProvider>

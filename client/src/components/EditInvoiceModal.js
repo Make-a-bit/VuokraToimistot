@@ -164,7 +164,7 @@ const EditInvoice = ({ show, onHide, invoice }) => {
                             <DatePicker
                                 key={1}
                                 disabled={isDisabled}
-                                format="YYYY-MM-DD"
+                                format="DD-MM-YYYY"
                                 label="Laskutuspäivä"
                                 onChange={(newValue) => {
                                     setInvoiceDate(newValue);
@@ -180,7 +180,7 @@ const EditInvoice = ({ show, onHide, invoice }) => {
                             <DatePicker
                                 key={2}
                                 disabled={isDisabled}
-                                format="YYYY-MM-DD"
+                                format="DD-MM-YYYY"
                                 label="Eräpäivä"
                                 onChange={(newValue) => {
                                     setDueDate(newValue);
@@ -277,10 +277,10 @@ const EditInvoice = ({ show, onHide, invoice }) => {
                 <Snackbar
                     anchorOrigin={{ horizontal: "right", vertical: "top" }}
                     open={Boolean(errorMessage)}
-                    autoHideDuration={6000}>
+                    autoHideDuration={3000}>
                     <Alert
-                        color="warning"
-                        severity="warning"
+                        color="error"
+                        severity="error"
                         variant="filled"
                         sx={{ border: "1px solid #000", width: "100%" }}>
                         {errorMessage}
@@ -292,7 +292,7 @@ const EditInvoice = ({ show, onHide, invoice }) => {
                 <Snackbar
                     anchorOrigin={{ horizontal: "right", vertical: "top" }}
                     open={Boolean(successMessage)}
-                    autoHideDuration={6000}>
+                    autoHideDuration={3000}>
                     <Alert
                         color="success"
                         severity="success"

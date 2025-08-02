@@ -197,11 +197,11 @@ const EditEntryModal = ({ schema, onClose, show, onHide, title, action, entry })
                         if (fieldDef.field === "vat") {
                             return (
                                 <FormControl key={fieldDef.field} fullWidth>
-                                    <InputLabel id="vat-select-label">ALV</InputLabel>
+                                    <InputLabel id="vat-select-label">Veroluokka</InputLabel>
                                     <Select
                                         labelId="vat-select-label"
                                         value={formData[fieldDef.field] || ""}
-                                        label="ALV"
+                                        label="Veroluokka"
                                         onChange={handleChange(fieldDef.field)}
                                     >
                                         {Array.isArray(vats) && vats.length > 0 ? (

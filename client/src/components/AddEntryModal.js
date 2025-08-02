@@ -150,19 +150,19 @@ const AddEntry = ({ schema, show, onHide, apiEndPoint, title, action, extraData 
                     if (input.field === "vat") {
                         return (
                             <FormControl fullWidth margin="normal" required key={input.field} sx={{ minWidth: 100 }}>
-                                <InputLabel id="vat-select-label">{input.header}</InputLabel>
+                                <InputLabel id="vat-select-label">Veroluokka</InputLabel>
                                 <Select
                                     labelId="vat-select-label"
                                     id="vat-select"
                                     name="vat"
                                     value={formData["vat"] || ""}
-                                    label={input.header}
+                                    label={`Veroluokka`}
                                     onChange={handleChange}
                                     inputRef={index === 0 ? firstInputRef : null}
                                 >
                                     {vats && vats.length > 0 ? vats.map((vat) => (
-                                        <MenuItem key={vat.id || vat.taxValue} value={vat.id}>
-                                            {vat.taxValue} %
+                                        <MenuItem key={vat.id || vat.vatValue} value={vat.id}>
+                                            {vat.vatValue} %
                                         </MenuItem>
                                     )) : (
                                         <MenuItem value="">Ei ALV-vaihtoehtoja</MenuItem>
