@@ -2,7 +2,7 @@
 
 const Footer = () => {
     return (
-            <p>This is footer</p>
+            <p>VuokraToimistot APP &copy; Janne Toivonen</p>
     )
 }
 

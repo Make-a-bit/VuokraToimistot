@@ -15,22 +15,59 @@ import { fetchInvoices, updateInvoice } from "../redux/actions/invoiceActions";
 import { autoCompleteFieldMargins } from "../utils/fieldMarginals"
 import useAutoClearMessages from "../hooks/autoClearMessages";
 
+/**
+ * EditInvoice component for editing invoice details in a modal dialog.
+ * 
+ * @param {Object} props
+ * @param {boolean} props.show - Whether the dialog is open.
+ * @param {Function} props.onHide - Function to close the dialog.
+ * @param {Object} [props.invoice] - Invoice object to edit.
+ * @returns {JSX.Element}
+ */
 const EditInvoice = ({ show, onHide, invoice }) => {
+    /** @type {import('react-redux').Dispatch} */
     const dispatch = useDispatch();
+
+    /**
+     * errorMessage and successMessage are strings or null from Redux UI state.
+     * @type {{ errorMessage: string|null, successMessage: string|null }}
+     */
     const { errorMessage, successMessage } = useSelector(state => state.ui);
 
+    /**
+     * invoiceDate and dueDate are dayjs objects or null.
+     * @type {[import('dayjs').Dayjs|null, Function]}
+     */
     const [invoiceDate, setInvoiceDate] = useState(null);
+    /** @type {[import('dayjs').Dayjs|null, Function]} */
     const [dueDate, setDueDate] = useState(null);
+
+    /**
+     * subTotal, discounts, vat, totalSum are strings (may be empty or numeric as string).
+     * @type {[string, Function]}
+     */
     const [subTotal, setSubTotal] = useState("");
+    /** @type {[string, Function]} */
     const [discounts, setDiscounts] = useState("");
+    /** @type {[string, Function]} */
     const [vat, setVat] = useState("");
+    /** @type {[string, Function]} */
     const [totalSum, setTotalSum] = useState("");
+    /** @type {[boolean, Function]} */
     const [paid, setPaid] = useState(false);
 
+    /**
+     * isDisabled is a boolean indicating if invoice is paid.
+     * @type {boolean}
+     */
     const isDisabled = invoice ? invoice.paid : false;
 
     useAutoClearMessages(errorMessage, successMessage);
 
+    /**
+     * firstFieldRef is a ref to the first input field.
+     * @type {import('react').RefObject<HTMLInputElement>}
+     */
     const firstFieldRef = useRef(null);
 
     useEffect(() => {
@@ -64,6 +101,12 @@ const EditInvoice = ({ show, onHide, invoice }) => {
         }
     }, [show, invoice]);
 
+    /**
+     * Formats a value as a currency string in EUR.
+     * 
+     * @param {string|number|null|undefined} value
+     * @returns {string}
+     */
     const formatCurrency = (value) => {
         if (value === "" || value === null || value === undefined) return "";
         return new Intl.NumberFormat("fi-FI", {
@@ -74,6 +117,12 @@ const EditInvoice = ({ show, onHide, invoice }) => {
         }).format(Number(value));
     };
 
+    /**
+     * Handles saving the invoice changes.
+     * 
+     * @param {import('react').SyntheticEvent} [e]
+     * @returns {Promise<void>}
+     */
     const handleSave = async (e) => {
         if (e) e.preventDefault();
 

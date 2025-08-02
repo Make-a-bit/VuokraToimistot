@@ -8,6 +8,23 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useDispatch, useSelector } from "react-redux";
 import { SHOW_LOADING, HIDE_LOADING } from "../redux/actions/actiontypes";
 
+/**
+ * ConfirmModal props type definition.
+ * @typedef {Object} ConfirmModalProps
+ * @property {boolean} show - Whether the modal is open.
+ * @property {() => void} onHide - Function to close the modal.
+ * @property {string} [title] - Title of the modal.
+ * @property {string} [message] - Message to display in the modal.
+ * @property {string} [confirmText] - Text for the confirm button.
+ * @property {string} [cancelText] - Text for the cancel button.
+ * @property {() => Promise<void>} onConfirm - Function to call on confirm, returns a Promise.
+ */
+
+/**
+ * ConfirmModal component displays a confirmation dialog.
+ * @param {ConfirmModalProps} props
+ * @returns {JSX.Element}
+ */
 const ConfirmModal = ({
     show,
     onHide,
@@ -18,16 +35,25 @@ const ConfirmModal = ({
     onConfirm,
 }) => {
 
+    /** @type {import('react-redux').Dispatch} */
+    // useDispatch returns the Redux dispatch function.
     const dispatch = useDispatch();
+
+    /** @type {boolean} */
+    // loading is a boolean indicating if a loading state is active.
     const loading = useSelector(state => state.ui.loadingState);
 
+    /**
+     * Handles the confirm action, dispatching loading actions and calling onConfirm.
+     * @returns {Promise<void>}
+     */
     const handleConfirm = async () => {
         dispatch({ type: SHOW_LOADING })
         try {
             await onConfirm();
             onHide();
         } catch (err) {
-            console.log("Error saving new data:", err)
+            //console.log("Error saving new data:", err)
         } finally {
             dispatch({ type: HIDE_LOADING })
         }

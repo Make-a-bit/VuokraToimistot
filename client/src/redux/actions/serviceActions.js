@@ -7,10 +7,18 @@
     SELECTED_SERVICE_OFFICE_SET
 } from "./actiontypes"
 
-const mainURI = "https://localhost:7017";
+import mainURI from "../../constants/apiEndpoint";
 
+/**
+ * Adds a new office service via API.
+ * apiEndPoint is expected to be a string URL.
+ * service is expected to be an object representing the service to add.
+ * Returns a thunk function for Redux dispatch.
+ * @param {string} apiEndPoint 
+ * @param {Object} service
+ * @returns {function(function): Promise<void>}
+ */
 export const addOfficeService = (apiEndPoint, service) => {
-    console.log("Service:", service);
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
         const token = localStorage.getItem("token");
@@ -27,7 +35,6 @@ export const addOfficeService = (apiEndPoint, service) => {
 
             if (response.ok) {
                 const createdService = await response.json();
-                console.log("Created service:", createdService);
                 dispatch({ type: ADD_OFFICE_SERVICE_SUCCESS, payload: createdService })
                 dispatch({ type: SHOW_SUCCESS, payload: "Palvelun tallennus onnistui" })
             } else {
@@ -35,15 +42,20 @@ export const addOfficeService = (apiEndPoint, service) => {
             }
         } catch (err) {
             dispatch({ type: SHOW_ERROR, payload: "Palvelun tallennus epäonnistui!" })
-            console.log("Error while adding a new service:", err)
         } finally {
             dispatch({ type: HIDE_LOADING })
         }
     }
 }
 
+/**
+ * Deletes a service via API.
+ * service is expected to be an object with at least an 'id' property (number or string).
+ * Returns a thunk function for Redux dispatch.
+ * @param {{id: number|string, [key: string]: any}} service
+ * @returns {function(function): Promise<void>}
+ */
 export const deleteService = (service) => {
-    console.log("Service to del:", service)
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
         const token = localStorage.getItem("token");
@@ -58,7 +70,6 @@ export const deleteService = (service) => {
             dispatch({ type: DELETE_OFFICE_SERVICE_SUCCESS, payload: service })
             dispatch({ type: SHOW_SUCCESS, payload: "Palvelun poisto onnistui!" })
         } catch (error) {
-            console.log("Error while deleting service:", error);
             dispatch({ type: SHOW_ERROR, payload: "Palvelun poisto epäonnistui!" })
         } finally {
             dispatch({ type: HIDE_LOADING })
@@ -66,6 +77,13 @@ export const deleteService = (service) => {
     }
 }
 
+/**
+ * Edits an existing service via API.
+ * service is expected to be an object representing the service to edit.
+ * Returns a thunk function for Redux dispatch.
+ * @param {Object} service
+ * @returns {function(function): Promise<void>}
+ */
 export const editService = (service) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
@@ -82,12 +100,10 @@ export const editService = (service) => {
 
             if (response.ok) {
                 const editedService = await response.json();
-                console.log("Service edited:", editedService)
                 dispatch({ type: EDIT_OFFICE_SERVICE_SUCCESS, payload: editedService })
                 dispatch({ type: SHOW_SUCCESS, payload: "Palvelun päivitys onnistui!" })
             }
         } catch (error) {
-            console.log("Error while saving edited service data:", error)
             dispatch({ type: SHOW_ERROR, payload: "Palvelun päivitys epäonnistui!" })
         } finally {
             dispatch({ type: HIDE_LOADING })
@@ -95,6 +111,13 @@ export const editService = (service) => {
     }
 }
 
+/**
+ * Fetches services for a given office or all services if officeId is null/undefined/0.
+ * officeId is expected to be a number or null/undefined.
+ * Returns a thunk function for Redux dispatch.
+ * @param {?number} officeId
+ * @returns {function(function): Promise<void>}
+ */
 export const fetchServices = (officeId) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
@@ -114,7 +137,6 @@ export const fetchServices = (officeId) => {
             const data = await response.json();
             dispatch({ type: FETCH_OFFICE_SERVICES_SUCCESS, payload: data })
         } catch (error) {
-            console.log("Error while fetching office services:", error);
             dispatch({ type: SHOW_ERROR, payload: "Palvelujen nouto epäonnistui!" })
         } finally {
             dispatch({ type: HIDE_LOADING })
@@ -122,6 +144,13 @@ export const fetchServices = (officeId) => {
     }
 }
 
+/**
+ * Sets the selected office in the Redux store.
+ * office is expected to be an object (structure not specified).
+ * Returns a thunk function for Redux dispatch.
+ * @param {Object} office
+ * @returns {function(function): Promise<void>}
+ */
 export const setOffice = (office) => {
     return async (dispatch) => {
         dispatch({ type: SELECTED_SERVICE_OFFICE_SET, payload: office })

@@ -11,6 +11,11 @@ import { serviceReducer } from "./reducers/serviceReducer";
 import { taxReducer } from "./reducers/taxReducer";
 import { uiReducer } from "./reducers/uiReducer";
 
+/**
+ * The root reducer combines all feature reducers into a single reducer function.
+ * @type {import('redux').Reducer}
+ * Reasoning: combineReducers returns a Redux reducer function.
+ */
 const rootReducer = combineReducers({
     customers: customerReducer,
     devices: deviceReducer,
@@ -22,7 +27,13 @@ const rootReducer = combineReducers({
     services: serviceReducer,
     taxes: taxReducer,
     ui: uiReducer,
-})
+});
+
+/**
+ * The Redux store instance for the application.
+ * @type {import('@reduxjs/toolkit').EnhancedStore}
+ * Reasoning: configureStore returns an EnhancedStore from Redux Toolkit.
+ */
 export const store = configureStore({
     reducer: rootReducer,
 });

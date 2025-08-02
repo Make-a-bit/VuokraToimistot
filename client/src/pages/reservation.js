@@ -16,24 +16,102 @@ import ConfirmModal from "../components/ConfirmModal";
 import dayjs from "../../src/dayjs-setup";
 import useAutoClearMessages from "../hooks/autoClearMessages";
 
+/**
+ * Reservation page component.
+ * @returns {JSX.Element}
+ */
 const Reservation = () => {
+    /** @type {import('react-redux').Dispatch<any>} */
     const dispatch = useDispatch();
+
+    /**
+     * errorMessage and successMessage are strings or null, from UI state.
+     * @type {{ errorMessage: string|null, successMessage: string|null }}
+     */
     const { errorMessage, successMessage } = useSelector(state => state.ui);
+
+    /**
+     * offices is an array of office objects.
+     * @type {Array<{ id: number, name: string }>}
+     */
     const offices = useSelector(state => state.offices.offices);
+
+    /**
+     * properties is an array of property objects.
+     * @type {Array<{ id: number, name: string, officeId: number }>}
+     */
     const properties = useSelector(state => state.properties.properties);
+
+    /**
+     * allReservations is an array of reservation objects.
+     * @type {Array<Object>}
+     */
     const allReservations = useSelector(state => state.reservations.reservations);
+
+    /**
+     * reservedDates is an array of date strings.
+     * @type {Array<string>}
+     */
     const reservedDates = useSelector(state => state.reservations.reservedDates);
 
+    /**
+     * showAddReservation controls AddReservation modal visibility.
+     * @type {[boolean, Function]}
+     */
     const [showAddReservation, setShowAddReservation] = useState(false);
+
+    /**
+     * showEditModal controls EditReservationModal visibility.
+     * @type {[boolean, Function]}
+     */
     const [showEditModal, setShowEditModal] = useState(false);
+
+    /**
+     * showConfirm controls ConfirmModal visibility.
+     * @type {[boolean, Function]}
+     */
     const [showConfirm, setShowConfirm] = useState(false);
+
+    /**
+     * selectedOffice is the currently selected office or null.
+     * @type {[{ id: number, name: string }|null, Function]}
+     */
     const [selectedOffice, setSelectedOffice] = useState(null);
+
+    /**
+     * selectedProperty is the currently selected property or null.
+     * @type {[{ id: number, name: string, officeId: number }|null, Function]}
+     */
     const [selectedProperty, setSelectedProperty] = useState(null);
+
+    /**
+     * selectedReservation is the currently selected reservation or null.
+     * @type {[Object|null, Function]}
+     */
     const [selectedReservation, setSelectedReservation] = useState(null);
+
+    /**
+     * modalOffice is the office passed to AddReservation modal.
+     * @type {[{ id: number, name: string }|null, Function]}
+     */
     const [modalOffice, setModalOffice] = useState(null);
+
+    /**
+     * modalProperty is the property passed to AddReservation modal.
+     * @type {[{ id: number, name: string, officeId: number }|null, Function]}
+     */
     const [modalProperty, setModalProperty] = useState(null);
+
+    /**
+     * isEditable controls if reservation is editable.
+     * @type {[boolean, Function]}
+     */
     const [isEditable, setIsEditable] = useState(false);
 
+    /**
+     * propertyOptions is a filtered array of properties for the selected office.
+     * @type {Array<{ id: number, name: string, officeId: number }>}
+     */
     const propertyOptions = useMemo(() =>
         properties.filter(
             p => selectedOffice && p.officeId === selectedOffice.id
@@ -41,11 +119,18 @@ const Reservation = () => {
         [properties, selectedOffice]
     );
 
+    /**
+     * officePropertyIds is an array of property ids for the selected office.
+     * @type {Array<number>}
+     */
     const officePropertyIds = selectedOffice
         ? properties.filter(p => p.officeId === selectedOffice.id).map(p => p.id)
         : [];
 
-    // Map nested objects to flat fields for DataGrid
+    /**
+     * mappedReservations flattens nested reservation fields for DataGrid.
+     * @type {Array<Object>}
+     */
     const mappedReservations = allReservations.map(r => ({
         ...r,
         customerName: r.customer?.name || "",
@@ -58,6 +143,10 @@ const Reservation = () => {
         id: r.id 
     }));
 
+    /**
+     * reservations is a filtered array of reservations based on selection.
+     * @type {Array<Object>}
+     */
     const reservations = mappedReservations.filter(r => {
         if (selectedProperty) {
             return r.propertyId === selectedProperty.id;
@@ -67,6 +156,11 @@ const Reservation = () => {
         return true;
     });
 
+    /**
+     * Handles row click in DataGrid.
+     * @param {Object} params - DataGrid row params.
+     * @returns {void}
+     */
     const handleRowClick = (params) => {
         setSelectedReservation(params.row);
         dispatch(fetchReservedDates(params.row.propertyId));
@@ -74,9 +168,18 @@ const Reservation = () => {
         setShowEditModal(true);
     };
 
+    /**
+     * Checks if a date should be disabled in the calendar.
+     * @param {import("dayjs").Dayjs} date
+     * @returns {boolean}
+     */
     const disableDates = (date) =>
         reservedDates.some((d) => dayjs(d).isSame(date, "day"));
 
+    /**
+     * Columns configuration for DataGrid.
+     * @type {Array<Object>}
+     */
     const reservationColumns = [
         { field: "id", headerName: "Varaus #", width: 75 },
         { field: "customerName", headerName: "Asiakas", flex: 1 },
@@ -253,10 +356,10 @@ const Reservation = () => {
                 <Snackbar
                     anchorOrigin={{ horizontal: "right", vertical: "top" }}
                     open={Boolean(errorMessage)}
-                    autoHideDuration={6000}>
+                    autoHideDuration={3000}>
                     <Alert
-                        color="warning"
-                        severity="warning"
+                        color="error"
+                        severity="error"
                         variant="filled"
                         sx={{ border: "1px solid #000", width: "100%" }}>
                         {errorMessage}
@@ -268,7 +371,7 @@ const Reservation = () => {
                 <Snackbar
                     anchorOrigin={{ horizontal: "right", vertical: "top" }}
                     open={Boolean(successMessage)}
-                    autoHideDuration={6000}>
+                    autoHideDuration={3000}>
                     <Alert
                         color="success"
                         severity="success"

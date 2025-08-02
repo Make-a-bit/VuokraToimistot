@@ -3,10 +3,14 @@
     SHOW_LOADING, HIDE_LOADING, RESET_APP_STATE
 } from "../actions/actiontypes";
 
-const mainURI = "https://localhost:7017";
+import mainURI from "../../constants/apiEndpoint";
 
+/**
+ * Dispatches login actions and handles authentication.
+ * @param {{ username: string, [key: string]: any }} user - The user credentials object. Assumed to have at least a username property based on usage.
+ * @returns {function(function): Promise<void>} A thunk function for Redux dispatch.
+ */
 export const loginUser = (user) => {
-//    console.log(user)
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
         try {
@@ -31,6 +35,10 @@ export const loginUser = (user) => {
     }
 }
 
+/**
+ * Dispatches logout and app state reset actions.
+ * @returns {function(function): void} A thunk function for Redux dispatch.
+ */
 export const logoutUser = () => {
     return (dispatch) => {
         dispatch({ type: LOGOUT });

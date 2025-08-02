@@ -1,4 +1,13 @@
-﻿const customerSchema = [
+﻿/**
+ * customerSchema is an array of objects, each representing a field in the customer data model.
+ * Each object contains:
+ *   - field: string (the property name)
+ *   - header: string (the display name)
+ *   - type: string (the data type, e.g., "string")
+ * 
+ * @type {Array<{field: string, header: string, type: string}>}
+ */
+const customerSchema = [
     { field: "name", header: "Nimi", type: "string" },
     { field: "address", header: "Katuosoite", type: "string" },
     { field: "postalCode", header: "Postinumero", type: "string" },

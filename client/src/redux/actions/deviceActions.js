@@ -5,8 +5,17 @@
     SELECTED_DEVICE_OFFICE_SET
 } from "./actiontypes";
 
-const mainURI = "https://localhost:7017";
+import mainURI from "../../constants/apiEndpoint";
 
+/**
+ * Adds a new device via API and dispatches Redux actions.
+ * apiEndPoint is expected to be a string URL.
+ * device is expected to be an object representing the device.
+ * Returns a thunk function for Redux.
+ * @param {string} apiEndPoint
+ * @param {Object} device
+ * @returns {function(Function): Promise<void>}
+ */
 export const addDevice = (apiEndPoint, device) => {
     console.log("Device", device)
     return async (dispatch) => {
@@ -37,6 +46,13 @@ export const addDevice = (apiEndPoint, device) => {
     }
 }
 
+/**
+ * Deletes a device via API and dispatches Redux actions.
+ * device is expected to be an object with at least an 'id' property.
+ * Returns a thunk function for Redux.
+ * @param {{id: number, [key: string]: any}} device
+ * @returns {function(Function): Promise<void>}
+ */
 export const deleteDevice = (device) => {
     console.log("Device to del:", device)
     return async (dispatch) => {
@@ -61,6 +77,13 @@ export const deleteDevice = (device) => {
     }
 }
 
+/**
+ * Edits a device via API and dispatches Redux actions.
+ * device is expected to be an object representing the device.
+ * Returns a thunk function for Redux.
+ * @param {Object} device
+ * @returns {function(Function): Promise<void>}
+ */
 export const editDevice = (device) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
@@ -89,6 +112,13 @@ export const editDevice = (device) => {
     }
 }
 
+/**
+ * Fetches devices for a given office or all devices if officeId is null or <= 0.
+ * officeId is expected to be a number or null.
+ * Returns a thunk function for Redux.
+ * @param {?number} officeId
+ * @returns {function(Function): Promise<void>}
+ */
 export const fetchDevices = (officeId) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
@@ -116,6 +146,13 @@ export const fetchDevices = (officeId) => {
     }
 }
 
+/**
+ * Sets the selected office for a device.
+ * office is expected to be an object (could be null or undefined if not set).
+ * Returns a thunk function for Redux.
+ * @param {Object} office
+ * @returns {function(Function): Promise<void>}
+ */
 export const setDeviceOffice = (office) => {
     return async (dispatch) => {
         dispatch({ type: SELECTED_DEVICE_OFFICE_SET, payload: office })

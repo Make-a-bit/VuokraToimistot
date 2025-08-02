@@ -1,8 +1,7 @@
 ﻿import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-    Alert, Autocomplete, Box, Button, FormControl, InputLabel, MenuItem, Select,
-    Snackbar, TextField
+    Alert, Autocomplete, Box, Button, FormControl, Snackbar, TextField
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import AddEntry from "../components/AddEntryModal";
@@ -13,56 +12,124 @@ import dataGridColumns from "../utils/datagridcolumns";
 import dataGridSx from "../utils/dataGridSx";
 import deviceSchema from "../schema/device";
 import useAutoClearMessages from "../hooks/autoClearMessages";
+import mainURI from "../constants/apiEndpoint";
 
-const mainURI = "https://localhost:7017";
-
+/**
+ * Devices component for managing device entries.
+ * 
+ * @returns {JSX.Element}
+ */
 const Devices = () => {
+    /**
+     * @type {function}
+     * Redux dispatch function.
+     */
     const dispatch = useDispatch();
+
+    /**
+     * @type {boolean}
+     * Loading state from Redux UI slice.
+     */
     const loading = useSelector(state => state.ui.loadingState);
+
+    /**
+     * @type {Array<Object>}
+     * List of office objects from Redux.
+     */
     const offices = useSelector(state => state.offices.offices);
+
+    /**
+     * @type {Array<Object>}
+     * List of device objects from Redux.
+     */
     const devices = useSelector(state => state.devices.devices);
+
+    /**
+     * @type {Object|null}
+     * Currently selected office object or null.
+     */
     const selectedOffice = useSelector(state => state.devices.selectedDeviceOffice);
+
+    /**
+     * @type {{ errorMessage: string, successMessage: string }}
+     * Error and success messages from Redux UI slice.
+     */
     const { errorMessage, successMessage } = useSelector(state => state.ui);
 
-    const [showAddDevice, setShowAddDevice] = useState(false)
-    const [showConfirm, setShowConfirm] = useState(false)
-    const [showEditDevice, setShowEditDevice] = useState(false)
-    const [selectedDevice, setSelectedDevice] = useState({})
+    /**
+     * @type {[boolean, function]}
+     * State for showing the Add Device modal.
+     */
+    const [showAddDevice, setShowAddDevice] = useState(false);
 
+    /**
+     * @type {[boolean, function]}
+     * State for showing the Confirm modal.
+     */
+    const [showConfirm, setShowConfirm] = useState(false);
+
+    /**
+     * @type {[boolean, function]}
+     * State for showing the Edit Device modal.
+     */
+    const [showEditDevice, setShowEditDevice] = useState(false);
+
+    /**
+     * @type {[Object, function]}
+     * State for the currently selected device object.
+     */
+    const [selectedDevice, setSelectedDevice] = useState({});
+
+    // Custom hook to auto-clear messages.
     useAutoClearMessages(errorMessage, successMessage);
 
-    const handleOfficeChange = (e) => {
-        const office = offices.find(o => o.id === e.target.value);
-        dispatch(setDeviceOffice(office));
-    };
-
+    /**
+     * @type {Array<Object>}
+     * Devices filtered by selected office.
+     */
     const filteredDevices = selectedOffice
         ? devices.filter(d => d.officeId === selectedOffice.id)
         : devices;
 
+    /**
+     * Opens the confirm modal for deleting a device.
+     * @param {Object} device
+     */
     const btnDeleteDevice = (device) => {
         setSelectedDevice(device)
         setShowConfirm(true)
     }
 
+    /**
+     * Handles row click in the DataGrid.
+     * @param {Object} params
+     */
     const handleRowClick = (params) => {
         setSelectedDevice(params.row);
         setShowEditDevice(true);
     };
 
+    /**
+     * Closes the Add Device modal and refreshes devices.
+     */
     const handleCloseAddDevice = () => {
         setShowAddDevice(false);
         dispatch(fetchDevices());
     };
 
+    /**
+     * Closes the Edit Device modal and refreshes devices.
+     */
     const handleCloseEditDevice = () => {
         setShowEditDevice(false);
         dispatch(fetchDevices());
     };
 
+    /**
+     * @type {Array<Object>}
+     * Memoized columns for the DataGrid.
+     */
     const columns = React.useMemo(() => dataGridColumns(deviceSchema, btnDeleteDevice), []);
-
-    //console.log("DEVICES:", devices)
 
     return (
         <>
@@ -147,7 +214,7 @@ const Devices = () => {
                 <Snackbar
                     anchorOrigin={{ horizontal: "right", vertical: "top" }}
                     open={Boolean(errorMessage)}
-                    autoHideDuration={6000}>
+                    autoHideDuration={3000}>
                     <Alert
                         color="error"
                         severity="error"
@@ -162,7 +229,7 @@ const Devices = () => {
                 <Snackbar
                     anchorOrigin={{ horizontal: "right", vertical: "top" }}
                     open={Boolean(successMessage)}
-                    autoHideDuration={6000}>
+                    autoHideDuration={3000}>
                     <Alert
                         color="success"
                         severity="success"

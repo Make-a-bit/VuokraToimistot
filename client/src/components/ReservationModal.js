@@ -1,14 +1,12 @@
 ﻿import React, { useState, useMemo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-    addReservation, fetchReservations, fetchReservedDates,
-    setOffice, setProperty
+    addReservation, fetchReservations, fetchReservedDates
 } from "../redux/actions/reservationActions";
 import { createInvoice } from "../redux/actions/invoiceActions";
 import {
     Autocomplete, Box, Button, Dialog, DialogTitle, DialogActions,
-    DialogContent, Divider, FormControl, InputLabel, MenuItem, Select,
-    TextField, Typography,
+    DialogContent, Divider, FormControl, TextField, Typography
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import ClearAllIcon from '@mui/icons-material/ClearAll';
@@ -21,35 +19,140 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { getReservationDateUtils } from "../utils/reservationDateUtils";
 import { getDuration, addItemRow, updateRowsQty, deleteRow, updateRow } from "../utils/reservationUtils";
-import { autoCompleteFieldMargins, leftButton, middleButton, rightButton } from "../utils/fieldMarginals"
+import { autoCompleteFieldMargins } from "../utils/fieldMarginals"
 
 import dayjs from "../../src/dayjs-setup";
 
+/**
+ * @typedef {Object} Customer
+ * @property {number|string} id
+ * @property {string} name
+ */
+
+/**
+ * @typedef {Object} Device
+ * @property {number|string} id
+ * @property {string} name
+ * @property {number} [price]
+ * @property {number} [vat]
+ */
+
+/**
+ * @typedef {Object} Office
+ * @property {number|string} id
+ * @property {string} name
+ */
+
+/**
+ * @typedef {Object} Property
+ * @property {number|string} id
+ * @property {string} name
+ * @property {number} [price]
+ * @property {number} [vat]
+ * @property {number|string} officeId
+ */
+
+/**
+ * @typedef {Object} Service
+ * @property {number|string} id
+ * @property {string} name
+ * @property {number} [price]
+ * @property {number} [vat]
+ */
+
+/**
+ * @typedef {Object} ItemRow
+ * @property {string} id
+ * @property {"device"|"service"|"property"} type
+ * @property {number|string} itemId
+ * @property {string} name
+ * @property {number} price
+ * @property {number} vat
+ * @property {number} qty
+ * @property {number} discount
+ */
+
+/**
+ * @typedef {Object} Reservation
+ * @property {Object} property
+ * @property {number|string} property.id
+ * @property {Object} customer
+ * @property {number|string} customer.id
+ * @property {string} startDate
+ * @property {string} endDate
+ * @property {string} description
+ * @property {Array<Object>} devices
+ * @property {Array<Object>} services
+ * @property {boolean} invoiced
+ */
+
+/**
+ * @typedef {Object} InvoiceReservation
+ * @property {number|string} id
+ * @property {Object} property
+ * @property {number|string} property.id
+ * @property {Object} customer
+ * @property {number|string} customer.id
+ * @property {string} startDate
+ * @property {string} endDate
+ * @property {Array<Object>} devices
+ * @property {Array<Object>} services
+ * @property {boolean} invoiced
+ * @property {string} dateInvoiced
+ * @property {string} dueDate
+ */
+
+/**
+ * AddReservation component for creating a new reservation.
+ * @param {{ show: boolean, onHide: function, office?: Office, property?: Property }} props
+ * @returns {JSX.Element}
+ */
 export const AddReservation = ({ show, onHide, office, property }) => {
     const dispatch = useDispatch();
+    /** @type {boolean} */
     const loading = useSelector(state => state.ui.loadingState);
+    /** @type {Customer[]} */
     const customers = useSelector(state => state.customers.customers);
+    /** @type {Device[]} */
     const devices = useSelector(state => state.devices.devices);
+    /** @type {Office[]} */
     const offices = useSelector(state => state.offices.offices);
+    /** @type {Property[]} */
     const properties = useSelector(state => state.properties.properties);
+    /** @type {Service[]} */
     const services = useSelector(state => state.services.services);
+    /** @type {Array} */
     const reservedDates = useSelector(state => state.reservations.reservedDates);
 
+    /** @type {[Customer|null, function]} */
     const [selectedCustomer, setSelectedCustomer] = useState(null);
+    /** @type {[Device|null, function]} */
     const [selectedDevice, setSelectedDevice] = useState(null);
+    /** @type {[Office|null, function]} */
     const [selectedOfficeLocal, setSelectedOfficeLocal] = useState(null);
+    /** @type {[Property|null, function]} */
     const [selectedPropertyLocal, setSelectedPropertyLocal] = useState(null);
+    /** @type {[Service|null, function]} */
     const [selectedService, setSelectedService] = useState(null);
+    /** @type {[import("dayjs").Dayjs|null, function]} */
     const [startDate, setStartDate] = useState(null);
+    /** @type {[import("dayjs").Dayjs|null, function]} */
     const [endDate, setEndDate] = useState(null);
+    /** @type {[ItemRow[], function]} */
     const [itemRows, setItemRows] = useState([]);
+    /** @type {[string, function]} */
     const [description, setDescription] = useState("");
 
+    /** @type {{startDate: import("dayjs").Dayjs|null, endDate: import("dayjs").Dayjs|null}} */
     const reservation = {
         startDate: startDate,
         endDate: endDate
     };
 
+    /**
+     * Memoized date utils for disabling dates.
+     * @type {{ shouldDisableStartDate: function, shouldDisableEndDate: function }}
+     */
     const {
         shouldDisableStartDate,
         shouldDisableEndDate,
@@ -139,6 +242,10 @@ export const AddReservation = ({ show, onHide, office, property }) => {
         // eslint-disable-next-line
     }, [selectedPropertyLocal, startDate, endDate, properties]);
 
+    /**
+     * Calculates the total sum of all item rows.
+     * @type {number}
+     */
     const totalSum = useMemo(() => {
         return itemRows.reduce((acc, row) => {
             const price = parseFloat(row.price) || 0;
@@ -154,17 +261,29 @@ export const AddReservation = ({ show, onHide, office, property }) => {
         }, 0);
     }, [itemRows]);
 
+    /**
+     * Device options for Autocomplete, filtered to exclude already selected devices.
+     * @type {Device[]}
+     */
     const deviceOptions = useMemo(() =>
         devices.filter(
             d => !itemRows.some(row => row.type === "device" && row.itemId === d.id)
         ), [devices, itemRows]);
 
+    /**
+     * Service options for Autocomplete, filtered to exclude already selected services.
+     * @type {Service[]}
+     */
     const serviceOptions = useMemo(() =>
         services.filter(
             s => !itemRows.some(row => row.type === "service" && row.itemId === s.id)
         ), [services, itemRows]
     );
 
+    /**
+     * Property options for Autocomplete, filtered by selected office.
+     * @type {Property[]}
+     */
     const propertyOptions = useMemo(() =>
         properties.filter(
             p => selectedOfficeLocal && p.officeId === selectedOfficeLocal.id
@@ -172,15 +291,30 @@ export const AddReservation = ({ show, onHide, office, property }) => {
         [properties, selectedOfficeLocal]
     );
 
+    /**
+     * Handles row edit in DataGrid.
+     * @param {ItemRow} newRow
+     * @returns {ItemRow}
+     */
     const handleRowEdit = (newRow) => {
         setItemRows(prev => updateRow(prev, newRow));
         return newRow;
     };
 
+    /**
+     * Handles row deletion in DataGrid.
+     * @param {string|number} id
+     * @returns {void}
+     */
     const handleRowDelete = (id) => {
         setItemRows(prev => deleteRow(prev, id));
     };
 
+    /**
+     * Handles reservation form submission.
+     * @param {React.FormEvent} [e]
+     * @returns {Promise<any>}
+     */
     const handleSubmit = async (e) => {
         if (e) e.preventDefault();
 
@@ -205,6 +339,7 @@ export const AddReservation = ({ show, onHide, office, property }) => {
                 discount: s.discount
             }));
 
+        /** @type {Reservation} */
         const reservation = {
             property: { id: selectedPropertyLocal.id },
             customer: { id: selectedCustomer.id },
@@ -230,6 +365,11 @@ export const AddReservation = ({ show, onHide, office, property }) => {
         return result;
     }
 
+    /**
+     * Handles reservation submission and invoicing.
+     * @param {React.FormEvent} e
+     * @returns {Promise<void>}
+     */
     const handleInvoicing = async (e) => {
         e.preventDefault();
 
@@ -259,6 +399,7 @@ export const AddReservation = ({ show, onHide, office, property }) => {
 
         const dateInvoiced = dayjs();
 
+        /** @type {InvoiceReservation} */
         const invoiceReservation = {
             id: result.id,
             property: { id: selectedPropertyLocal.id },
@@ -588,3 +729,6 @@ export const AddReservation = ({ show, onHide, office, property }) => {
         </Dialog>
     )
 }
+
+// Reasoning: Types are inferred from usage, Redux state, and prop usage. 
+// JSDoc typedefs are provided for all main entities and used for state and function annotations.

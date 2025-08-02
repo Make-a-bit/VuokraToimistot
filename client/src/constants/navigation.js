@@ -1,4 +1,18 @@
-﻿const navigationLinks = [
+﻿/**
+ * @typedef {Object} NavigationLink
+ * @property {string} [path] - The URL path for the navigation link.
+ * @property {string} label - The display label for the navigation link.
+ * @property {boolean} [dropdownParent] - Indicates if this link has a dropdown menu.
+ * @property {NavigationLink[]} [dropdown] - The dropdown links if this is a parent.
+ */
+
+/**
+ * navigationLinks is an array of navigation link objects.
+ * Each object can represent a simple link or a dropdown parent with nested links.
+ * 
+ * @type {NavigationLink[]}
+ */
+const navigationLinks = [
     { path: "/", label: "Etusivu" },
     { path: "/asiakkaat/", label: "Asiakkaat" },
     {
