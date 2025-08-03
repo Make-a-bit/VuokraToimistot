@@ -1,5 +1,5 @@
 CREATE DATABASE VuokraToimistot;
-Use VuokraToimistot;
+
 
 -- CREATE TABLES
 
@@ -159,10 +159,10 @@ BEGIN
         invoice_paid BIT DEFAULT 0 NOT NULL,
         CONSTRAINT Invoices_Customers_customer_id FOREIGN KEY (customer_id) REFERENCES Customers (customer_id)
         ON DELETE NO ACTION
-        ON UPDATE CASCADE,
+        ON UPDATE NO ACTION,
         CONSTRAINT Invoices_Reservations_reservation_id FOREIGN KEY (reservation_id) REFERENCES Reservations (reservation_id)
         ON DELETE NO ACTION
-        ON UPDATE CASCADE
+        ON UPDATE NO ACTION
     );
 END;
 
