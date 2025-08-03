@@ -148,7 +148,6 @@ const Services = () => {
      */
     const columns = React.useMemo(() => dataGridColumns(serviceSchema, btnDeleteService), []);
 
-    console.log(services)
     return (
         <>
             <Box sx={{ marginTop: "20px", width: "200px" }}>

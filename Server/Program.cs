@@ -1,6 +1,5 @@
 using API.Repositories;
 using API.Services;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using System.Threading.RateLimiting;
 
@@ -31,12 +30,17 @@ namespace API
 
             builder.Services.AddRateLimiter(options =>
             {
-                options.AddFixedWindowLimiter("fixed", config =>
-                {
-                    config.PermitLimit = 20; 
-                    config.Window = TimeSpan.FromMinutes(1); 
-                    config.QueueLimit = 0; 
-                });
+                options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+                    RateLimitPartition.GetFixedWindowLimiter(
+                        context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                        _ => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 20,
+                            Window = TimeSpan.FromMinutes(1),
+                            QueueLimit = 0
+                        }
+                    )
+                );
             });
 
             builder.Services.AddEndpointsApiExplorer();
@@ -97,7 +101,7 @@ namespace API
             // Configure the HTTP request pipeline.
             app.UseHttpsRedirection();
             app.UseCors(corsPolicyName);
-
+            app.UseRateLimiter();
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
