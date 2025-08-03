@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
     addReservation, fetchReservations, fetchReservedDates
 } from "../redux/actions/reservationActions";
-import { createInvoice } from "../redux/actions/invoiceActions";
+import { createInvoice, fetchInvoices } from "../redux/actions/invoiceActions";
 import {
     Autocomplete, Box, Button, Dialog, DialogTitle, DialogActions,
     DialogContent, Divider, FormControl, TextField, Typography
@@ -20,6 +20,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { getReservationDateUtils } from "../utils/reservationDateUtils";
 import { getDuration, addItemRow, updateRowsQty, deleteRow, updateRow } from "../utils/reservationUtils";
 import { autoCompleteFieldMargins } from "../utils/fieldMarginals"
+import ConfirmModal from "../components/ConfirmModal";
 
 import dayjs from "../../src/dayjs-setup";
 
@@ -142,6 +143,10 @@ export const AddReservation = ({ show, onHide, office, property }) => {
     const [itemRows, setItemRows] = useState([]);
     /** @type {[string, function]} */
     const [description, setDescription] = useState("");
+    /** @type {[Object|null, function]} */
+    const [showConfirm, setShowConfirm] = useState(false);
+    /** @type {[Object|null, function]} */
+    const [showConfirmInvoicing, setShowConfirmInvoicing] = useState(false);
 
     /** @type {{startDate: import("dayjs").Dayjs|null, endDate: import("dayjs").Dayjs|null}} */
     const reservation = {
@@ -316,15 +321,8 @@ export const AddReservation = ({ show, onHide, office, property }) => {
         setItemRows(prev => deleteRow(prev, id));
     };
 
-    /**
-     * Handles reservation form submission.
-     * @param {React.FormEvent} [e]
-     * @returns {Promise<any>}
-     */
-    const handleSubmit = async (e) => {
-        if (e) e.preventDefault();
-
-        // Separate devices and services
+    // Helper to create reservation and return the result
+    const createReservation = async () => {
         const devices = itemRows
             .filter(row => row.type === "device")
             .map(d => ({
@@ -357,19 +355,28 @@ export const AddReservation = ({ show, onHide, office, property }) => {
             invoiced: false
         };
 
-        const result = await dispatch(addReservation(reservation))
-        setSelectedOfficeLocal(null)
-        setSelectedPropertyLocal(null)
+        const result = await dispatch(addReservation(reservation));
+        await dispatch(fetchReservations());
+        return result;
+    };
+
+    /**
+     * Handles reservation form submission.
+     * @param {React.FormEvent} [e]
+     * @returns {Promise<any>}
+     */
+    const handleSubmit = async (e) => {
+        if (e) e.preventDefault();
+        await createReservation();
+        setSelectedOfficeLocal(null);
+        setSelectedPropertyLocal(null);
         setSelectedCustomer(null);
         setStartDate(null);
         setEndDate(null);
         setDescription("");
         setItemRows([]);
-        dispatch(fetchReservations());
         onHide();
-
-        return result;
-    }
+    };
 
     /**
      * Handles reservation submission and invoicing.
@@ -377,11 +384,9 @@ export const AddReservation = ({ show, onHide, office, property }) => {
      * @returns {Promise<void>}
      */
     const handleInvoicing = async (e) => {
-        e.preventDefault();
+        if (e && e.preventDefault) e.preventDefault();
 
-        const result = await handleSubmit();
-
-        console.log("Reservation:", result)
+        const result = await createReservation();
 
         const services = itemRows
             .filter(row => row.type === "service" || row.type === "property")
@@ -408,8 +413,8 @@ export const AddReservation = ({ show, onHide, office, property }) => {
         /** @type {InvoiceReservation} */
         const invoiceReservation = {
             id: result.id,
-            property: { id: selectedPropertyLocal.id },
-            customer: { id: selectedCustomer.id },
+            property: { id: selectedPropertyLocal.id, name: selectedPropertyLocal.name },
+            customer: { id: selectedCustomer.id, name: selectedCustomer.name },
             startDate: startDate.format("YYYY-MM-DD"),
             endDate: endDate.format("YYYY-MM-DD"),
             devices,
@@ -419,19 +424,20 @@ export const AddReservation = ({ show, onHide, office, property }) => {
             dueDate: dateInvoiced.add(14, "day").format("YYYY-MM-DD")
         };
 
-        dispatch(createInvoice(invoiceReservation))
-        setSelectedOfficeLocal(null)
-        setSelectedPropertyLocal(null)
+        await dispatch(createInvoice(invoiceReservation));
+        await dispatch(fetchInvoices());
+        setSelectedOfficeLocal(null);
+        setSelectedPropertyLocal(null);
         setSelectedCustomer(null);
         setStartDate(null);
         setEndDate(null);
         setDescription("");
         setItemRows([]);
-        dispatch(fetchReservations());
         onHide();
-    }
+    };
 
     return (
+        <>
         <Dialog
             open={show}
             onClose={onHide}
@@ -529,7 +535,6 @@ export const AddReservation = ({ show, onHide, office, property }) => {
                             slotProps={{
                                 textField: {
                                     sx: { ...autoCompleteFieldMargins, marginRight: "10px" },
-                                    fullWidth: true,
                                     label: "Varauksen alku",
                                     variant: "outlined",
                                     disabled: !selectedCustomer || !selectedOfficeLocal || !selectedPropertyLocal
@@ -554,7 +559,6 @@ export const AddReservation = ({ show, onHide, office, property }) => {
                             slotProps={{
                                 textField: {
                                     sx: { ...autoCompleteFieldMargins },
-                                    fullWidth: true,
                                     label: "Varauksen loppu",
                                     variant: "outlined",
                                     disabled: !startDate
@@ -700,8 +704,8 @@ export const AddReservation = ({ show, onHide, office, property }) => {
                         startIcon={<SaveIcon />}
                         color="success"
                         loading={loading}
-                        variant="contained"
-                        onClick={handleSubmit}
+                            variant="contained"
+                            onClick={() => setShowConfirm(true)}
                         disabled={loading || !endDate}
                         sx={{ marginBottom: "10px" }}
                         >
@@ -712,8 +716,8 @@ export const AddReservation = ({ show, onHide, office, property }) => {
                         startIcon={<ReceiptLongIcon />}
                         color="success"
                         loading={loading}
-                        variant="contained"
-                        onClick={handleInvoicing}
+                            variant="contained"
+                            onClick={() => setShowConfirmInvoicing(true)}
                         disabled={loading || !endDate}
                         sx={{  }}
                     >
@@ -754,7 +758,29 @@ export const AddReservation = ({ show, onHide, office, property }) => {
                     </Button>
                 </Box>
             </DialogActions>
-        </Dialog>
+            </Dialog>
+
+            <ConfirmModal
+                onConfirm={handleSubmit}
+                onHide={() => setShowConfirm(false)}
+                show={showConfirm}
+                cancelText="Peruuta"
+                confirmText="Tallenna"
+                message="Tallennetaanko uusi varaus?"
+                title="Vahvista tallennus"
+            />
+
+            <ConfirmModal
+                onConfirm={handleInvoicing}
+                onHide={() => setShowConfirmInvoicing(false)}
+                show={showConfirmInvoicing}
+                cancelText="Peruuta"
+                confirmText="Tallenna ja Laskuta"
+                message="Tallennetaanko ja laskutetaanko uusi varaus?"
+                title="Vahvista tallennus ja laskutus"
+            />
+
+        </>
     )
 }
 

@@ -912,7 +912,7 @@ export const EditReservationModal = ({ show, onHide, reservation }) => {
                 show={showConfirm}
                 cancelText="Peruuta"
                 confirmText="Tallenna"
-                message="Haluatko varmasti tallentaa muutokset varaukseen?"
+                message="Tallennetaanko muutokset varaukseen?"
                 title="Vahvista tallennus"
             />
 

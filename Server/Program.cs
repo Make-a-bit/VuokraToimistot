@@ -1,14 +1,14 @@
 using API.Repositories;
 using API.Services;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
-using System.Threading.Tasks;
+using System.Threading.RateLimiting;
 
 namespace API
 {
     public class Program
     {
-        public static async Task Main(string[] args)
+        public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -16,21 +16,26 @@ namespace API
             builder.Services.AddControllers();
 
             var corsPolicyName = "AllowFrontend";
+            var allowedCors = (Environment.GetEnvironmentVariable("VUOKRATOIMISTOT_CORS") ?? "")
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries); 
 
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy(name: corsPolicyName, policy =>
+                options.AddPolicy(corsPolicyName, policy =>
                 {
-                    policy.WithOrigins(
-                        "http://localhost:3000",     
-                        "http://localhost:3001",     
-                        "https://localhost:3000",    
-                        "https://localhost:3001",    
-                        "https://localhost:7017",    
-                        "http://localhost:5140"      
-                    )
-                    .AllowAnyHeader()
-                    .AllowAnyMethod();
+                    policy.WithOrigins(allowedCors)
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
+
+            builder.Services.AddRateLimiter(options =>
+            {
+                options.AddFixedWindowLimiter("fixed", config =>
+                {
+                    config.PermitLimit = 20; 
+                    config.Window = TimeSpan.FromMinutes(1); 
+                    config.QueueLimit = 0; 
                 });
             });
 

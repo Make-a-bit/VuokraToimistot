@@ -65,10 +65,10 @@ BEGIN
         property_area DECIMAL(10, 2) NOT NULL,
         property_price DECIMAL(10, 2) NOT NULL,
         property_vat INT NOT NULL,
-        FOREIGN KEY (office_id) REFERENCES Offices (office_id)
+        CONSTRAINT FK_Office_properties_Offices_Office_id FOREIGN KEY (office_id) REFERENCES Offices (office_id)
         ON DELETE NO ACTION
         ON UPDATE CASCADE,
-        FOREIGN KEY (property_vat) REFERENCES VAT (vat_id)
+        CONSTRAINT FK_Office_properties_VAT_vat_id FOREIGN KEY (property_vat) REFERENCES VAT (vat_id)
         ON DELETE NO ACTION
         ON UPDATE CASCADE
     );
@@ -87,10 +87,10 @@ BEGIN
         service_unit VARCHAR(255) NOT NULL,
         service_price DECIMAL(10, 2) NOT NULL,
         service_vat INT NOT NULL,
-        FOREIGN KEY (office_id) REFERENCES Offices (office_id)
+        CONSTRAINT FK_Office_services_Offices_office_id FOREIGN KEY (office_id) REFERENCES Offices (office_id)
         ON DELETE NO ACTION
         ON UPDATE CASCADE,
-        FOREIGN KEY (service_vat) REFERENCES VAT (vat_id)
+        CONSTRAINT FK_Office_services_VAT_vat_id FOREIGN KEY (service_vat) REFERENCES VAT (vat_id)
         ON DELETE NO ACTION
         ON UPDATE CASCADE
     );
@@ -108,10 +108,10 @@ BEGIN
         device_name VARCHAR(255) NOT NULL,
         device_price DECIMAL(10, 2) NOT NULL,
         device_vat INT NOT NULL,
-        FOREIGN KEY (office_id) REFERENCES Offices (office_id)
+        CONSTRAINT Office_devices_Offices_office_id FOREIGN KEY (office_id) REFERENCES Offices (office_id)
         ON DELETE NO ACTION
         ON UPDATE CASCADE,
-        FOREIGN KEY (device_vat) REFERENCES VAT (vat_id)
+        CONSTRAINT Office_devices_VAT_vat_id FOREIGN KEY (device_vat) REFERENCES VAT (vat_id)
         ON DELETE NO ACTION
         ON UPDATE CASCADE
     );
@@ -131,10 +131,10 @@ BEGIN
         reservation_end DATE NOT NULL,
         reservation_description VARCHAR(255),
         invoiced BIT DEFAULT(0),
-        FOREIGN KEY (property_id) REFERENCES Office_properties (property_id)
+        CONSTRAINT Reservations_Office_properties_property_id FOREIGN KEY (property_id) REFERENCES Office_properties (property_id)
         ON DELETE NO ACTION
         ON UPDATE CASCADE,
-        FOREIGN KEY (customer_id) REFERENCES Customers (customer_id)
+        CONSTRAINT Reservations_Customers_customer_id FOREIGN KEY (customer_id) REFERENCES Customers (customer_id)
         ON DELETE NO ACTION
         ON UPDATE CASCADE
     );
@@ -157,10 +157,10 @@ BEGIN
         invoice_vattotal DECIMAL(10, 2) NOT NULL,
         invoice_totalsum DECIMAL(10, 2) NOT NULL,
         invoice_paid BIT DEFAULT 0 NOT NULL,
-        FOREIGN KEY (customer_id) REFERENCES Customers (customer_id)
+        CONSTRAINT Invoices_Customers_customer_id FOREIGN KEY (customer_id) REFERENCES Customers (customer_id)
         ON DELETE NO ACTION
         ON UPDATE CASCADE,
-        FOREIGN KEY (reservation_id) REFERENCES Reservations (reservation_id)
+        CONSTRAINT Invoices_Reservations_reservation_id FOREIGN KEY (reservation_id) REFERENCES Reservations (reservation_id)
         ON DELETE NO ACTION
         ON UPDATE CASCADE
     );
@@ -180,10 +180,10 @@ BEGIN
         device_vat DECIMAL(4, 2) NOT NULL,
         device_qty INT NOT NULL,
         device_discount DECIMAL(10, 2) NOT NULL,
-        FOREIGN KEY (reservation_id) REFERENCES Reservations (reservation_id)
+        CONSTRAINT Reservation_devices_Reservations_reservation_id FOREIGN KEY (reservation_id) REFERENCES Reservations (reservation_id)
         ON DELETE NO ACTION
         ON UPDATE NO ACTION,
-        FOREIGN KEY (device_id) REFERENCES Office_devices (device_id)
+        CONSTRAINT Reservation_devices_Office_devices_device_id FOREIGN KEY (device_id) REFERENCES Office_devices (device_id)
         ON DELETE NO ACTION
         ON UPDATE NO ACTION
     );
@@ -203,10 +203,10 @@ BEGIN
         service_vat DECIMAL(4, 2) NOT NULL,
         service_qty INT NOT NULL,
         service_discount DECIMAL(10, 2) NOT NULL,
-        FOREIGN KEY (reservation_id) REFERENCES Reservations (reservation_id)
+        CONSTRAINT Reservation_services_Reservations_reservation_id FOREIGN KEY (reservation_id) REFERENCES Reservations (reservation_id)
         ON DELETE NO ACTION
         ON UPDATE NO ACTION,
-        FOREIGN KEY (service_id) REFERENCES Office_services (service_id)
+        CONSTRAINT Reservation_services_Office_services_service_id FOREIGN KEY (service_id) REFERENCES Office_services (service_id)
         ON DELETE NO ACTION
         ON UPDATE NO ACTION
     );
@@ -225,30 +225,17 @@ BEGIN
 END;
 
 
--- MOCK DATA:
-
-INSERT INTO Customers (customer_name, customer_email, customer_phone, customer_address, customer_postalcode, customer_city, customer_country) 
-VALUES 
-('Janne T.', 'janne@test.com', '0401122334', 'Katu 3', '15100', 'Lahti', 'FIN'),
-('Testaaja 1', 'testi@test.com', '0401234567', 'Testikatu 10', '02340', 'Lahti', 'FIN')
-;
-
-INSERT INTO Offices (office_name, office_address, office_city, office_postalcode, office_phone, office_email, office_country)
-VALUES
-('Toimistohotelli Lahti', 'Lahdenkatu 10', 'Lahti', '15100', '0409876543', 'thlahti@test.fi', 'Suomi'),
-('Lahden varastot', 'Varastotie 3', 'Lahti', '15300', '0401002003', 'varasto@test.fi', 'Suomi')
-;
-
-INSERT INTO Office_devices (office_id, device_name, device_price)
-VALUES 
-(1, 'Kannettava tietokone', 20),
-(1, 'Tulostin', 20),
-(1, 'Näyttö 42"', 15.25)
-;
-
-INSERT INTO Office_services (office_id, service_name, service_unit, service_price)
-VALUES 
-(1, 'Loppusiivous', 'Tunti', 35.25),
-(1, 'Nopeampi netti (1gb/1gb)', 'pv', 10),
-(1, 'Aamupala', 'kpl', 15)
-;
+CREATE INDEX IX_Office_Devices_officeId ON Office_devices(office_id);
+CREATE INDEX IX_Office_Devices_deviceVat ON Office_devices(device_vat);
+CREATE INDEX IX_Office_Properties_officeId ON Office_properties(office_id);
+CREATE INDEX IX_Office_Properties_propertyVat ON Office_properties(property_vat);
+CREATE INDEX IX_Office_Services_officeId ON Office_services(office_id);
+CREATE INDEX IX_Office_Services_serviceVat ON Office_services(service_vat);
+CREATE INDEX IX_Reservation_devices_reservationId ON Reservation_devices(reservation_id);
+CREATE INDEX IX_Reservation_devices_deviceId ON Reservation_devices(device_id);
+CREATE INDEX IX_Reservation_services_reservationId ON Reservation_services(reservation_id);
+CREATE INDEX IX_Reservation_services_serviceId ON Reservation_services(service_id);
+CREATE INDEX IX_Reservations_propertyId ON Reservations(property_id);
+CREATE INDEX IX_Reservations_customerId ON Reservations(customer_id);
+CREATE INDEX IX_Reservations_startDate ON Reservations(reservation_start);
+CREATE INDEX IX_Reservations_endDate ON Reservations(reservation_end);
