@@ -27,8 +27,8 @@ export const loginUser = (user) => {
             } else {
                 const errorText = await response.text();
                 console.error('Server error:', errorText);
-                throw new Error(errorText);
                 dispatch({ type: LOGIN_FAILED });
+                throw new Error(errorText);
             }
         } catch (err) {
             console.error('Login failed:', err.message);
