@@ -161,6 +161,7 @@ const Login = () => {
                         <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
                             <TextField
                                 required
+                                disabled={loading}
                                 label="Käyttäjänimi"
                                 id="outlined-required"
                                 value={username}
@@ -172,6 +173,7 @@ const Login = () => {
                             <InputLabel htmlFor="outlined-adornment-password">Salasana*</InputLabel>
                             <OutlinedInput
                                 id="outlined-adornment-password"
+                                disabled={loading}
                                 type={showPassword ? 'text' : 'password'}
                                 endAdornment={
                                     <InputAdornment position="end">
