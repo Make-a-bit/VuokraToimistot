@@ -12,8 +12,6 @@ Thumbs.db
 # Node.js / React
 #####################
 client/node_modules/
-<<<<<<< HEAD
-build/
 dist/
 =======
 client/dist/
