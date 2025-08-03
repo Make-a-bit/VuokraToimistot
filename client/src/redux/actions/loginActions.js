@@ -13,11 +13,17 @@ import mainURI from "../../constants/apiEndpoint";
 export const loginUser = (user) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
+        console.log(user)
         try {
+            const credentials = {
+                UserName: user.username, // or user.UserName if already correct
+                Password: user.password  // or user.Password if already correct
+            };
+
             const response = await fetch(`${mainURI}/auth`, {
                 method: "POST",
                 headers: { "Content-type": "application/json" },
-                body: JSON.stringify(user),
+                body: JSON.stringify(credentials),
             });
 
             if (response.ok) {
