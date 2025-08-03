@@ -103,12 +103,6 @@ const Reservation = () => {
     const [modalProperty, setModalProperty] = useState(null);
 
     /**
-     * isEditable controls if reservation is editable.
-     * @type {[boolean, Function]}
-     */
-    const [isEditable, setIsEditable] = useState(false);
-
-    /**
      * propertyOptions is a filtered array of properties for the selected office.
      * @type {Array<{ id: number, name: string, officeId: number }>}
      */
@@ -164,7 +158,6 @@ const Reservation = () => {
     const handleRowClick = (params) => {
         setSelectedReservation(params.row);
         dispatch(fetchReservedDates(params.row.propertyId));
-        setIsEditable(!params.row.invoiced);
         setShowEditModal(true);
     };
 

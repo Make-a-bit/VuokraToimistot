@@ -29,15 +29,6 @@ const Login = () => {
     const navigate = useNavigate();
 
     /**
-     * Login error message from Redux state.
-     * @type {string|null}
-     */
-    const loginError = useSelector(
-        /** @param {object} state */
-        state => state.login.loginError
-    );
-
-    /**
      * Logged in user object from Redux state.
      * @type {object|null}
      */

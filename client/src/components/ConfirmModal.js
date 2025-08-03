@@ -1,7 +1,7 @@
-﻿import React from 'react';
+import React from 'react';
 
 import {
-    Box, Button, Dialog, DialogTitle, DialogContent, DialogActions
+    Button, Dialog, DialogTitle, DialogContent, DialogActions
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from '@mui/icons-material/Delete';

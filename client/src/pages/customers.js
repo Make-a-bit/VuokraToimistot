@@ -1,6 +1,6 @@
 ﻿import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Alert, Button, Snackbar, Typography } from "@mui/material";
+import { Alert, Button, Snackbar } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { addCustomer, editCustomer, deleteCustomer } from "../redux/actions/customerActions";
 import AddEntry from "../components/AddEntryModal";

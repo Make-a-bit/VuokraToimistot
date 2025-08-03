@@ -91,15 +91,6 @@ const Properties = () => {
     }, [selectedOffice, offices, dispatch]);
 
     /**
-     * Handles office selection change.
-     * @param {React.ChangeEvent<HTMLInputElement>} e
-     */
-    const handleOfficeChange = (e) => {
-        const office = offices.find(o => o.id === e.target.value);
-        dispatch(setPropertyOffice(office));
-    };
-
-    /**
      * Filtered properties based on selected office.
      * @type {Array<Object>}
      */

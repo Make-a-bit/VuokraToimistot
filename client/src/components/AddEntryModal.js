@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import CloseIcon from "@mui/icons-material/Close";
 import {
@@ -66,7 +66,7 @@ const AddEntry = ({ schema, show, onHide, apiEndPoint, title, action, extraData 
             setErrorState(false);
             setErrorMessage("");
         }
-    }, [show]);
+    }, [show, initialFormData]);
 
     /**
      * Handles input changes in the form.

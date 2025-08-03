@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @typedef {Object} NavigationLink
  * @property {string} [path] - The URL path for the navigation link.
  * @property {string} label - The display label for the navigation link.

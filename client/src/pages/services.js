@@ -87,16 +87,6 @@ const Services = () => {
     useAutoClearMessages(errorMessage, successMessage);
 
     /**
-     * Handles office selection change.
-     * @param {React.ChangeEvent<HTMLInputElement>} e
-     * @returns {void}
-     */
-    const handleOfficeChange = (e) => {
-        const office = offices.find(o => o.id === e.target.value);
-        dispatch(setOffice(office))
-    };
-
-    /**
      * Handles closing the Add Service modal and refreshes services.
      * @returns {void}
      */

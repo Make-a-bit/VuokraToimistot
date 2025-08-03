@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
     addReservation, fetchReservations, fetchReservedDates
@@ -147,12 +147,6 @@ export const AddReservation = ({ show, onHide, office, property }) => {
     const [showConfirm, setShowConfirm] = useState(false);
     /** @type {[Object|null, function]} */
     const [showConfirmInvoicing, setShowConfirmInvoicing] = useState(false);
-
-    /** @type {{startDate: import("dayjs").Dayjs|null, endDate: import("dayjs").Dayjs|null}} */
-    const reservation = {
-        startDate: startDate,
-        endDate: endDate
-    };
 
     /**
      * Memoized date utils for disabling dates.

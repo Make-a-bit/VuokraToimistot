@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { Box, Container, Grid } from "@mui/material";
 import Header from "./header"
 import { Footer } from "./footer"

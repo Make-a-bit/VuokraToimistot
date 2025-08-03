@@ -1,4 +1,4 @@
-﻿// Reasoning: React is imported as a module object.
+// Reasoning: React is imported as a module object.
 /** @type {import("react")} */
 import React from "react";
 

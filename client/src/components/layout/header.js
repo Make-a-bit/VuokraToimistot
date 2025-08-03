@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import navigationLinks from '../../constants/navigation';
@@ -52,15 +52,6 @@ const Header = () => {
     const handleMenuClose = (key) => {
         setAnchorEls(prev => ({ ...prev, [key]: null }));
     };
-
-    // Check if any dropdown link is active
-    /**
-     * Checks if any link in the dropdown is active (matches current pathname).
-     * @param {Array<{path: string, label: string}>} dropdown - Array of dropdown link objects.
-     * @returns {boolean}
-     */
-    const isDropdownActive = (dropdown) =>
-        dropdown.some(link => location.pathname === link.path);
 
     return (
         <AppBar
