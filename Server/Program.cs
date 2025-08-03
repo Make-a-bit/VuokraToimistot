@@ -15,14 +15,12 @@ namespace API
             builder.Services.AddControllers();
 
             var corsPolicyName = "AllowFrontend";
-            var allowedCors = (Environment.GetEnvironmentVariable("VUOKRATOIMISTOT_CORS") ?? "")
-                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries); 
-
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy(corsPolicyName, policy =>
                 {
-                    policy.WithOrigins(allowedCors)
+                    policy
+                        .WithOrigins("https://zealous-plant-0981ddf03.2.azurestaticapps.net")
                         .AllowAnyHeader()
                         .AllowAnyMethod();
                 });
@@ -105,6 +103,10 @@ namespace API
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
+
+            // Add this test endpoint to verify CORS
+            app.MapGet("/test-cors", () => "CORS OK").RequireCors(corsPolicyName);
+
             app.Run();
         }
     }

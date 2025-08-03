@@ -25,9 +25,13 @@ export const loginUser = (user) => {
                 localStorage.setItem("token", token);
                 dispatch({ type: LOGIN_SUCCESS, payload: user.username })
             } else {
+                const errorText = await response.text();
+                console.error('Server error:', errorText);
+                throw new Error(errorText);
                 dispatch({ type: LOGIN_FAILED });
             }
-        } catch {
+        } catch (err) {
+            console.error('Login failed:', err.message);
             dispatch({ type: LOGIN_FAILED })
         } finally {
             dispatch({ type: HIDE_LOADING })

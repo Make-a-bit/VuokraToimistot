@@ -32,28 +32,37 @@ namespace API.Controllers
         [HttpPost]
         public async Task<ActionResult<string>> Authenticate([FromBody] Credentials request)
         {
+            try
+            {
                 var validation = await AccessManager.ValidateUser(request);
 
-            if (!validation)
-            {
-                return Unauthorized();
+                if (!validation)
+                {
+                    return Unauthorized();
+                }
+
+                var randomBytes = Convert.FromBase64String(keyString);
+                var key = new SymmetricSecurityKey(randomBytes);
+                var signCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+                var jwtToken = new JwtSecurityToken(
+                    issuer: "VuokraToimistot",
+                    audience: "VuokraToimistot",
+                    claims: new[] { new Claim(ClaimTypes.Name, request.UserName) },
+                    expires: DateTime.Now.AddMinutes(30),
+                    signingCredentials: signCredentials
+                );
+
+                var token = new JwtSecurityTokenHandler().WriteToken(jwtToken);
+
+                return Ok(token);
             }
-
-            var randomBytes = Convert.FromBase64String(keyString);
-            var key = new SymmetricSecurityKey(randomBytes);
-            var signCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var jwtToken = new JwtSecurityToken(
-                issuer: "VuokraToimistot",
-                audience: "VuokraToimistot",
-                claims: new[] { new Claim(ClaimTypes.Name, request.UserName) },
-                expires: DateTime.Now.AddMinutes(30),
-                signingCredentials: signCredentials
-            );
-
-            var token = new JwtSecurityTokenHandler().WriteToken(jwtToken);
-
-            return Ok(token);
+            catch (Exception ex)
+            {
+                // Log the exception (to file, console, or Application Insights)
+                Console.WriteLine(ex.ToString());
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
         }
     }
 }
