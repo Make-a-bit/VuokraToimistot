@@ -17,7 +17,6 @@ build/
 dist/
 =======
 client/dist/
->>>>>>> 3123b1afeac439074883600ce62a19ab55f534e5
 .npm/
 client/.env*
 .env.*.local
@@ -25,7 +24,7 @@ coverage/
 .vite/
 .next/
 out/
-
+.vs/
 # React specific
 *.local
 *.env.local
