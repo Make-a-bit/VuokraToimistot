@@ -34,9 +34,9 @@ namespace API.Controllers
 
                 return Ok(invoices);
             }
-            catch
+            catch (Exception ex) 
             {
-                return BadRequest();
+                return BadRequest(ex.Message);
             }
         }
 
