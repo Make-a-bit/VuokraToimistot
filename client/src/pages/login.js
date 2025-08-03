@@ -110,7 +110,7 @@ const Login = () => {
          * Payload for login action.
          * @type {{username: string, password: string}}
          */
-        const payload = { username, password }
+        const payload = { UserName: username, Password: password }
 
         dispatch(loginUser(payload))
         setUsername("");
