@@ -19,7 +19,7 @@ export const loginUser = (user) => {
                 UserName: user.username, // or user.UserName if already correct
                 Password: user.password  // or user.Password if already correct
             };
-
+            console.log(credentials)
             const response = await fetch(`${mainURI}/auth`, {
                 method: "POST",
                 headers: { "Content-type": "application/json" },
