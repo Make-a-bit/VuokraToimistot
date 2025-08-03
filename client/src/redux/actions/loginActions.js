@@ -1,4 +1,4 @@
-﻿import {
+import {
     LOGIN_SUCCESS, LOGIN_FAILED, LOGOUT,
     SHOW_LOADING, HIDE_LOADING, RESET_APP_STATE
 } from "../actions/actiontypes";

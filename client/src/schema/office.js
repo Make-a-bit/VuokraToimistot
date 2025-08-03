@@ -1,4 +1,4 @@
-﻿/** 
+/** 
  * The officeSchema variable is an array of objects, each representing a field definition for an office.
  * Each object has the following properties: field (string), header (string), and type (string).
  * 

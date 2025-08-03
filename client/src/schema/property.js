@@ -1,4 +1,4 @@
-﻿/**
+/**
  * propertySchema is an array of objects, each describing a property field.
  * Each object contains:
  *   - field: string (the property key)

@@ -1,4 +1,4 @@
-﻿import dayjs from "../../src/dayjs-setup";
+import dayjs from "../../src/dayjs-setup";
 
 /**
  * Normalizes any date input to a Day.js object.

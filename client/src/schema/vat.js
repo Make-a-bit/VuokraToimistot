@@ -1,4 +1,4 @@
-﻿/**
+/**
  * vatSchema is an array of objects, each representing a column schema.
  * Each object contains:
  *   - field: string (the field name)

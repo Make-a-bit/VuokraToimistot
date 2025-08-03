@@ -1,4 +1,4 @@
-﻿import dayjs from "../../src/dayjs-setup";
+import dayjs from "../../src/dayjs-setup";
 
 /**
  * Returns the number of days between two dates (inclusive).

@@ -1,4 +1,4 @@
-﻿// The leftButton variable is an object representing CSS style properties for a left-aligned button.
+// The leftButton variable is an object representing CSS style properties for a left-aligned button.
 /**
  * @type {{marginBottom: string, marginLeft: string}}
  */

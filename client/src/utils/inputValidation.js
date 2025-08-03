@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Validates that all required fields in the object are filled (non-empty after trim).
  * Optionally, validates that specified fields are valid decimals (dot as separator, up to two decimals).
  * @param {Object} data - The object to validate (e.g., a form state).

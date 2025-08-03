@@ -1,4 +1,4 @@
-﻿import { LOGIN_SUCCESS, LOGIN_FAILED, LOGOUT } from "../actions/actiontypes";
+import { LOGIN_SUCCESS, LOGIN_FAILED, LOGOUT } from "../actions/actiontypes";
 
 /**
  * The initial state for the login reducer.

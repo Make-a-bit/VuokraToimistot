@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 
 /**
  * ErrorPage is a React functional component that displays a "Page not found" message.

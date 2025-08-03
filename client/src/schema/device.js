@@ -1,4 +1,4 @@
-﻿/**
+/**
  * deviceSchema is an array of objects describing the schema for a device.
  * Each object contains a field name, a header label, and a type.
  * The type annotation is Array<{field: string, header: string, type: string}>.

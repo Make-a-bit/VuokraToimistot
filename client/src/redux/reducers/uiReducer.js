@@ -1,4 +1,4 @@
-﻿import {
+import {
     CLEAR_MESSAGES, HIDE_LOADING, SHOW_ERROR, SHOW_LOADING, SHOW_SUCCESS
 } from "../actions/actiontypes"
 

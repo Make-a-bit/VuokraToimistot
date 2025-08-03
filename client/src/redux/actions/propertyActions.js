@@ -1,4 +1,4 @@
-﻿import {
+import {
     ADD_PROPERTY_SUCCESS,
     DELETE_PROPERTY_SUCCESS,
     EDIT_PROPERTY_SUCCESS,

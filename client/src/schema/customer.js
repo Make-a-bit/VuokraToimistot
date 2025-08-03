@@ -1,4 +1,4 @@
-﻿/**
+/**
  * customerSchema is an array of objects, each representing a field in the customer data model.
  * Each object contains:
  *   - field: string (the property name)

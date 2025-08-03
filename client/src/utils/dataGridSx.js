@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @type {Object.<string, Object|string>}
  * 
  * The `dataGridSx` object defines custom style overrides for a DataGrid component.
