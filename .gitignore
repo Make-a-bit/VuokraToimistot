@@ -16,7 +16,6 @@ client/node_modules/
 build/
 dist/
 =======
-client/build/
 client/dist/
 >>>>>>> 3123b1afeac439074883600ce62a19ab55f534e5
 .npm/

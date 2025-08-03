@@ -7,7 +7,7 @@
   "parameters": {
     "resourceGroupName": {
       "type": "string",
-      "defaultValue": "myFreeDBResourceGroup",
+      "defaultValue": "vuokratoimistot-rg",
       "metadata": {
         "description": "Name of the resource group for the resource. It is recommended to put resources under same resource group for better tracking."
       }
@@ -21,7 +21,7 @@
     },
     "resourceName": {
       "type": "string",
-      "defaultValue": "API20250325151249",
+      "defaultValue": "VuokraToimistot",
       "metadata": {
         "description": "Name of the main resource to be created by this template."
       }
@@ -81,7 +81,7 @@
                   "metadata": [
                     {
                       "name": "CURRENT_STACK",
-                      "value": "dotnetcore"
+                      "value": "dotnet"
                     }
                   ]
                 }
