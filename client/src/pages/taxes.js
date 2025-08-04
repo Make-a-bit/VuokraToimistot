@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
     Alert, Button, Snackbar
@@ -13,6 +13,7 @@ import ConfirmModal from "../components/ConfirmModal";
 import EditEntry from "../components/EditEntryModal";
 import { addTax, fetchTaxes, deleteTax, editTax } from "../redux/actions/taxActions";
 import useAutoClearMessages from "../hooks/autoClearMessages";
+import mainURI from "../constants/apiEndpoint";
 
 /**
  * Taxes component for managing VAT entries.
@@ -36,7 +37,7 @@ const Taxes = () => {
      * List of VAT entries from Redux.
      * @type {Array<Object>}
      */
-    const vats = useSelector(state => state.taxes.vats);
+    const vats = useSelector(state => state.taxes.vats) || [];
 
     /**
      * Error and success messages from Redux.
@@ -72,12 +73,6 @@ const Taxes = () => {
     useAutoClearMessages(errorMessage, successMessage);
 
     /**
-     * API base URI.
-     * @type {string}
-     */
-    const mainURI = "https://localhost:7017";
-
-    /**
      * Handles delete button click for a VAT entry.
      * @param {Object} vat - VAT entry object to delete.
      * @returns {void}
@@ -105,6 +100,13 @@ const Taxes = () => {
 
     const addButtonRef = useRef(null);
 
+    useEffect(() => {
+        const bg = document.getElementById("background");
+        return () => {
+            if (bg) bg.removeAttribute("inert");
+        };
+    }, []);
+
     return (
         <>
             <Button
@@ -121,6 +123,7 @@ const Taxes = () => {
             >
                 <DataGrid
                     rows={vats}
+                    getRowId={row => row.id}
                     columns={columns}
                     disableRowSelectionOnClick
                     onRowClick={handleRowClick}

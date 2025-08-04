@@ -17,7 +17,6 @@ import mainURI from "../../constants/apiEndpoint";
  * @returns {function(Function): Promise<void>}
  */
 export const addDevice = (apiEndPoint, device) => {
-    console.log("Device", device)
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
         const token = localStorage.getItem("token");
@@ -33,13 +32,11 @@ export const addDevice = (apiEndPoint, device) => {
 
             if (response.ok) {
                 const createdDevice = await response.json();
-                console.log("Created device:", createdDevice);
                 dispatch({ type: ADD_OFFICE_DEVICE_SUCCESS, payload: createdDevice })
                 dispatch({ type: SHOW_SUCCESS, payload: "Laitteen tallennus onnistui!" })
             }
         } catch (error) {
             dispatch({ type: SHOW_ERROR, payload: "Laitteen tallennus epäonnistui!" })
-            console.log("Error while saving new device", error)
         } finally {
             dispatch({ type: HIDE_LOADING })
         }
@@ -54,7 +51,6 @@ export const addDevice = (apiEndPoint, device) => {
  * @returns {function(Function): Promise<void>}
  */
 export const deleteDevice = (device) => {
-    console.log("Device to del:", device)
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
         const token = localStorage.getItem("token");
@@ -69,7 +65,6 @@ export const deleteDevice = (device) => {
             dispatch({ type: DELETE_OFFICE_DEVICE_SUCCESS, payload: device })
             dispatch({ type: SHOW_SUCCESS, payload: "Laitteen poistaminen onnistui!" })
         } catch (error) {
-            console.log("Error while deleting device:", error)
             dispatch({ type: SHOW_ERROR, payload: "Laitteen poistaminen epäonnistui!" })
         } finally {
             dispatch({ type: HIDE_LOADING })
@@ -100,7 +95,6 @@ export const editDevice = (device) => {
 
             if (response.ok) {
                 const editedDevice = await response.json();
-                console.log("Device edited:", editedDevice)
                 dispatch({ type: EDIT_OFFICE_DEVICE_SUCCESS, payload: editedDevice })
                 dispatch({ type: SHOW_SUCCESS, payload: "Laitteen päivitys onnistui!" })
             }
@@ -138,7 +132,6 @@ export const fetchDevices = (officeId) => {
             const data = await response.json();
             dispatch({ type: FETCH_OFFICE_DEVICES_SUCCESS, payload: data })
         } catch (error) {
-            console.log("Error while fetching office devices:", error)
             dispatch({ type: SHOW_ERROR, payload: "Laitteiden nouto epäonnistui!" })
         } finally {
             dispatch({ type: HIDE_LOADING })
