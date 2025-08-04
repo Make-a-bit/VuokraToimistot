@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from "react";
+import React, { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { Alert, Button, Snackbar } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
@@ -105,6 +105,8 @@ const Customers = () => {
         [btnDeleteCustomer]
     );
 
+    const addButtonRef = useRef(null);
+
     const slotProps = useMemo(() => ({
         loadingOverlay: {
             variant: "linear-progress",
@@ -116,12 +118,19 @@ const Customers = () => {
 
     useEffect(() => {
         const bg = document.getElementById("background");
-        if (!bg) return; // defensive
+        if (!bg) return;
         if (anyModalOpen) {
+            if (document.activeElement && bg && bg.contains(document.activeElement)) {
+                document.activeElement.blur();
+            }
             bg.setAttribute("inert", "");
         } else {
             bg.removeAttribute("inert");
         }
+        // Cleanup: always remove inert on unmount
+        return () => {
+            if (bg) bg.removeAttribute("inert");
+        };
     }, [anyModalOpen]);
 
     return (
@@ -138,6 +147,8 @@ const Customers = () => {
                 onHide={() => setShowAddCustomer(false)}
                 title="Lisää uusi asiakas"
                 action={addCustomer}
+                onExited={() => addButtonRef.current?.focus()}
+                openerRef={addButtonRef}
             />
 
             <EditEntry

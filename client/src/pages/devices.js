@@ -139,6 +139,9 @@ const Devices = () => {
         const bg = document.getElementById("background");
         if (!bg) return;
         if (anyModalOpen) {
+            if (document.activeElement && bg && bg.contains(document.activeElement)) {
+                document.activeElement.blur();
+            }
             bg.setAttribute("inert", "");
         } else {
             bg.removeAttribute("inert");

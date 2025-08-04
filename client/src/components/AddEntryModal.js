@@ -68,6 +68,26 @@ const AddEntry = ({ schema, show, onHide, apiEndPoint, title, action, extraData,
         }
     }, [show, initialFormData]);
 
+    useEffect(() => {
+        if (show) {
+            // If focus is outside the modal, blur it
+            const dialog = document.querySelector('[role="dialog"]');
+            if (
+                document.activeElement &&
+                dialog &&
+                !dialog.contains(document.activeElement)
+            ) {
+                document.activeElement.blur();
+            }
+        }
+    }, [show]);
+
+    useEffect(() => {
+        if (show && nameInputRef.current) {
+            nameInputRef.current.focus();
+        }
+    }, [show]);
+
     /**
      * Handles input changes in the form.
      * @param {React.ChangeEvent<HTMLInputElement|HTMLTextAreaElement|{ name: string, value: any }>} e
