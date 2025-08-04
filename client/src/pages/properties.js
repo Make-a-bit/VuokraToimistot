@@ -132,8 +132,6 @@ const Properties = () => {
         dispatch(fetchProperties());
     };
 
-    useAutoClearMessages(errorMessage, successMessage);
-
     /**
      * Memoized columns for DataGrid.
      * @type {Array<Object>}
