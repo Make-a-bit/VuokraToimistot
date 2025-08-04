@@ -39,7 +39,7 @@ import { SHOW_LOADING, HIDE_LOADING } from "../redux/actions/actiontypes";
  * }} props
  * @returns {JSX.Element}
  */
-const AddEntry = ({ schema, show, onHide, apiEndPoint, title, action, extraData, openerRef }) => {
+const AddEntry = ({ schema, show, onHide, apiEndPoint, title, action, extraData, onExited }) => {
     // initialFormData is an object with keys from schema fields, all initialized to empty string
     /** @type {FormData} */
     const initialFormData = schema.reduce((acc, field) => ({ ...acc, [field.field]: "" }), {});
@@ -67,12 +67,6 @@ const AddEntry = ({ schema, show, onHide, apiEndPoint, title, action, extraData,
             setErrorMessage("");
         }
     }, [show, initialFormData]);
-
-    useEffect(() => {
-        if (!show && openerRef?.current) {
-            openerRef.current.focus();
-        }
-    }, [show, openerRef]);
 
     /**
      * Handles input changes in the form.
@@ -138,9 +132,7 @@ const AddEntry = ({ schema, show, onHide, apiEndPoint, title, action, extraData,
             open={show}
             onClose={onHide}
             TransitionProps={{
-                onExited: () => {
-                    if (openerRef?.current) openerRef.current.focus();
-                }
+                onExited: onExited, 
             }}
             slotProps={{
                 transition: {
