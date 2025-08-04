@@ -69,9 +69,9 @@ namespace API.Controllers
                 property.Id = propertyId.Value;
                 return Ok(property);
             }
-            catch
+            catch (Exception ex) 
             {
-                return BadRequest();
+                return BadRequest(ex.Message);
             }
         }
 
