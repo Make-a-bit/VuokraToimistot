@@ -20,6 +20,7 @@ export const addProperty = (apiEndPoint, property) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
         const token = localStorage.getItem("token");
+        console.log(property)
         try {
             const response = await fetch(apiEndPoint, {
                 method: "POST",

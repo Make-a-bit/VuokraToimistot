@@ -59,6 +59,7 @@ namespace API.Services
             catch (Exception ex)
             {
                 // logger
+                Console.WriteLine(ex.ToString());
                 await transaction.RollbackAsync();
             }
 
