@@ -18,48 +18,51 @@ import mainURI from "../constants/apiEndpoint";
  * @returns {JSX.Element}
  */
 const Offices = () => {
-    /** @type {import('react-redux').Dispatch} */
+    /**
+     * Redux dispatch function.
+     * @type {import('react-redux').Dispatch}
+     */
     const dispatch = useDispatch();
 
     /**
-     * @type {boolean}
      * Loading state from Redux UI slice.
+     * @type {boolean}
      */
     const loading = useSelector(state => state.ui.loadingState);
 
     /**
-     * @type {Array<Object>}
      * List of office objects from Redux store.
+     * @type {Array<Object>}
      */
     const offices = useSelector(state => state.offices.offices);
 
     /**
-     * @type {{ errorMessage: string, successMessage: string }}
      * Error and success messages from Redux UI slice.
+     * @type {{ errorMessage: string, successMessage: string }}
      */
     const { errorMessage, successMessage } = useSelector(state => state.ui);
 
     /**
-     * @type {[boolean, Function]}
      * State for showing the Add Office modal.
+     * @type {[boolean, React.Dispatch<React.SetStateAction<boolean>>]}
      */
     const [showAddOffice, setShowAddOffice] = useState(false);
 
     /**
-     * @type {[boolean, Function]}
      * State for showing the Edit Office modal.
+     * @type {[boolean, React.Dispatch<React.SetStateAction<boolean>>]}
      */
     const [showEditOffice, setShowEditOffice] = useState(false);
 
     /**
-     * @type {[boolean, Function]}
      * State for showing the Confirm modal.
+     * @type {[boolean, React.Dispatch<React.SetStateAction<boolean>>]}
      */
     const [showConfirm, setShowConfirm] = useState(false);
 
     /**
-     * @type {[Object, Function]}
      * State for the currently selected office.
+     * @type {[Object, React.Dispatch<React.SetStateAction<Object>>]}
      */
     const [selectedOffice, setSelectedOffice] = useState({});
 
@@ -92,13 +95,21 @@ const Offices = () => {
     useAutoClearMessages(errorMessage, successMessage);
 
     /**
-     * @type {Array<Object>}
      * Memoized columns for the DataGrid, generated from officeSchema and btnDeleteOffice.
+     * @type {Array<Object>}
      */
     const columns = React.useMemo(() => dataGridColumns(officeSchema, btnDeleteOffice), []);
 
+    /**
+     * Ref for the add button, used to return focus after closing modals.
+     * @type {React.RefObject<HTMLButtonElement>}
+     */
     const addButtonRef = useRef(null);
 
+    /**
+     * Whether any modal is open.
+     * @type {boolean}
+     */
     const anyModalOpen = showAddOffice || showEditOffice || showConfirm;
 
     useEffect(() => {

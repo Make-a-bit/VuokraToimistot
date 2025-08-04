@@ -36,36 +36,42 @@ const Taxes = () => {
     /**
      * List of VAT entries from Redux.
      * @type {Array<Object>}
+     * Reason: vats is used as rows for DataGrid, which expects an array of objects.
      */
     const vats = useSelector(state => state.taxes.vats) || [];
 
     /**
      * Error and success messages from Redux.
      * @type {{ errorMessage: string, successMessage: string }}
+     * Reason: errorMessage and successMessage are used as strings in Snackbar/Alert.
      */
     const { errorMessage, successMessage } = useSelector(state => state.ui);
 
     /**
      * Currently selected VAT entry for edit/delete.
      * @type {Object|null}
+     * Reason: selectedVat is set to a row object or null.
      */
     const [selectedVat, setSelectedVat] = useState(null);
 
     /**
      * Controls visibility of AddEntry modal.
      * @type {boolean}
+     * Reason: showAddTax is a boolean state for modal visibility.
      */
     const [showAddTax, setShowAddTax] = useState(false);
 
     /**
      * Controls visibility of ConfirmModal.
      * @type {boolean}
+     * Reason: showConfirm is a boolean state for modal visibility.
      */
     const [showConfirm, setShowConfirm] = useState(false);
 
     /**
      * Controls visibility of EditEntry modal.
      * @type {boolean}
+     * Reason: showEditTax is a boolean state for modal visibility.
      */
     const [showEditTax, setShowEditTax] = useState(false);
 
@@ -76,6 +82,7 @@ const Taxes = () => {
      * Handles row click in the DataGrid.
      * @param {Object} params - DataGrid row params.
      * @returns {void}
+     * Reason: params.row is an object representing the clicked row.
      */
     const handleRowClick = (params) => {
         setSelectedVat(params.row);
@@ -84,9 +91,10 @@ const Taxes = () => {
 
     /**
      * Handles delete button click for a VAT entry.
-    * @param {Object} vat - VAT entry object to delete.
-    * @returns {void}
-    */
+     * @param {Object} vat - VAT entry object to delete.
+     * @returns {void}
+     * Reason: vat is an object representing a VAT entry.
+     */
     const btnDeleteVat = useCallback((vat) => {
         setSelectedVat(vat);
         setShowConfirm(true);
@@ -95,11 +103,22 @@ const Taxes = () => {
     /**
      * Memoized columns for DataGrid.
      * @type {Array<Object>}
+     * Reason: columns is an array of column definition objects for DataGrid.
      */
     const columns = React.useMemo(() => dataGridColumns(vatSchema, btnDeleteVat), [btnDeleteVat]);
 
+    /**
+     * Ref for the add button element.
+     * @type {React.MutableRefObject<HTMLButtonElement|null>}
+     * Reason: addButtonRef is used to focus the button, so it refers to a button element.
+     */
     const addButtonRef = useRef(null);
 
+    /**
+     * Whether any modal is open.
+     * @type {boolean}
+     * Reason: anyModalOpen is a boolean derived from modal states.
+     */
     const anyModalOpen = showAddTax || showEditTax || showConfirm;
 
     useEffect(() => {

@@ -21,62 +21,62 @@ import mainURI from "../constants/apiEndpoint";
  */
 const Devices = () => {
     /**
-     * @type {function}
      * Redux dispatch function.
+     * @type {function}
      */
     const dispatch = useDispatch();
 
     /**
-     * @type {boolean}
      * Loading state from Redux UI slice.
+     * @type {boolean}
      */
     const loading = useSelector(state => state.ui.loadingState);
 
     /**
-     * @type {Array<Object>}
      * List of office objects from Redux.
+     * @type {Array<Object>}
      */
     const offices = useSelector(state => state.offices.offices);
 
     /**
-     * @type {Array<Object>}
      * List of device objects from Redux.
+     * @type {Array<Object>}
      */
     const devices = useSelector(state => state.devices.devices);
 
     /**
-     * @type {Object|null}
      * Currently selected office object or null.
+     * @type {Object|null}
      */
     const selectedOffice = useSelector(state => state.devices.selectedDeviceOffice);
 
     /**
-     * @type {{ errorMessage: string, successMessage: string }}
      * Error and success messages from Redux UI slice.
+     * @type {{ errorMessage: string, successMessage: string }}
      */
     const { errorMessage, successMessage } = useSelector(state => state.ui);
 
     /**
-     * @type {[boolean, function]}
      * State for showing the Add Device modal.
+     * @type {[boolean, function]}
      */
     const [showAddDevice, setShowAddDevice] = useState(false);
 
     /**
-     * @type {[boolean, function]}
      * State for showing the Confirm modal.
+     * @type {[boolean, function]}
      */
     const [showConfirm, setShowConfirm] = useState(false);
 
     /**
-     * @type {[boolean, function]}
      * State for showing the Edit Device modal.
+     * @type {[boolean, function]}
      */
     const [showEditDevice, setShowEditDevice] = useState(false);
 
     /**
-     * @type {[Object, function]}
      * State for the currently selected device object.
+     * @type {[Object, function]}
      */
     const [selectedDevice, setSelectedDevice] = useState({});
 
@@ -84,8 +84,9 @@ const Devices = () => {
     useAutoClearMessages(errorMessage, successMessage);
 
     /**
-     * @type {Array<Object>}
      * Devices filtered by selected office.
+     * @type {Array<Object>}
+     * Reasoning: Array of device objects, filtered by office.
      */
     const filteredDevices = selectedOffice
         ? devices.filter(d => d.officeId === selectedOffice.id)
@@ -93,7 +94,9 @@ const Devices = () => {
 
     /**
      * Opens the confirm modal for deleting a device.
-     * @param {Object} device
+     * @param {Object} device - The device object to delete.
+     * @returns {void}
+     * Reasoning: device is an object representing a device.
      */
     const btnDeleteDevice = (device) => {
         setSelectedDevice(device)
@@ -102,7 +105,9 @@ const Devices = () => {
 
     /**
      * Handles row click in the DataGrid.
-     * @param {Object} params
+     * @param {Object} params - DataGrid row params, contains row object.
+     * @returns {void}
+     * Reasoning: params.row is a device object.
      */
     const handleRowClick = (params) => {
         setSelectedDevice(params.row);
@@ -111,6 +116,7 @@ const Devices = () => {
 
     /**
      * Closes the Add Device modal and refreshes devices.
+     * @returns {void}
      */
     const handleCloseAddDevice = () => {
         setShowAddDevice(false);
@@ -119,6 +125,7 @@ const Devices = () => {
 
     /**
      * Closes the Edit Device modal and refreshes devices.
+     * @returns {void}
      */
     const handleCloseEditDevice = () => {
         setShowEditDevice(false);
@@ -126,13 +133,24 @@ const Devices = () => {
     };
 
     /**
-     * @type {Array<Object>}
      * Memoized columns for the DataGrid.
+     * @type {Array<Object>}
+     * Reasoning: dataGridColumns returns an array of column definitions.
      */
     const columns = React.useMemo(() => dataGridColumns(deviceSchema, btnDeleteDevice), []);
 
+    /**
+     * Ref for the add button.
+     * @type {React.MutableRefObject<HTMLButtonElement|null>}
+     * Reasoning: useRef is initialized with null, used for focusing the button.
+     */
     const addButtonRef = useRef(null);
 
+    /**
+     * Whether any modal is open.
+     * @type {boolean}
+     * Reasoning: Boolean OR of modal states.
+     */
     const anyModalOpen = showAddDevice || showEditDevice || showConfirm;
 
     useEffect(() => {

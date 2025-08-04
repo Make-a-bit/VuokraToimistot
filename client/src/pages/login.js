@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Navigate } from "react-router-dom";
 import {
-    Box, Button, FormControl, IconButton, InputAdornment,
+    Box, Button, CircularProgress, FormControl, IconButton, InputAdornment,
     InputLabel, OutlinedInput, Paper, TextField
 } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
@@ -19,18 +19,21 @@ const Login = () => {
     /**
      * Redux dispatch function.
      * @type {function}
+     * Reasoning: useDispatch returns a dispatch function.
      */
     const dispatch = useDispatch();
 
     /**
      * React Router navigation function.
      * @type {function}
+     * Reasoning: useNavigate returns a navigation function.
      */
     const navigate = useNavigate();
 
     /**
      * Logged in user object from Redux state.
      * @type {object|null}
+     * Reasoning: loggedUser is either an object or null.
      */
     const loggedUser = useSelector(
         /** @param {object} state */
@@ -38,8 +41,19 @@ const Login = () => {
     );
 
     /**
+     * Login error message from Redux state.
+     * @type {string|null}
+     * Reasoning: loginError is likely a string or null.
+     */
+    const loginError = useSelector(
+        /** @param {object} state */
+        state => state.login.loginError
+    );
+
+    /**
      * Loading state from Redux UI slice.
      * @type {boolean}
+     * Reasoning: loadingState is a boolean flag.
      */
     const loading = useSelector(
         /** @param {object} state */
@@ -47,26 +61,30 @@ const Login = () => {
     );
 
     /**
-     * Username input value.
+     * Username input value and setter.
      * @type {[string, function]}
+     * Reasoning: useState returns a tuple of value and setter.
      */
     const [username, setUsername] = useState("");
 
     /**
-     * Password input value.
+     * Password input value and setter.
      * @type {[string, function]}
+     * Reasoning: useState returns a tuple of value and setter.
      */
     const [password, setPassword] = useState("");
 
     /**
-     * Show/hide password state.
+     * Show/hide password state and setter.
      * @type {[boolean, function]}
+     * Reasoning: useState returns a tuple of value and setter.
      */
     const [showPassword, setShowPassword] = useState(false);
 
     /**
      * Ref for the username input field.
      * @type {React.MutableRefObject<HTMLInputElement|null>}
+     * Reasoning: useRef is used for a DOM input element.
      */
     const usernameRef = useRef(null);
 
@@ -74,6 +92,7 @@ const Login = () => {
      * Toggles the visibility of the password field.
      * @function
      * @returns {void}
+     * Reasoning: No return value, just toggles state.
      */
     const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -82,6 +101,7 @@ const Login = () => {
      * @function
      * @param {React.MouseEvent<HTMLButtonElement>} event
      * @returns {void}
+     * Reasoning: Event handler for mouse down.
      */
     const handleMouseDownPassword = (event) => {
         event.preventDefault();
@@ -92,6 +112,7 @@ const Login = () => {
      * @function
      * @param {React.MouseEvent<HTMLButtonElement>} event
      * @returns {void}
+     * Reasoning: Event handler for mouse up.
      */
     const handleMouseUpPassword = (event) => {
         event.preventDefault();
@@ -102,6 +123,7 @@ const Login = () => {
      * @function
      * @param {React.FormEvent<HTMLFormElement>} e
      * @returns {void}
+     * Reasoning: Handles form submit event, no return value.
      */
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -109,6 +131,7 @@ const Login = () => {
         /**
          * Payload for login action.
          * @type {{username: string, password: string}}
+         * Reasoning: loginUser expects an object with username and password.
          */
         const payload = {
             username: username,
@@ -118,9 +141,6 @@ const Login = () => {
         dispatch(loginUser(payload))
         setUsername("");
         setPassword("");
-        if (usernameRef.current) {
-            usernameRef.current.focus();
-        }
     }
 
     useEffect(() => {
@@ -130,10 +150,10 @@ const Login = () => {
     }, [loggedUser, navigate]);
 
     useEffect(() => {
-        if (usernameRef.current) {
+        if (loginError && usernameRef.current) {
             usernameRef.current.focus();
         }
-    }, []);
+    }, [loginError]);
 
     if (loggedUser) {
         return <Navigate to="/home" replace />;
@@ -201,6 +221,7 @@ const Login = () => {
                         <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
                             <Button
                                 disabled={!username || !password || loading}
+                                startIcon={loading ? <CircularProgress size={20} color="inherit" /> : null}
                                 variant="contained"
                                 color="success"
                                 type="submit"

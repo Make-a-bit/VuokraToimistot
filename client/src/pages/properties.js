@@ -25,60 +25,70 @@ const Properties = () => {
     /**
      * Redux dispatch function.
      * @type {function}
+     * Reasoning: useDispatch returns a dispatch function.
      */
     const dispatch = useDispatch();
 
     /**
      * Loading state from Redux.
      * @type {boolean}
+     * Reasoning: Used as a boolean prop for DataGrid's loading.
      */
     const loading = useSelector(state => state.ui.loadingState);
 
     /**
      * List of office objects from Redux.
      * @type {Array<Object>}
+     * Reasoning: Used as options for Autocomplete, so must be an array of objects.
      */
     const offices = useSelector(state => state.offices.offices);
 
     /**
      * List of property objects from Redux.
      * @type {Array<Object>}
+     * Reasoning: Used as rows for DataGrid, so must be an array of objects.
      */
     const properties = useSelector(state => state.properties.properties);
 
     /**
      * Currently selected office object from Redux.
      * @type {?Object}
+     * Reasoning: Used as value for Autocomplete, can be null or an object.
      */
     const selectedOffice = useSelector(state => state.properties.selectedPropertyOffice);
 
     /**
      * Error and success messages from Redux UI state.
      * @type {{ errorMessage: ?string, successMessage: ?string }}
+     * Reasoning: Destructured from state.ui, both can be string or null/undefined.
      */
     const { errorMessage, successMessage } = useSelector(state => state.ui);
 
     /**
      * Controls visibility of AddEntry modal.
      * @type {[boolean, function]}
+     * Reasoning: useState returns [state, setState] tuple, state is boolean.
      */
     const [showAddProperty, setShowAddProperty] = useState(false);
 
     /**
      * Controls visibility of ConfirmModal.
      * @type {[boolean, function]}
+     * Reasoning: useState returns [state, setState] tuple, state is boolean.
      */
     const [showConfirm, setShowConfirm] = useState(false);
 
     /**
      * Controls visibility of EditEntry modal.
      * @type {[boolean, function]}
+     * Reasoning: useState returns [state, setState] tuple, state is boolean.
      */
     const [showEditProperty, setShowEditProperty] = useState(false);
 
     /**
      * Currently selected property object for editing or deleting.
      * @type {[Object, function]}
+     * Reasoning: useState returns [state, setState] tuple, state is an object.
      */
     const [selectedProperty, setSelectedProperty] = useState({});
 
@@ -93,6 +103,7 @@ const Properties = () => {
     /**
      * Filtered properties based on selected office.
      * @type {Array<Object>}
+     * Reasoning: Result of filtering an array of objects.
      */
     const filteredProperties = selectedOffice
         ? properties.filter(s => s.officeId === selectedOffice.id)
@@ -100,7 +111,9 @@ const Properties = () => {
 
     /**
      * Handles delete button click for a property.
-     * @param {Object} property
+     * @param {Object} property - The property object to delete.
+     * @returns {void}
+     * Reasoning: Sets state, does not return a value.
      */
     const btnDeleteProperty = (property) => {
         setSelectedProperty(property)
@@ -109,7 +122,9 @@ const Properties = () => {
 
     /**
      * Handles row click in DataGrid for editing.
-     * @param {Object} params
+     * @param {Object} params - DataGrid row params.
+     * @returns {void}
+     * Reasoning: Sets state, does not return a value.
      */
     const handleRowClick = (params) => {
         setSelectedProperty(params.row);
@@ -118,6 +133,8 @@ const Properties = () => {
 
     /**
      * Handles closing of AddEntry modal.
+     * @returns {void}
+     * Reasoning: Sets state and dispatches, does not return a value.
      */
     const handleCloseAddProperty = () => {
         setShowAddProperty(false);
@@ -126,6 +143,8 @@ const Properties = () => {
 
     /**
      * Handles closing of EditEntry modal.
+     * @returns {void}
+     * Reasoning: Sets state and dispatches, does not return a value.
      */
     const handleCloseEditProperty = () => {
         setShowEditProperty(false);
@@ -135,11 +154,22 @@ const Properties = () => {
     /**
      * Memoized columns for DataGrid.
      * @type {Array<Object>}
+     * Reasoning: Result of dataGridColumns, which returns an array of column objects.
      */
     const columns = React.useMemo(() => dataGridColumns(propertySchema, btnDeleteProperty), []);
 
+    /**
+     * Ref for the add button.
+     * @type {React.MutableRefObject<?HTMLButtonElement>}
+     * Reasoning: useRef returns a mutable ref object, initially null.
+     */
     const addButtonRef = useRef(null);
 
+    /**
+     * Whether any modal is open.
+     * @type {boolean}
+     * Reasoning: Result of logical OR of booleans.
+     */
     const anyModalOpen = showAddProperty || showEditProperty || showConfirm;
 
     useEffect(() => {

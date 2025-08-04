@@ -18,8 +18,6 @@ import useAutoClearMessages from "../hooks/autoClearMessages";
 import mainURI from "../constants/apiEndpoint";
 
 /**
- * 
- * @returns
  * Services page component.
  * @returns {JSX.Element}
  */
@@ -34,31 +32,46 @@ const Services = () => {
      * Loading state from Redux.
      * @type {boolean}
      */
-    const loading = useSelector(state => state.ui.loadingState);
+    const loading = useSelector(
+        /** @param {Object} state */
+        state => state.ui.loadingState
+    );
 
     /**
      * List of office objects from Redux.
      * @type {Array<Object>}
      */
-    const offices = useSelector(state => state.offices.offices);
+    const offices = useSelector(
+        /** @param {Object} state */
+        state => state.offices.offices
+    );
 
     /**
      * List of service objects from Redux.
      * @type {Array<Object>}
      */
-    const services = useSelector(state => state.services.services);
+    const services = useSelector(
+        /** @param {Object} state */
+        state => state.services.services
+    );
 
     /**
      * Currently selected office object from Redux.
      * @type {?Object}
      */
-    const selectedOffice = useSelector(state => state.services.selectedServiceOffice);
+    const selectedOffice = useSelector(
+        /** @param {Object} state */
+        state => state.services.selectedServiceOffice
+    );
 
     /**
      * Error and success messages from Redux UI state.
      * @type {{ errorMessage: ?string, successMessage: ?string }}
      */
-    const { errorMessage, successMessage } = useSelector(state => state.ui);
+    const { errorMessage, successMessage } = useSelector(
+        /** @param {Object} state */
+        state => state.ui
+    );
 
     /**
      * Controls visibility of Add Service modal.
@@ -117,6 +130,7 @@ const Services = () => {
     /**
      * Filters services by selected office.
      * @type {Array<Object>}
+     * Reason: services is an array of objects, filtered by officeId.
      */
     const filteredServices = selectedOffice
         ? services.filter(s => s.officeId === selectedOffice.id)
@@ -135,11 +149,22 @@ const Services = () => {
     /**
      * Memoized columns for DataGrid.
      * @type {Array<Object>}
+     * Reason: dataGridColumns returns an array of column definitions.
      */
     const columns = React.useMemo(() => dataGridColumns(serviceSchema, btnDeleteService), []);
 
+    /**
+     * Ref for the add button.
+     * @type {React.MutableRefObject<HTMLButtonElement|null>}
+     * Reason: useRef is initialized with null, used for focusing the button.
+     */
     const addButtonRef = useRef(null);
 
+    /**
+     * Whether any modal is open.
+     * @type {boolean}
+     * Reason: Logical OR of three boolean modal states.
+     */
     const anyModalOpen = showAddService || showEditService || showConfirm;
 
     useEffect(() => {

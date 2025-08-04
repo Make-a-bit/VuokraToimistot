@@ -28,40 +28,51 @@ import { SHOW_LOADING, HIDE_LOADING } from "../redux/actions/actiontypes";
 
 /**
  * AddEntry component for adding a new entry using a dynamic schema.
- * @param {{
- *   schema: SchemaField[],
- *   show: boolean,
- *   onHide: () => void,
- *   apiEndPoint: string,
- *   title: string,
- *   action: (endpoint: string, payload: object) => Promise<any>,
- *   extraData?: object
- * }} props
+ * @param {Object} props
+ * @param {SchemaField[]} props.schema - The schema describing the form fields
+ * @param {boolean} props.show - Whether the dialog is open
+ * @param {() => void} props.onHide - Function to close the dialog
+ * @param {string} props.apiEndPoint - API endpoint for the action
+ * @param {string} props.title - Dialog title
+ * @param {(endpoint: string, payload: object) => Promise<any>} props.action - Action dispatcher
+ * @param {object} [props.extraData] - Additional data to include in the payload
+ * @param {() => void} [props.onExited] - Optional callback for dialog exit
  * @returns {JSX.Element}
  */
 const AddEntry = ({ schema, show, onHide, apiEndPoint, title, action, extraData, onExited }) => {
     // initialFormData is an object with keys from schema fields, all initialized to empty string
     /** @type {FormData} */
+    // Reason: Each field in schema is initialized to an empty string for controlled inputs.
     const initialFormData = React.useMemo(
         () => schema.reduce((acc, field) => ({ ...acc, [field.field]: "" }), {}),
         [schema]
-    );    /** @type {[FormData, Function]} */
+    );
+    /** @type {[FormData, React.Dispatch<React.SetStateAction<FormData>>]} */
+    // Reason: formData holds the current values of the form fields.
     const [formData, setFormData] = useState({});
-    /** @type {[boolean, Function]} */
+    /** @type {[boolean, React.Dispatch<React.SetStateAction<boolean>>]} */
+    // Reason: errorState is a boolean indicating if an error is present.
     const [errorState, setErrorState] = useState(false);
-    /** @type {[string, Function]} */
+    /** @type {[string, React.Dispatch<React.SetStateAction<string>>]} */
+    // Reason: errorMessage is a string describing the error.
     const [errorMessage, setErrorMessage] = useState("");
     /** @type {React.MutableRefObject<HTMLInputElement|null>} */
+    // Reason: firstInputRef is used to focus the first input in the form.
     const firstInputRef = useRef(null);
     const dispatch = useDispatch();
     /** @type {boolean} */
+    // Reason: loading is a boolean from Redux UI state.
     const loading = useSelector(state => state.ui.loadingState);
     /** @type {Vat[]} */
+    // Reason: vats is an array of VAT objects from Redux taxes state.
     const vats = useSelector(state => state.taxes.vats);
 
     /** @type {React.MutableRefObject<HTMLInputElement|null>} */
+    // Reason: nameInputRef is used to focus the name input field.
     const nameInputRef = useRef(null);
 
+    /** @type {React.MutableRefObject<boolean>} */
+    // Reason: prevShowRef tracks the previous value of show to reset form on close.
     const prevShowRef = useRef(show);
     useEffect(() => {
         if (prevShowRef.current && !show) {
@@ -95,6 +106,7 @@ const AddEntry = ({ schema, show, onHide, apiEndPoint, title, action, extraData,
     /**
      * Handles input changes in the form.
      * @param {React.ChangeEvent<HTMLInputElement|HTMLTextAreaElement|{ name: string, value: any }>} e
+     * Reason: e is a change event from a text field or select.
      */
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -105,6 +117,7 @@ const AddEntry = ({ schema, show, onHide, apiEndPoint, title, action, extraData,
      * Handles form submission, validates input, and dispatches the action.
      * @param {React.FormEvent<HTMLFormElement>|React.MouseEvent<HTMLButtonElement>} e
      * @returns {Promise<void>}
+     * Reason: e is a form or button event; function is async and returns void.
      */
     const handleSubmit = async (e) => {
         e.preventDefault();

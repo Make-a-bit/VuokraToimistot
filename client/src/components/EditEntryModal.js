@@ -52,39 +52,50 @@ const EditEntryModal = ({ schema, onClose, show, onHide, title, action, entry })
     /**
      * @type {Vat[]}
      * vats: Array of VAT objects from Redux store.
+     * Chose Vat[] because state.taxes.vats is mapped as an array of VAT objects.
      */
     const vats = useSelector(state => state.taxes.vats);
 
     /**
      * @type {Office[]}
      * offices: Array of office objects from Redux store.
+     * Chose Office[] because state.offices.offices is mapped as an array of Office objects.
      */
     const offices = useSelector(state => state.offices.offices);
 
     /**
      * @type {[FormData, Function]}
      * formData: State for form field values.
+     * Chose [FormData, Function] because useState is initialized with an object and updated with objects.
      */
     const [formData, setFormData] = useState({});
 
     /**
      * @type {[Errors, Function]}
      * errors: State for field-level error messages.
+     * Chose [Errors, Function] because useState is initialized with an object and used for error messages.
      */
     const [errors, setErrors] = useState({});
 
     /**
      * @type {[boolean, Function]}
      * errorState: State for showing a general error alert.
+     * Chose [boolean, Function] because useState is initialized with false and used as a boolean flag.
      */
     const [errorState, setErrorState] = useState(false);
 
     /**
      * @type {[string, Function]}
      * errorMessage: State for the general error message.
+     * Chose [string, Function] because useState is initialized with an empty string and used for error text.
      */
     const [errorMessage, setErrorMessage] = useState("");
 
+    /**
+     * @type {React.RefObject<HTMLInputElement>}
+     * firstFieldRef: Ref for focusing the first input field.
+     * Chose React.RefObject<HTMLInputElement> because useRef is initialized with null and used for input focus.
+     */
     const firstFieldRef = useRef(null);
 
     useEffect(() => {
@@ -145,6 +156,7 @@ const EditEntryModal = ({ schema, onClose, show, onHide, title, action, entry })
      * Returns a change handler for a given field.
      * @param {string} field - The field name to handle changes for.
      * @returns {(event: React.ChangeEvent<HTMLInputElement | { value: unknown }>) => void}
+     * Chose this type because the handler is used for both TextField and Select components.
      */
     const handleChange = (field) => (event) => {
         setFormData({ ...formData, [field]: event.target.value });
@@ -155,6 +167,7 @@ const EditEntryModal = ({ schema, onClose, show, onHide, title, action, entry })
      * Handles form submission, validates fields, and dispatches the action.
      * @param {React.FormEvent<HTMLFormElement> | React.MouseEvent} e
      * @returns {Promise<void>}
+     * Chose this type because the handler is used for both form submit and button click events.
      */
     const handleSubmit = async (e) => {
         e.preventDefault();

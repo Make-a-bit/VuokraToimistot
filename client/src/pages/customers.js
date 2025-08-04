@@ -21,28 +21,31 @@ const Customers = () => {
     /**
      * Redux dispatch function.
      * @type {function}
+     * Reasoning: useDispatch returns a dispatch function for Redux actions.
      */
     const dispatch = useDispatch();
 
     /**
      * Array of customer objects from Redux state.
      * @type {Array<Object>}
+     * Reasoning: customers is an array of customer objects from Redux.
      */
     const customers = useSelector(state => state.customers.customers, shallowEqual) || [];
 
     /**
      * Loading state from Redux UI slice.
      * @type {boolean}
+     * Reasoning: loadingState is a boolean flag in Redux UI slice.
      */
     const loading = useSelector(state => state.ui.loadingState);
 
     /**
      * Error message string from Redux UI slice.
      * @type {string}
-     */
-    /**
+     * 
      * Success message string from Redux UI slice.
      * @type {string}
+     * Reasoning: Both are strings from Redux UI slice.
      */
     const { errorMessage, successMessage } = useSelector(
         state => ({ errorMessage: state.ui.errorMessage, successMessage: state.ui.successMessage }),
@@ -52,24 +55,28 @@ const Customers = () => {
     /**
      * State for showing Add Customer modal.
      * @type {[boolean, function]}
+     * Reasoning: useState returns [state, setState] tuple, state is boolean.
      */
     const [showAddCustomer, setShowAddCustomer] = useState(false);
 
     /**
      * State for showing Confirm modal.
      * @type {[boolean, function]}
+     * Reasoning: useState returns [state, setState] tuple, state is boolean.
      */
     const [showConfirm, setShowConfirm] = useState(false);
 
     /**
      * State for showing Edit Customer modal.
      * @type {[boolean, function]}
+     * Reasoning: useState returns [state, setState] tuple, state is boolean.
      */
     const [showEditCustomer, setShowEditCustomer] = useState(false);
 
     /**
      * State for the currently selected customer.
-     * @type {[Object, function]}
+     * @type {[Object|null, function]}
+     * Reasoning: selectedCustomer is either a customer object or null.
      */
     const [selectedCustomer, setSelectedCustomer] = useState(null);
 
@@ -77,6 +84,7 @@ const Customers = () => {
      * Handles delete button click for a customer.
      * @param {Object} customer - The customer object to delete.
      * @returns {void}
+     * Reasoning: Receives a customer object, does not return anything.
      */
     const btnDeleteCustomer = useCallback((customer) => {
         setSelectedCustomer(customer);
@@ -87,6 +95,7 @@ const Customers = () => {
      * Handles row click in the DataGrid.
      * @param {Object} params - DataGrid row params.
      * @returns {void}
+     * Reasoning: Receives params object from DataGrid, does not return anything.
      */
     const handleRowClick = useCallback((params) => {
         setSelectedCustomer(params.row);
@@ -99,14 +108,25 @@ const Customers = () => {
     /**
      * Memoized columns for the DataGrid.
      * @type {Array<Object>}
+     * Reasoning: columns is an array of column definition objects for DataGrid.
      */
     const columns = useMemo(
         () => dataGridColumns(customerSchema, btnDeleteCustomer),
         [btnDeleteCustomer]
     );
 
+    /**
+     * Ref for the add button element.
+     * @type {React.RefObject<HTMLButtonElement>}
+     * Reasoning: useRef returns a mutable ref object for a button element.
+     */
     const addButtonRef = useRef(null);
 
+    /**
+     * Slot props for DataGrid customization.
+     * @type {Object}
+     * Reasoning: slotProps is an object with configuration for DataGrid slots.
+     */
     const slotProps = useMemo(() => ({
         loadingOverlay: {
             variant: "linear-progress",
@@ -114,6 +134,11 @@ const Customers = () => {
         },
     }), []);
 
+    /**
+     * Boolean indicating if any modal is open.
+     * @type {boolean}
+     * Reasoning: anyModalOpen is a boolean OR of modal states.
+     */
     const anyModalOpen = showAddCustomer || showEditCustomer || showConfirm;
 
     useEffect(() => {
