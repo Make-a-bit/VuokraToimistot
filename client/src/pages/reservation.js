@@ -301,6 +301,10 @@ const Reservation = () => {
             </Box>
             <br />
 
+            <div
+                style={{ height: "auto", width: "100%" }}
+                inert={showAddReservation || showEditModal || showConfirm ? "true" : undefined}
+            >
             <DataGrid
                 rows={reservations}
                 columns={reservationColumns}
@@ -313,6 +317,7 @@ const Reservation = () => {
                     minHeight: "175px",
                 }}
             />
+            </div>
 
             <ConfirmModal
                 onConfirm={async () => {
