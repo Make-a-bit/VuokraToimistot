@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { Alert, Button, Snackbar } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
@@ -71,7 +71,7 @@ const Customers = () => {
      * State for the currently selected customer.
      * @type {[Object, function]}
      */
-    const [selectedCustomer, setSelectedCustomer] = useState({});
+    const [selectedCustomer, setSelectedCustomer] = useState(null);
 
     /**
      * Handles delete button click for a customer.
@@ -111,6 +111,18 @@ const Customers = () => {
             noRowsVariant: "skeleton",
         },
     }), []);
+
+    const anyModalOpen = showAddCustomer || showEditCustomer || showConfirm;
+
+    useEffect(() => {
+        const bg = document.getElementById("background");
+        if (!bg) return; // defensive
+        if (anyModalOpen) {
+            bg.setAttribute("inert", "");
+        } else {
+            bg.removeAttribute("inert");
+        }
+    }, [anyModalOpen]);
 
     return (
         <>
@@ -159,7 +171,9 @@ const Customers = () => {
                 message={`Haluatko varmasti poistaa asiakkaan ${selectedCustomer?.name}?`}
                 confirmText="Poista"
                 cancelText="Peruuta"
-                onConfirm={() => dispatch(deleteCustomer(selectedCustomer))}
+                onConfirm={() => {
+                    if (selectedCustomer) dispatch(deleteCustomer(selectedCustomer));
+                }}
             />
 
             {errorMessage &&
