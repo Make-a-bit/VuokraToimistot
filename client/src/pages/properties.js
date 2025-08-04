@@ -226,7 +226,7 @@ const Properties = () => {
                 onHide={handleCloseAddProperty}
                 title="Lisää uusi vuokratila"
                 action={addProperty}
-                extraData={selectedOffice ? { officeId: selectedOffice.id } : {}}
+                extraData={selectedOffice ? { officeId: selectedOffice.id, officeName: selectedOffice.name } : {}}
                 onExited={() => addButtonRef.current?.focus()}
                 openerRef={addButtonRef}
             />

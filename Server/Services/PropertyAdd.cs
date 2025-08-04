@@ -34,19 +34,22 @@ namespace API.Services
                     office_id, 
                     property_name, 
                     property_area, 
-                    property_price) 
+                    property_price,
+                    property_vat) 
                 OUTPUT INSERTED.property_id
                 VALUES (
                     @oId, 
                     @name, 
                     @area, 
-                    @price)",
+                    @price,
+                    @vat)",
                 conn, transaction);
 
                 cmd.Parameters.AddWithValue("@oId", property.OfficeId);
                 cmd.Parameters.AddWithValue("@name", property.Name);
                 cmd.Parameters.AddWithValue("@area", property.Area);
                 cmd.Parameters.AddWithValue("@price", property.Price);
+                cmd.Parameters.AddWithValue("@vat", property.VAT);
 
                 var result = await cmd.ExecuteScalarAsync();
                 await transaction.CommitAsync();

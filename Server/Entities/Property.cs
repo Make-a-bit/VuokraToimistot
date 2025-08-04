@@ -9,5 +9,6 @@
         public decimal Area { get; set; }
         public decimal Price { get; set; }
         public decimal VAT { get; set; }
+        public int VatId { get; set; }
     }
 }

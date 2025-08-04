@@ -53,7 +53,8 @@ namespace API.Repositories
                         Name = reader.GetString(reader.GetOrdinal("property_name")),
                         Area = reader.GetDecimal(reader.GetOrdinal("property_area")),
                         Price = reader.GetDecimal(reader.GetOrdinal("property_price")),
-                        VAT = reader.GetDecimal(reader.GetOrdinal("vat_value"))
+                        VAT = reader.GetDecimal(reader.GetOrdinal("vat_value")),
+                        VatId = reader.GetInt32(reader.GetOrdinal("vat_id"))
                     };
                     properties.Add(property);
                 }
@@ -108,7 +109,8 @@ namespace API.Repositories
                         Name = reader.GetString(reader.GetOrdinal("property_name")),
                         Area = reader.GetDecimal(reader.GetOrdinal("property_area")),
                         Price = reader.GetDecimal(reader.GetOrdinal("property_price")),
-                        VAT = reader.GetDecimal(reader.GetOrdinal("vat_value"))
+                        VAT = reader.GetDecimal(reader.GetOrdinal("vat_value")),
+                        VatId = reader.GetInt32(reader.GetOrdinal("vat_id"))
                     };
 
                     properties.Add(property);
@@ -154,6 +156,7 @@ namespace API.Repositories
                     property.Name = reader.GetString(reader.GetOrdinal("property_name"));
                     property.Area = reader.GetDecimal(reader.GetOrdinal("property_area"));
                     property.Price = reader.GetDecimal(reader.GetOrdinal("property_price"));
+                    property.VatId = reader.GetInt32(reader.GetOrdinal("property_vat"));
                 }
 
                 return property;
