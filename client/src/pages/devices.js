@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
     Alert, Autocomplete, Box, Button, FormControl, Snackbar, TextField
@@ -131,6 +131,24 @@ const Devices = () => {
      */
     const columns = React.useMemo(() => dataGridColumns(deviceSchema, btnDeleteDevice), []);
 
+    const addButtonRef = useRef(null);
+
+    const anyModalOpen = showAddDevice || showEditDevice || showConfirm;
+
+    useEffect(() => {
+        const bg = document.getElementById("background");
+        if (!bg) return;
+        if (anyModalOpen) {
+            bg.setAttribute("inert", "");
+        } else {
+            bg.removeAttribute("inert");
+        }
+        // Cleanup: always remove inert on unmount
+        return () => {
+            if (bg) bg.removeAttribute("inert");
+        };
+    }, [anyModalOpen]);
+
     return (
         <>
             <Box sx={{ marginTop: "20px", width: "200px" }}>
@@ -170,6 +188,8 @@ const Devices = () => {
                 title={`Lisää vuokralaite kohteeseen ${selectedOffice ? selectedOffice.name : ""}`}
                 action={addDevice}
                 extraData={selectedOffice ? { officeId: selectedOffice.id } : {}}
+                onExited={() => addButtonRef.current?.focus()}
+                openerRef={addButtonRef}
             />
 
             <EditEntry

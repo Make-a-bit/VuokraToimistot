@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
     Alert, Autocomplete, Box, Button, FormControl, Snackbar, TextField
 } from "@mui/material";
@@ -137,6 +137,25 @@ const Properties = () => {
      * @type {Array<Object>}
      */
     const columns = React.useMemo(() => dataGridColumns(propertySchema, btnDeleteProperty), []);
+
+    const addButtonRef = useRef(null);
+
+    const anyModalOpen = showAddProperty || showEditProperty || showConfirm;
+
+    useEffect(() => {
+        const bg = document.getElementById("background");
+        if (!bg) return;
+        if (anyModalOpen) {
+            bg.setAttribute("inert", "");
+        } else {
+            bg.removeAttribute("inert");
+        }
+        // Cleanup: always remove inert on unmount
+        return () => {
+            if (bg) bg.removeAttribute("inert");
+        };
+    }, [anyModalOpen]);
+
     return (
         <>
             <Box sx={{ marginTop: "20px", width: "200px" }}>
@@ -175,6 +194,8 @@ const Properties = () => {
                 title="Lisää uusi vuokratila"
                 action={addProperty}
                 extraData={selectedOffice ? { officeId: selectedOffice.id } : {}}
+                onExited={() => addButtonRef.current?.focus()}
+                openerRef={addButtonRef}
             />
 
             <EditEntry

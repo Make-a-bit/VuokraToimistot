@@ -100,12 +100,21 @@ const Taxes = () => {
 
     const addButtonRef = useRef(null);
 
+    const anyModalOpen = showAddTax || showEditTax || showConfirm;
+
     useEffect(() => {
         const bg = document.getElementById("background");
+        if (!bg) return;
+        if (anyModalOpen) {
+            bg.setAttribute("inert", "");
+        } else {
+            bg.removeAttribute("inert");
+        }
+        // Cleanup: always remove inert on unmount
         return () => {
             if (bg) bg.removeAttribute("inert");
         };
-    }, []);
+    }, [anyModalOpen]);
 
     return (
         <>
@@ -145,9 +154,9 @@ const Taxes = () => {
                         setShowAddTax(false);
                         dispatch(fetchTaxes());
                     }}
-                    onExited={() => addButtonRef.current?.focus()}
                     title={`Lisää uusi verokanta`}
                     action={addTax}
+                    onExited={() => addButtonRef.current?.focus()}
                     openerRef={addButtonRef}
                 />
 

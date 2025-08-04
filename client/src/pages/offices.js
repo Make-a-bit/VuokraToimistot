@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Alert, Button, Snackbar } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
@@ -97,6 +97,24 @@ const Offices = () => {
      */
     const columns = React.useMemo(() => dataGridColumns(officeSchema, btnDeleteOffice), []);
 
+    const addButtonRef = useRef(null);
+
+    const anyModalOpen = showAddOffice || showEditOffice || showConfirm;
+
+    useEffect(() => {
+        const bg = document.getElementById("background");
+        if (!bg) return;
+        if (anyModalOpen) {
+            bg.setAttribute("inert", "");
+        } else {
+            bg.removeAttribute("inert");
+        }
+        // Cleanup: always remove inert on unmount
+        return () => {
+            if (bg) bg.removeAttribute("inert");
+        };
+    }, [anyModalOpen]);
+
     return (
         <>
             <Button
@@ -121,6 +139,8 @@ const Offices = () => {
                 title={`Muokkaa kohdetta ${selectedOffice ? selectedOffice.name : ""}`}
                 action={editOffice}
                 entry={selectedOffice}
+                onExited={() => addButtonRef.current?.focus()}
+                openerRef={addButtonRef}
             />
 
             <div style={{ height: "auto", width: "100%" }}>
