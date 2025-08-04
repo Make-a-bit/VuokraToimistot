@@ -1,15 +1,15 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Alert, Button, Snackbar } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { addCustomer, editCustomer } from "../redux/actions/customerActions";
+import { addCustomer, editCustomer, deleteCustomer } from "../redux/actions/customerActions";
 import AddEntry from "../components/AddEntryModal";
-//import ConfirmModal from "../components/ConfirmModal";
+import ConfirmModal from "../components/ConfirmModal";
 import EditEntry from "../components/EditEntryModal";
 import customerSchema from "../schema/customer";
 import dataGridColumns from "../utils/datagridcolumns";
 import dataGridSx from "../utils/dataGridSx";
-//import useAutoClearMessages from "../hooks/autoClearMessages";
+import useAutoClearMessages from "../hooks/autoClearMessages";
 import mainURI from "../constants/apiEndpoint";
 
 /**
@@ -22,13 +22,13 @@ const Customers = () => {
      * Redux dispatch function.
      * @type {function}
      */
-    //const dispatch = useDispatch();
+    const dispatch = useDispatch();
 
     /**
      * Array of customer objects from Redux state.
      * @type {Array<Object>}
      */
-    const customers = useSelector(state => state.customers.customers);
+    const customers = useSelector(state => state.customers.customers) || [];
 
     /**
      * Loading state from Redux UI slice.
@@ -56,7 +56,7 @@ const Customers = () => {
      * State for showing Confirm modal.
      * @type {[boolean, function]}
      */
-    //const [showConfirm, setShowConfirm] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
 
     /**
      * State for showing Edit Customer modal.
@@ -77,7 +77,7 @@ const Customers = () => {
      */
     const btnDeleteCustomer = (customer) => {
         setSelectedCustomer(customer);
-    //    setShowConfirm(true);
+        setShowConfirm(true);
     }
 
     /**
@@ -91,7 +91,7 @@ const Customers = () => {
     };
 
     // Custom hook to auto-clear messages, no return value.
-    //useAutoClearMessages(errorMessage, successMessage);
+    useAutoClearMessages(errorMessage, successMessage);
 
     /**
      * Memoized columns for the DataGrid.
@@ -129,7 +129,6 @@ const Customers = () => {
             <div style={{ height: "auto", width: "100%" }}>
                 <DataGrid
                     rows={customers}
-                    getRowId={(row => row.id)}
                     columns={columns}
                     disableRowSelectionOnClick
                     onRowClick={handleRowClick}
@@ -144,7 +143,6 @@ const Customers = () => {
                 />
             </div>
 
-            {/*
             <ConfirmModal
                 show={showConfirm}
                 onHide={() => setShowConfirm(false)}
@@ -154,7 +152,6 @@ const Customers = () => {
                 cancelText="Peruuta"
                 onConfirm={() => dispatch(deleteCustomer(selectedCustomer))}
             />
-            */ }
 
             {errorMessage &&
                 <Snackbar
