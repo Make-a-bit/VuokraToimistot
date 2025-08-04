@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
     Alert, Button, Snackbar
@@ -73,16 +73,6 @@ const Taxes = () => {
     useAutoClearMessages(errorMessage, successMessage);
 
     /**
-     * Handles delete button click for a VAT entry.
-     * @param {Object} vat - VAT entry object to delete.
-     * @returns {void}
-     */
-    const btnDeleteVat = (vat) => {
-        setSelectedVat(vat);
-        setShowConfirm(true);
-    };
-
-    /**
      * Handles row click in the DataGrid.
      * @param {Object} params - DataGrid row params.
      * @returns {void}
@@ -93,10 +83,20 @@ const Taxes = () => {
     };
 
     /**
+     * Handles delete button click for a VAT entry.
+    * @param {Object} vat - VAT entry object to delete.
+    * @returns {void}
+    */
+    const btnDeleteVat = useCallback((vat) => {
+        setSelectedVat(vat);
+        setShowConfirm(true);
+    }, []);
+
+    /**
      * Memoized columns for DataGrid.
      * @type {Array<Object>}
      */
-    const columns = React.useMemo(() => dataGridColumns(vatSchema, btnDeleteVat), []);
+    const columns = React.useMemo(() => dataGridColumns(vatSchema, btnDeleteVat), [btnDeleteVat]);
 
     const addButtonRef = useRef(null);
 

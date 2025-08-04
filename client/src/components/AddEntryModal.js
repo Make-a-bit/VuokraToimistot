@@ -42,8 +42,10 @@ import { SHOW_LOADING, HIDE_LOADING } from "../redux/actions/actiontypes";
 const AddEntry = ({ schema, show, onHide, apiEndPoint, title, action, extraData, onExited }) => {
     // initialFormData is an object with keys from schema fields, all initialized to empty string
     /** @type {FormData} */
-    const initialFormData = schema.reduce((acc, field) => ({ ...acc, [field.field]: "" }), {});
-    /** @type {[FormData, Function]} */
+    const initialFormData = React.useMemo(
+        () => schema.reduce((acc, field) => ({ ...acc, [field.field]: "" }), {}),
+        [schema]
+    );    /** @type {[FormData, Function]} */
     const [formData, setFormData] = useState({});
     /** @type {[boolean, Function]} */
     const [errorState, setErrorState] = useState(false);
@@ -60,12 +62,14 @@ const AddEntry = ({ schema, show, onHide, apiEndPoint, title, action, extraData,
     /** @type {React.MutableRefObject<HTMLInputElement|null>} */
     const nameInputRef = useRef(null);
 
+    const prevShowRef = useRef(show);
     useEffect(() => {
-        if (!show) {
+        if (prevShowRef.current && !show) {
             setFormData(initialFormData);
             setErrorState(false);
             setErrorMessage("");
         }
+        prevShowRef.current = show;
     }, [show, initialFormData]);
 
     useEffect(() => {
