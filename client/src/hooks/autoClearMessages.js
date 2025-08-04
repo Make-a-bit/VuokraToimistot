@@ -11,21 +11,19 @@ import { clearMessages } from "../redux/actions/uiActions";
  *
  * Reasoning: errorMessage and successMessage are checked for truthiness and passed to useEffect dependencies, suggesting they are likely strings or possibly null/undefined.
  */
-const useAutoClearMessages = (errorMessage, successMessage) => {
-    /** @type {import('react-redux').Dispatch} */
-    // Reasoning: useDispatch returns the Redux dispatch function.
+const useAutoClearMessages = (errorMessage, successMessage, delayMs = 3000) => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if (errorMessage || successMessage) {
-            /** @type {NodeJS.Timeout} */
-            // Reasoning: setTimeout returns a Timeout object in Node.js, which is compatible with clearTimeout.
-            const timer = setTimeout(() => {
-                dispatch(clearMessages());
-            }, 3000);
-            return () => clearTimeout(timer);
-        }
-    }, [errorMessage, successMessage, dispatch]);
+        if (!errorMessage && !successMessage) return;
+
+        const timer = window.setTimeout(() => {
+            dispatch(clearMessages());
+        }, delayMs);
+        return () => {
+            window.clearTimeout(timer);
+        };
+    }, [errorMessage, successMessage, delayMs, dispatch]);
 };
 
 export default useAutoClearMessages;

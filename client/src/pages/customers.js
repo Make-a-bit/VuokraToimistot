@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState, useMemo, useCallback } from "react";
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { Alert, Button, Snackbar } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { addCustomer, editCustomer, deleteCustomer } from "../redux/actions/customerActions";
@@ -28,7 +28,7 @@ const Customers = () => {
      * Array of customer objects from Redux state.
      * @type {Array<Object>}
      */
-    const customers = useSelector(state => state.customers.customers) || [];
+    const customers = useSelector(state => state.customers.customers, shallowEqual) || [];
 
     /**
      * Loading state from Redux UI slice.
@@ -44,7 +44,10 @@ const Customers = () => {
      * Success message string from Redux UI slice.
      * @type {string}
      */
-    const { errorMessage, successMessage } = useSelector(state => state.ui);
+    const { errorMessage, successMessage } = useSelector(
+        state => ({ errorMessage: state.ui.errorMessage, successMessage: state.ui.successMessage }),
+        shallowEqual
+    );
 
     /**
      * State for showing Add Customer modal.
@@ -75,20 +78,20 @@ const Customers = () => {
      * @param {Object} customer - The customer object to delete.
      * @returns {void}
      */
-    const btnDeleteCustomer = (customer) => {
+    const btnDeleteCustomer = useCallback((customer) => {
         setSelectedCustomer(customer);
         setShowConfirm(true);
-    }
+    }, []);
 
     /**
      * Handles row click in the DataGrid.
      * @param {Object} params - DataGrid row params.
      * @returns {void}
      */
-    const handleRowClick = (params) => {
+    const handleRowClick = useCallback((params) => {
         setSelectedCustomer(params.row);
         setShowEditCustomer(true);
-    };
+    }, []);
 
     // Custom hook to auto-clear messages, no return value.
     useAutoClearMessages(errorMessage, successMessage);
@@ -97,7 +100,17 @@ const Customers = () => {
      * Memoized columns for the DataGrid.
      * @type {Array<Object>}
      */
-    const columns = React.useMemo(() => dataGridColumns(customerSchema, btnDeleteCustomer), []);
+    const columns = useMemo(
+        () => dataGridColumns(customerSchema, btnDeleteCustomer),
+        [btnDeleteCustomer]
+    );
+
+    const slotProps = useMemo(() => ({
+        loadingOverlay: {
+            variant: "linear-progress",
+            noRowsVariant: "skeleton",
+        },
+    }), []);
 
     return (
         <>
@@ -131,14 +144,10 @@ const Customers = () => {
                     rows={customers}
                     columns={columns}
                     disableRowSelectionOnClick
+                    getRowId={(row) => row.id}
                     onRowClick={handleRowClick}
                     loading={loading}
-                    slotProps={{
-                        loadingOverlay: {
-                            variant: "linear-progress",
-                            noRowsVariant: "skeleton"
-                        },
-                    }}
+                    slotProps={slotProps}
                     sx={dataGridSx}
                 />
             </div>
