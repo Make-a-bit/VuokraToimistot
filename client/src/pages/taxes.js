@@ -118,8 +118,6 @@ const Taxes = () => {
 
             <div
                 style={{ height: "auto", width: "100%" }}
-                inert={showAddTax || showEditTax || showConfirm ? "true" : undefined}
-                aria-hidden={undefined} // Remove any aria-hidden here
             >
                 <DataGrid
                     rows={vats}
@@ -142,9 +140,9 @@ const Taxes = () => {
                     show={showAddTax}
                     onHide={() => {
                         setShowAddTax(false);
-                        setTimeout(() => addButtonRef.current?.focus(), 0);
                         dispatch(fetchTaxes());
                     }}
+                    onExited={() => addButtonRef.current?.focus()}
                     title={`Lisää uusi verokanta`}
                     action={addTax}
                     openerRef={addButtonRef}

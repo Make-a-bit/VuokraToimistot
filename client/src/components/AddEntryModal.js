@@ -137,6 +137,11 @@ const AddEntry = ({ schema, show, onHide, apiEndPoint, title, action, extraData,
         <Dialog
             open={show}
             onClose={onHide}
+            TransitionProps={{
+                onExited: () => {
+                    if (openerRef?.current) openerRef.current.focus();
+                }
+            }}
             slotProps={{
                 transition: {
                     onEntered: () => {
