@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
     Alert, Box, Button, Dialog, DialogTitle, DialogContent, DialogActions,
     FormControl, InputLabel, MenuItem, Select, TextField
@@ -84,6 +84,27 @@ const EditEntryModal = ({ schema, onClose, show, onHide, title, action, entry })
      * errorMessage: State for the general error message.
      */
     const [errorMessage, setErrorMessage] = useState("");
+
+    const firstFieldRef = useRef(null);
+
+    useEffect(() => {
+        if (show) {
+            const dialog = document.querySelector('[role="dialog"]');
+            if (
+                document.activeElement &&
+                dialog &&
+                !dialog.contains(document.activeElement)
+            ) {
+                document.activeElement.blur();
+            }
+        }
+    }, [show]);
+
+    useEffect(() => {
+        if (show && firstFieldRef.current) {
+            firstFieldRef.current.focus();
+        }
+    }, [show]);
 
     useEffect(() => {
         /** @type {FormData} */
@@ -192,7 +213,7 @@ const EditEntryModal = ({ schema, onClose, show, onHide, title, action, entry })
             <DialogTitle>{title || "Muokkaa tietoja"}</DialogTitle>
             <DialogContent dividers>
                 <Box display="flex" flexDirection="column" gap={2}>
-                    {(schema || []).map(fieldDef => {
+                    {(schema || []).map((fieldDef, index) => {
                         // Render ALV (VAT) as dropdown
                         if (fieldDef.field === "vat") {
                             return (
@@ -245,6 +266,8 @@ const EditEntryModal = ({ schema, onClose, show, onHide, title, action, entry })
                         return (
                             <TextField
                                 key={fieldDef.field}
+                                inputRef={index === 0 ? firstFieldRef : null}
+                                autoFocus={index === 0}
                                 label={fieldDef.header || fieldDef.field}
                                 value={formData[fieldDef.field] || ""}
                                 onChange={handleChange(fieldDef.field)}
