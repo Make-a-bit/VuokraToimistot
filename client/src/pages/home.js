@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { Alert, Snackbar } from "@mui/material";
 import { fetchCustomers } from "../redux/actions/customerActions";
 import { fetchDevices } from "../redux/actions/deviceActions";
-import { fetchInvoices } from "../redux/actions/invoiceActions";
 import { fetchOffices } from "../redux/actions/officeActions";
 import { fetchProperties } from "../redux/actions/propertyActions";
 import { fetchReservations } from "../redux/actions/reservationActions";
@@ -48,7 +47,6 @@ const Home = () => {
     useEffect(() => {
         dispatch(fetchCustomers());
         dispatch(fetchDevices());
-        dispatch(fetchInvoices());
         dispatch(fetchOffices());
         dispatch(fetchProperties());
         dispatch(fetchReservations());
