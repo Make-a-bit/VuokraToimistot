@@ -34,12 +34,9 @@ export const addProperty = (apiEndPoint, property) => {
                 const createdProperty = await response.json();
                 dispatch({ type: ADD_PROPERTY_SUCCESS, payload: createdProperty })
                 dispatch({ type: SHOW_SUCCESS, payload: "Vuokratilan tallennus onnistui!" })
-            } else {
-                const error = await response.json();
-                console.log("Error", error)
-                throw new error(error);
-            }
+            } 
         } catch (err) {
+            console.log("Error", err)
             dispatch({ type: SHOW_ERROR, payload: "Vuokratilan tallennus epäonnistui!" })
         } finally {
             dispatch({ type: HIDE_LOADING })
