@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
     Alert, Button, Snackbar
@@ -103,12 +103,15 @@ const Taxes = () => {
      */
     const columns = React.useMemo(() => dataGridColumns(vatSchema, btnDeleteVat), []);
 
+    const addButtonRef = useRef(null);
+
     return (
         <>
             <Button
                 variant="contained"
                 sx={{ marginBottom: "10px" }}
                 onClick={() => setShowAddTax(true)}
+                ref={addButtonRef}
             >
                 Lisää uusi verokanta
             </Button>
@@ -139,10 +142,12 @@ const Taxes = () => {
                     show={showAddTax}
                     onHide={() => {
                         setShowAddTax(false);
+                        setTimeout(() => addButtonRef.current?.focus(), 0);
                         dispatch(fetchTaxes());
                     }}
                     title={`Lisää uusi verokanta`}
                     action={addTax}
+                    openerRef={addButtonRef}
                 />
 
                 <EditEntry
