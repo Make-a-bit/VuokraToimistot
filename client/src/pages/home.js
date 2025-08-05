@@ -99,6 +99,7 @@ const Home = () => {
                         <li>Kielituki ja muita vähemmän tärkeitä viilauksia</li>
                     </ul>
                 </p>
+                <br />
 
                     <h3>Arkkitehtuuri</h3>
                 <p>
