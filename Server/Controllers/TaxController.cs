@@ -61,6 +61,9 @@ namespace API.Controllers
         {
             try
             {
+                if (await _taxDelete.IsTaxInUseAsync(id))
+                    return BadRequest();
+
                 if (await _taxDelete.DeleteTaxAsync(id))
                     return Ok();
 

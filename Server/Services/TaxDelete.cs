@@ -30,11 +30,35 @@ namespace API.Services
 
                 return rowsAffected > 0;
             }
-            catch
+            catch 
             {
                 await transaction.RollbackAsync();
                 return false;
             }
+        }
+
+        public async Task<bool> IsTaxInUseAsync(int id)
+        {
+            using var conn = _dbManager.GetConnection();
+            await conn.OpenAsync();
+
+            // Tarkista, onko vat_id käytössä Services- tai Devices-tauluissa
+            using var cmd = new SqlCommand(@"
+            SELECT COUNT(*) FROM Services WHERE vat_id = @id
+            UNION ALL
+            SELECT COUNT(*) FROM Devices WHERE vat_id = @id", 
+            conn);
+
+            cmd.Parameters.AddWithValue("@id", id);
+
+            using var reader = await cmd.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                if (reader.GetInt32(0) > 0)
+                    return true; 
+            }
+            return false; 
         }
     }
 }
