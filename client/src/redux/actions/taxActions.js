@@ -45,6 +45,7 @@ export const addTax = (apiEndPoint, tax) => {
  */
 export const deleteTax = (tax) => {
     return async (dispatch) => {
+        console.log(tax)
         dispatch({ type: SHOW_LOADING })
         const token = localStorage.getItem("token");
         try {
@@ -61,6 +62,8 @@ export const deleteTax = (tax) => {
                 dispatch({ type: DELETE_TAX_SUCCESS, payload: tax })
                 dispatch({ type: SHOW_SUCCESS, payload: "Verokannan poisto onnistui!" })
             }
+            console.log(response)
+
         } catch {
             dispatch({ type: SHOW_ERROR, payload: "Verokannan poisto epäonnistui!" })
         } finally {
