@@ -15,14 +15,20 @@ namespace API
             builder.Services.AddControllers();
 
             var corsPolicyName = "AllowFrontend";
+            var allowedOrigins = Environment.GetEnvironmentVariable("VUOKRATOIMISTOT_CORS")?
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            ?? Array.Empty<string>();
+
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy(corsPolicyName, policy =>
                 {
-                    policy
-                        .WithOrigins("https://zealous-plant-0981ddf03.2.azurestaticapps.net")
-                        .AllowAnyHeader()
-                        .AllowAnyMethod();
+                    if (allowedOrigins.Length > 0)
+                    {
+                        policy.WithOrigins(allowedOrigins)
+                              .AllowAnyHeader()
+                              .AllowAnyMethod();
+                    }
                 });
             });
 

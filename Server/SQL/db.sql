@@ -1,4 +1,3 @@
-CREATE DATABASE VuokraToimistot;
 
 
 -- CREATE TABLES
@@ -48,7 +47,7 @@ BEGIN
     CREATE TABLE Vat (
         vat_id INT IDENTITY PRIMARY KEY,
         vat_value DECIMAL(4, 2) NOT NULL,
-        vat_description VARCHAR(255) NOT NULL,
+        vat_description VARCHAR(255) NOT NULL
     );
 END;
 
@@ -220,10 +219,23 @@ AND TABLE_SCHEMA = 'dbo'
 BEGIN
     CREATE TABLE Users (
         userID VARCHAR(255) PRIMARY KEY,
-        userPassword VARCHAR(255) NOT NULL,
+        userPassword VARCHAR(255) NOT NULL
     );
 END;
 
+INSERT INTO Users (userID, userPassword)
+VALUES ('Testaaja', '13oIjci42/ro3xV5IfTpD3RzO0wq7ByWpruDr3vc5vw=');
+
+IF NOT EXISTS (SELECT * FROM sys.server_principals WHERE name = 'appuser')
+    CREATE LOGIN appuser WITH PASSWORD = 'f5vUhccI5Wfyj4iXXAuf';
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = 'appuser')
+    CREATE USER appuser FOR LOGIN appuser;
+GO
+
+EXEC sp_addrolemember N'db_datareader', N'appuser';
+EXEC sp_addrolemember N'db_datawriter', N'appuser';
 
 CREATE INDEX IX_Office_Devices_officeId ON Office_devices(office_id);
 CREATE INDEX IX_Office_Devices_deviceVat ON Office_devices(device_vat);
