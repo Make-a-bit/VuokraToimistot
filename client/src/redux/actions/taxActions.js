@@ -48,15 +48,19 @@ export const deleteTax = (tax) => {
         dispatch({ type: SHOW_LOADING })
         const token = localStorage.getItem("token");
         try {
-            await fetch(`${mainURI}/tax/delete/${tax.id}`, {
+            const response = await fetch(`${mainURI}/tax/delete/${tax.id}`, {
                 method: "DELETE",
                 headers: {
                     "Content-type": "application/json",
                     'Authorization': `Bearer ${token}`,
                 },
-            });
-            dispatch({ type: DELETE_TAX_SUCCESS, payload: tax })
-            dispatch({ type: SHOW_SUCCESS, payload: "Verokannan poisto onnistui!" })
+            })
+
+            if (response.ok) {
+                console.log(response)
+                dispatch({ type: DELETE_TAX_SUCCESS, payload: tax })
+                dispatch({ type: SHOW_SUCCESS, payload: "Verokannan poisto onnistui!" })
+            }
         } catch {
             dispatch({ type: SHOW_ERROR, payload: "Verokannan poisto epäonnistui!" })
         } finally {
@@ -124,6 +128,6 @@ export const fetchTaxes = () => {
     }
 }
 
-// Reasoning: The tax parameter is assumed to be an object with at least an id property for delete/edit, 
-// and possibly other properties for add / edit.The thunk actions return a function that takes dispatch 
+// Reasoning: The tax parameter is assumed to be an object with at least an id property for delete/edit,
+// and possibly other properties for add / edit.The thunk actions return a function that takes dispatch
 // and returns a Promise <void>.
