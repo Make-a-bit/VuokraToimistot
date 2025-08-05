@@ -6,7 +6,7 @@ VuokraToimistot oli alun perin kouluprojekti vuonna 2024, joka toteutettiin ryhm
 
 Toimintaa varten yritys tarvitsi keskitetyn varaus- ja asiakashallintajärjestelmän, jonka tavoitteena on mahdollistaa reaaliaikainen toimipisteiden varaustilanteen seuranta ja raportointi. Alkuperäinen toteutus tehtiin WPF-sovelluksena käyttäen vesiputousmallia ja MariaDB-tietokantaa. Osana jatkokehitysehdotuksia esille tuotiin ajatus web-sovelluksen rakentamisesta ja pilvipalveluun siirtymisestä. Nykyinen sovellus on tämän kehityssuunnan ensimmäinen toteutus.
 
-Vein projektia itsenäisesti eteenpäin harrastepohjalta kesällä 2026. Sovelluksen kehitys oli paikoin haastavaa, erityisesti käyttöliittymän osalta, ja joidenkin toimintojen kanssa tuli painittua pitkään. Suunnittelun puutteet aiheuttivat lisätyötä kehitysvaiheessa, mikä johti useiden asioiden tekemiseen useampaan kertaan. Projektin aikana opettelin myös Reactin ja Reduxin käyttöä. Lopputuloksena syntyi MVP-versio, jossa API, tietokanta ja käyttöliittymä toimivat yhdessä. Sovellus on julkaistu Microsoft Azuressa seuraavilla resursseilla:
+Vein projektia itsenäisesti eteenpäin harrastepohjalta kesällä 2025. Sovelluksen kehitys oli paikoin haastavaa, erityisesti käyttöliittymän osalta, ja joidenkin toimintojen kanssa tuli painittua pitkään. Suunnittelun puutteet aiheuttivat lisätyötä kehitysvaiheessa, mikä johti useiden asioiden tekemiseen useampaan kertaan. Projektin aikana opettelin myös Reactin ja Reduxin käyttöä. Lopputuloksena syntyi MVP-versio, jossa API, tietokanta ja käyttöliittymä toimivat yhdessä. Sovellus on julkaistu Microsoft Azuressa seuraavilla resursseilla:
 
 - App Service
 - Static Web App
