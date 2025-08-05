@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Alert, Snackbar } from "@mui/material";
+import { Alert, Paper, Snackbar } from "@mui/material";
 import { fetchCustomers } from "../redux/actions/customerActions";
 import { fetchDevices } from "../redux/actions/deviceActions";
 import { fetchInvoices } from "../redux/actions/invoiceActions";
@@ -58,7 +58,66 @@ const Home = () => {
 
     return (
         <>
-            <p>This is homepage</p>
+            <Paper elevation={3} sx={{ p: 4, maxWidth: 800, margin: "32px auto" }}>
+                <h1>VuokraToimistot APP</h1>
+                <h2>Kuvaus</h2>
+                <p>VuokraToimistot oli alunperin kouluprojekti vuonna 2024, joka toteutettiin ryhmätyönä viiden hengen ryhmässä. Tehtävässä
+                    kuvitteellinen toimistotiloja vuokraava yhtiö oli laajentamassa toimintaansa yhdeltä paikkakunnalta useampaan
+                    kaupunkiin. Yhtiö tarjoaa asiakkaille eri kokoisia, kalustettuja, paikkakunnittain vaihtelevia toimistotiloja
+                    vuokralle 1-8 hengelle. Tilojen vuokra-ajat vaihtelevat yhdestä päivästä kuukausiin. Tilojen lisäksi vuokralle
+                    tarjotaan myös laitteita ja palveluja. Asiakkaita voivat olla yksittäiset työntekijät, yritykset sekä yhteisöt.
+                </p>
+
+                <p>
+                    Toimintaa varten yritys tarvitsi keskitetyn varaus- ja asiakashallintajärjestelmän, jonka tavoitteena on
+                    mahdollistaa reaaliaikainen toimipisteiden varaustilanteen seuranta ja raportointi. Tehtävä toteutettiin
+                    vesiputousmallilla WPF-sovelluksena MariaDb tietokantaan. Jatkokehitysideana esittelimme web-sovelluksen
+                    kehittämistä ja sovelluksen siirtämistä pilvipalveluun. Tämä sovellus toteuttaa tätä ideaa.
+                </p>
+
+                <p>
+                    Alkuperäisessä vaatimusmäärittelyssä sovellukseen vaadittiin selkeä raportointi sekä laskutusmahdollisuudet 
+                    (paperi/sähköposti). Tästä versiosta vaatimukset vielä puuttuvat, sillä aika loppui kesken. Edelleen jatkokehitykseen
+                    menevät siis:
+                    <ul>
+                        <li>Raportointi</li>
+                        <li>Laskutusmahdollisuus</li>
+                        <li>Logitus taustajärjestelmään</li>
+                        <li>Kielituki ja muita vähemmän tärkeitä viilauksia</li>
+                    </ul>
+                </p>
+
+                <p>
+                    Projektin toteuttaminen oli harraste kesälle 2026. Valitettavasti aivan kaikkea en saanut valmiiksi, sillä muut
+                    projektit puskivat päälle elokuun alkaessa. Sovelluksesta on kuitenkin käytettävissä MVP versio, jossa 
+                    API ja käyttöliittymä ovat toiminnassa. Sovellus on julkaistu Azuressa seuraavilla resursseilla:
+                    <ul>
+                        <li>App Service</li>
+                        <li>Static Web App</li>
+                        <li>SQL database</li>
+                    </ul>
+                </p>
+
+                <p>
+                    Ohessa vielä lyhyesti arkkitehtuuri, jonka päälle sovellus on toteutettu.<br /><br />
+                    <strong>Backend:</strong>
+                    <ul>
+                        <li>.NET 9 (ASP.NET CORE)</li>
+                        <li>RESTful API</li>
+                        <li>JWT-pohjainen autentikointi</li>
+                        <li>SQL Server tietokantayhteys</li>
+                    </ul>
+
+                    <strong>Frontend:</strong>
+                    <ul>
+                        <li>React (Single page application)</li>
+                        <li>Redux & React-Redux</li>
+                        <li>MUI (Material UI)</li>
+                        <li>Dayjs</li>
+                    </ul>
+                </p>
+            </Paper>
+
             {errorMessage &&
                 <Snackbar
                     anchorOrigin={{ horizontal: "right", vertical: "top" }}
@@ -90,7 +149,6 @@ const Home = () => {
                     </Alert>
                 </Snackbar>
             }
-
         </>
     )
 }

@@ -50,9 +50,9 @@ namespace API.Controllers
 
                 else return NotFound();
             }
-            catch
+            catch (Exception ex) 
             {
-                return BadRequest();
+                return BadRequest(ex.Message);
             }
         }
 

@@ -36,6 +36,7 @@ namespace API.Repositories
                     p.property_name, 
                     p.property_area,
                     p.property_price,
+                    v.vat_id,
                     v.vat_value,
                     o.office_name
                 FROM Office_properties p
@@ -89,6 +90,7 @@ namespace API.Repositories
                     p.property_name, 
                     p.property_area,
                     p.property_price,
+                    v.vat_id,
                     v.vat_value,
                     o.office_name
                 FROM Office_properties p

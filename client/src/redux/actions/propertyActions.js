@@ -20,7 +20,6 @@ export const addProperty = (apiEndPoint, property) => {
     return async (dispatch) => {
         dispatch({ type: SHOW_LOADING })
         const token = localStorage.getItem("token");
-        console.log(property)
         try {
             const response = await fetch(apiEndPoint, {
                 method: "POST",
@@ -35,9 +34,8 @@ export const addProperty = (apiEndPoint, property) => {
                 const createdProperty = await response.json();
                 dispatch({ type: ADD_PROPERTY_SUCCESS, payload: createdProperty })
                 dispatch({ type: SHOW_SUCCESS, payload: "Vuokratilan tallennus onnistui!" })
-            } 
+            }
         } catch (err) {
-            console.log("Error", err)
             dispatch({ type: SHOW_ERROR, payload: "Vuokratilan tallennus epäonnistui!" })
         } finally {
             dispatch({ type: HIDE_LOADING })
@@ -131,6 +129,7 @@ export const fetchProperties = (officeId) => {
             const data = await response.json();
             dispatch({ type: FETCH_PROPERTIES_SUCCESS, payload: data });
         } catch (error) {
+            console.log("Error:", error)
             dispatch({ type: SHOW_ERROR, payload: "Vuokratilojen nouto epäonnistui!" })
         } finally {
             dispatch({ type: HIDE_LOADING })

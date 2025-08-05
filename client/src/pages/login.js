@@ -150,6 +150,12 @@ const Login = () => {
     }, [loggedUser, navigate]);
 
     useEffect(() => {
+        if (usernameRef.current) {
+            usernameRef.current.focus();
+        }
+    }, []);
+
+    useEffect(() => {
         if (loginError && usernameRef.current) {
             usernameRef.current.focus();
         }
