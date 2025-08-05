@@ -61,36 +61,36 @@ const Home = () => {
             <Paper elevation={3} sx={{ p: 4, maxWidth: 800, margin: "32px auto" }}>
                 <h1>VuokraToimistot APP</h1>
                 <h2>Kuvaus</h2>
-                <p>VuokraToimistot oli alunperin kouluprojekti vuonna 2024, joka toteutettiin ryhm‰tyˆn‰ viiden hengen ryhm‰ss‰. Teht‰v‰ss‰
-                    kuvitteellinen toimistotiloja vuokraava yhtiˆ oli laajentamassa toimintaansa yhdelt‰ paikkakunnalta useampaan
-                    kaupunkiin. Yhtiˆ tarjoaa asiakkaille eri kokoisia, kalustettuja, paikkakunnittain vaihtelevia toimistotiloja
-                    vuokralle 1-8 hengelle. Tilojen vuokra-ajat vaihtelevat yhdest‰ p‰iv‰st‰ kuukausiin. Tilojen lis‰ksi vuokralle
-                    tarjotaan myˆs laitteita ja palveluja. Asiakkaita voivat olla yksitt‰iset tyˆntekij‰t, yritykset sek‰ yhteisˆt.
+                <p>VuokraToimistot oli alunperin kouluprojekti vuonna 2024, joka toteutettiin ryhm√§ty√∂n√§ viiden hengen ryhm√§ss√§. Teht√§v√§ss√§
+                    kuvitteellinen toimistotiloja vuokraava yhti√∂ oli laajentamassa toimintaansa yhdelt√§ paikkakunnalta useampaan
+                    kaupunkiin. Yhti√∂ tarjoaa asiakkaille eri kokoisia, kalustettuja, paikkakunnittain vaihtelevia toimistotiloja
+                    vuokralle 1-8 hengelle. Tilojen vuokra-ajat vaihtelevat yhdest√§ p√§iv√§st√§ kuukausiin. Tilojen lis√§ksi vuokralle
+                    tarjotaan my√∂s laitteita ja palveluja. Asiakkaita voivat olla yksitt√§iset ty√∂ntekij√§t, yritykset sek√§ yhteis√∂t.
                 </p>
 
                 <p>
-                    Toimintaa varten yritys tarvitsi keskitetyn varaus- ja asiakashallintaj‰rjestelm‰n, jonka tavoitteena on
-                    mahdollistaa reaaliaikainen toimipisteiden varaustilanteen seuranta ja raportointi. Teht‰v‰ toteutettiin
+                    Toimintaa varten yritys tarvitsi keskitetyn varaus- ja asiakashallintaj√§rjestelm√§n, jonka tavoitteena on
+                    mahdollistaa reaaliaikainen toimipisteiden varaustilanteen seuranta ja raportointi. Teht√§v√§ toteutettiin
                     vesiputousmallilla WPF-sovelluksena MariaDb tietokantaan. Jatkokehitysideana esittelimme web-sovelluksen
-                    kehitt‰mist‰ ja sovelluksen siirt‰mist‰ pilvipalveluun. T‰m‰ sovellus toteuttaa t‰t‰ ideaa.
+                    kehitt√§mist√§ ja sovelluksen siirt√§mist√§ pilvipalveluun. T√§m√§ sovellus toteuttaa t√§t√§ ideaa.
                 </p>
 
                 <p>
-                    Alkuper‰isess‰ vaatimusm‰‰rittelyss‰ sovellukseen vaadittiin selke‰ raportointi sek‰ laskutusmahdollisuudet 
-                    (paperi/s‰hkˆposti). T‰st‰ versiosta vaatimukset viel‰ puuttuvat, sill‰ aika loppui kesken. Edelleen jatkokehitykseen
-                    menev‰t siis:
+                    Alkuper√§isess√§ vaatimusm√§√§rittelyss√§ sovellukseen vaadittiin selke√§ raportointi sek√§ laskutusmahdollisuudet 
+                    (paperi/s√§hk√∂posti). T√§st√§ versiosta vaatimukset viel√§ puuttuvat, sill√§ aika loppui kesken. Edelleen jatkokehitykseen
+                    menev√§t siis:
                     <ul>
                         <li>Raportointi</li>
                         <li>Laskutusmahdollisuus</li>
-                        <li>Logitus taustaj‰rjestelm‰‰n</li>
-                        <li>Kielituki ja muita v‰hemm‰n t‰rkeit‰ viilauksia</li>
+                        <li>Logitus taustaj√§rjestelm√§√§n</li>
+                        <li>Kielituki ja muita v√§hemm√§n t√§rkeit√§ viilauksia</li>
                     </ul>
                 </p>
 
                 <p>
-                    Projektin toteuttaminen oli harraste kes‰lle 2026. Valitettavasti aivan kaikkea en saanut valmiiksi, sill‰ muut
-                    projektit puskivat p‰‰lle elokuun alkaessa. Sovelluksesta on kuitenkin k‰ytett‰viss‰ MVP versio, jossa 
-                    API ja k‰yttˆliittym‰ ovat toiminnassa. Sovellus on julkaistu Azuressa seuraavilla resursseilla:
+                    Projektin toteuttaminen oli harraste kes√§lle 2026. Valitettavasti aivan kaikkea en saanut valmiiksi, sill√§ muut
+                    projektit puskivat p√§√§lle elokuun alkaessa. Sovelluksesta on kuitenkin k√§ytett√§viss√§ MVP versio, jossa 
+                    API ja k√§ytt√∂liittym√§ ovat toiminnassa. Sovellus on julkaistu Azuressa seuraavilla resursseilla:
                     <ul>
                         <li>App Service</li>
                         <li>Static Web App</li>
@@ -99,7 +99,7 @@ const Home = () => {
                 </p>
 
                 <p>
-                    Ohessa viel‰ lyhyesti arkkitehtuuri, jonka p‰‰lle sovellus on toteutettu.<br /><br />
+                    Ohessa viel√§ lyhyesti arkkitehtuuri, jonka p√§√§lle sovellus on toteutettu.<br /><br />
                     <strong>Backend:</strong>
                     <ul>
                         <li>.NET 9 (ASP.NET CORE)</li>

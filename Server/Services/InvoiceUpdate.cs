@@ -33,7 +33,7 @@ namespace API.Services
                 UPDATE Invoices
                 SET 
                     invoice_date = @iDate,
-                    invoice_duedate = @dDate,
+                    invoice_due_date = @dDate,
                     invoice_paid = @paid
                 WHERE invoice_id = @id", 
                 conn, transaction);

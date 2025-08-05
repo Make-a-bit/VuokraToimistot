@@ -88,7 +88,7 @@ namespace API.Services
                     reservation_id,
                     customer_id,
                     invoice_date,
-                    invoice_duedate,
+                    invoice_due_date,
                     invoice_subtotal,
                     invoice_discounts,
                     invoice_vattotal,
