@@ -1,4 +1,4 @@
-/** mainURI is a string representing the base URI for the application.
+/** mainURI is a string representing the base URI for the application..
  * 
  * @type {string}
  */
