@@ -76,7 +76,7 @@ const Home = () => {
                 </p>
 
                 <p>
-                    Vein projektia itsenäisesti eteenpäin harrastepohjalta kesällä 2026. Sovelluksen kehitys oli paikoin haastavaa, erityisesti
+                    Vein projektia itsenäisesti eteenpäin harrastepohjalta kesällä 2025. Sovelluksen kehitys oli paikoin haastavaa, erityisesti
                     käyttöliittymän osalta, ja joidenkin toimintojen kanssa tuli painittua pitkään. Suunnittelun puutteet aiheuttivat lisätyötä
                     kehitysvaiheessa, mikä johti useiden asioiden tekemiseen useampaan kertaan. Projektin aikana opettelin myös Reactin ja Reduxin
                     käyttöä. Lopputuloksena syntyi MVP-versio, jossa API, tietokanta ja käyttöliittymä toimivat yhdessä. Sovellus on julkaistu
@@ -89,9 +89,9 @@ const Home = () => {
                 </p>
 
                 <p>
-                    Alkuperäisessä vaatimusmäärittelyssä sovellukseen vaadittiin selkeä raportointi sekä laskutusmahdollisuudet
-                    (paperi/sähköposti). Kaikkea en kuitenkaan ehtinyt toteuttamaan valmiiksi, sillä
-                    elokuun alkaessa muut projektit veivät ajan. Seuraavat kehityskohteet ovat edelleen työn alla:
+                    Alkuperäisessä vaatimusmäärittelyssä sovellukselta edellytettiin selkeää raportointia sekä laskutusmahdollisuuksia
+                    (paperi/sähköposti). Kaikkea en kuitenkaan ehtinyt toteuttaa valmiiksi, sillä elokuun alkaessa muut projektit veivät
+                    käytettävissä olevan ajan. Sovelluksen jatkokehityslistalla on mm:
                     <ul>
                         <li>Raportointi</li>
                         <li>Laskutusmahdollisuus</li>
@@ -100,8 +100,8 @@ const Home = () => {
                     </ul>
                 </p>
 
+                    <h3>Arkkitehtuuri</h3>
                 <p>
-                    Ohessa vielä lyhyesti arkkitehtuuri, jonka päälle sovellus on toteutettu.<br /><br />
                     <strong>Backend:</strong>
                     <ul>
                         <li>.NET 9 (ASP.NET CORE)</li>
