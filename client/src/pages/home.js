@@ -118,10 +118,9 @@ const Home = () => {
                         <li>Dayjs</li>
                     </ul>
 
-                    <strong>Projektin- ja versionhallinta</strong>
                     <ul>
-                        <li><strong>Projektinhallinta:</strong> Azure DevOps</li>
-                        <li><strong>Versionhallinta:</strong> Git</li>
+                        <li>Projektinhallinta: Azure DevOps</li>
+                        <li>Versionhallinta: Git</li>
                     </ul>
                 </p>
             </Paper>
