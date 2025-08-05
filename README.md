@@ -12,7 +12,9 @@ Vein projektia itsenäisesti eteenpäin harrastepohjalta kesällä 2026. Sovellu
 - Static Web App
 - SQL database
 
-Alkuperäisessä vaatimusmäärittelyssä sovellukseen vaadittiin selkeä raportointi sekä laskutusmahdollisuudet (paperi/sähköposti). Kaikkea en kuitenkaan ehtinyt toteuttamaan valmiiksi, sillä elokuun alkaessa muut projektit veivät ajan. Seuraavat kehityskohteet ovat edelleen työn alla:
+Alkuperäisessä vaatimusmäärittelyssä sovellukselta edellytettiin selkeää raportointia sekä laskutusmahdollisuuksia
+(paperi/sähköposti). Kaikkea en kuitenkaan ehtinyt toteuttaa valmiiksi, sillä elokuun alkaessa muut projektit veivät
+käytettävissä olevan ajan. Sovelluksen jatkokehityslistalla on mm:
 
 - Raportointi
 - Laskutusmahdollisuus
