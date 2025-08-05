@@ -117,6 +117,12 @@ const Home = () => {
                         <li>MUI (Material UI)</li>
                         <li>Dayjs</li>
                     </ul>
+
+                    <strong>Projektin- ja versionhallinta</strong>
+                    <ul>
+                        <li><strong>Projektinhallinta:</strong> Azure DevOps</li>
+                        <li><strong>Versionhallinta:</strong> Git</li>
+                    </ul>
                 </p>
             </Paper>
 
