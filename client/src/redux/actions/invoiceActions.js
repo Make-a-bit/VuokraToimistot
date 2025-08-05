@@ -89,11 +89,13 @@ export const fetchInvoices = () => {
             if (response.ok) {
                 const data = await response.json();
                 dispatch({ type: FETCH_INVOICES_SUCCESS, payload: data })
-            } else {
+            }
+            /* else {
                 const errorText = await response.text();
                 console.error('Invoice fetch error:', errorText);
                 throw new Error(errorText);
             }
+            */
         } catch {
             dispatch({ type: SHOW_ERROR, payload: "Laskujen nouto epäonnistui!" })
         } finally {

@@ -73,7 +73,7 @@ namespace API.Repositories
         public async Task<List<Invoice>> GetAllInvoicesAsync()
         {
             var invoices = new List<Invoice>();
-
+            
             try
             {
                 using var conn = _dbManager.GetConnection();
@@ -85,7 +85,7 @@ namespace API.Repositories
                     i.reservation_id,
                     i.customer_id,
                     i.invoice_date,
-                    i.invoice_duedate,
+                    i.invoice_due_date,
                     i.invoice_subtotal,
                     i.invoice_discounts,
                     i.invoice_vattotal,
@@ -99,13 +99,14 @@ namespace API.Repositories
                 while (await reader.ReadAsync())
                 {
                     var invoice = new Invoice();
+                    invoice.Customer = new Customer();
 
                     invoice.Id = reader.GetInt32(reader.GetOrdinal("invoice_id"));
                     invoice.ReservationId = reader.GetInt32(reader.GetOrdinal("reservation_id"));
                     invoice.Customer.Id = reader.GetInt32(reader.GetOrdinal("customer_id"));
                     invoice.Customer.Name = reader.GetString(reader.GetOrdinal("customer_name"));
                     invoice.InvoiceDate = DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("invoice_date")));
-                    invoice.DueDate = DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("invoice_duedate")));
+                    invoice.DueDate = DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("invoice_due_date")));
                     invoice.SubTotal = reader.GetDecimal(reader.GetOrdinal("invoice_subtotal"));
                     invoice.Discounts = reader.GetDecimal(reader.GetOrdinal("invoice_discounts"));
                     invoice.VatTotal = reader.GetDecimal(reader.GetOrdinal("invoice_vattotal"));
